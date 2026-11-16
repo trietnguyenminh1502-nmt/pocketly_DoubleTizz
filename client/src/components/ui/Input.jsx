@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { cn } from '../../utils/cn';
 
 export const Input = React.forwardRef(
-  ({ label, error, helperText, icon: Icon, className = '', containerClassName = '', ...props }, ref) => {
+  ({ id, label, error, helperText, icon: Icon, className = '', containerClassName = '', ...props }, ref) => {
+    const generatedId = useId();
+    const inputId = id || (label ? `input-${generatedId}` : undefined);
+
     return (
       <div className={cn('flex flex-col gap-1.5 w-full', containerClassName)}>
         {label && (
-          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70">
+          <label
+            htmlFor={inputId}
+            className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70"
+          >
             {label}
           </label>
         )}
@@ -17,6 +23,7 @@ export const Input = React.forwardRef(
             </div>
           )}
           <input
+            id={inputId}
             ref={ref}
             className={cn(
               'w-full bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark border border-border-light dark:border-border-dark rounded-16 px-4 py-2.5 text-sm transition-all outline-none focus:border-primary dark:focus:border-lime focus:ring-2 focus:ring-primary/10 dark:focus:ring-lime/10 placeholder:text-ink-muted/50 disabled:opacity-50',
@@ -36,15 +43,22 @@ export const Input = React.forwardRef(
 Input.displayName = 'Input';
 
 export const Select = React.forwardRef(
-  ({ label, error, options = [], className = '', containerClassName = '', children, ...props }, ref) => {
+  ({ id, label, error, options = [], className = '', containerClassName = '', children, ...props }, ref) => {
+    const generatedId = useId();
+    const selectId = id || (label ? `select-${generatedId}` : undefined);
+
     return (
       <div className={cn('flex flex-col gap-1.5 w-full', containerClassName)}>
         {label && (
-          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70">
+          <label
+            htmlFor={selectId}
+            className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70"
+          >
             {label}
           </label>
         )}
         <select
+          id={selectId}
           ref={ref}
           className={cn(
             'w-full bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark border border-border-light dark:border-border-dark rounded-16 px-4 py-2.5 text-sm transition-all outline-none focus:border-primary dark:focus:border-lime focus:ring-2 focus:ring-primary/10 dark:focus:ring-lime/10',
@@ -69,15 +83,22 @@ export const Select = React.forwardRef(
 Select.displayName = 'Select';
 
 export const Textarea = React.forwardRef(
-  ({ label, error, helperText, className = '', containerClassName = '', rows = 3, ...props }, ref) => {
+  ({ id, label, error, helperText, className = '', containerClassName = '', rows = 3, ...props }, ref) => {
+    const generatedId = useId();
+    const textareaId = id || (label ? `textarea-${generatedId}` : undefined);
+
     return (
       <div className={cn('flex flex-col gap-1.5 w-full', containerClassName)}>
         {label && (
-          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70">
+          <label
+            htmlFor={textareaId}
+            className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70"
+          >
             {label}
           </label>
         )}
         <textarea
+          id={textareaId}
           ref={ref}
           rows={rows}
           className={cn(
