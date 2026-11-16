@@ -19,6 +19,7 @@ import budgetRoutes from './routes/budget.routes.js';
 import savingGoalRoutes from './routes/savingGoal.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import reportRoutes from './routes/report.routes.js';
+import chatbotRoutes from './routes/chatbot.routes.js';
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/v1/budgets', budgetRoutes);
 app.use('/api/v1/saving-goals', savingGoalRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/reports', reportRoutes);
+app.use('/api/v1/chat', chatbotRoutes);
 
 // 404 Handler
 app.use((req, res) => {
