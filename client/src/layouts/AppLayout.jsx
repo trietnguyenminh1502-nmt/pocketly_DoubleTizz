@@ -15,7 +15,9 @@ import {
   ChevronRight,
   LogOut,
   User,
-  ShieldAlert
+  ShieldAlert,
+  BarChart3,
+  Tags
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -30,6 +32,8 @@ export const AppLayout = () => {
     { name: 'Ví tiền', href: '/wallets', icon: Wallet },
     { name: 'Ngân sách', href: '/budgets', icon: PiggyBank },
     { name: 'Tiết kiệm', href: '/goals', icon: Target },
+    { name: 'Báo cáo', href: '/reports', icon: BarChart3 },
+    { name: 'Danh mục', href: '/categories', icon: Tags },
     { name: 'AI Chatbot', href: '/chat', icon: Bot }
   ];
 
