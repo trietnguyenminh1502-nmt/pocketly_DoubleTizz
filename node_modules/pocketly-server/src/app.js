@@ -4,7 +4,9 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import swaggerUi from 'swagger-ui-express';
 import { config } from './config/index.js';
+import { swaggerDocument } from './config/swagger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { errorResponse } from './utils/response.js';
 
@@ -20,11 +22,16 @@ import savingGoalRoutes from './routes/savingGoal.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 const app = express();
 
-// Security middlewares
-app.use(helmet());
+// Security middlewares (cho phép nạp tài nguyên swagger UI an toàn)
+app.use(
+  helmet({
+    contentSecurityPolicy: false
+  })
+);
 app.use(
   cors({
     origin: config.clientUrl,
@@ -55,6 +62,9 @@ app.use('/api', apiLimiter);
 // Serve static upload files (avatars)
 app.use('/uploads', express.static(path.resolve('uploads')));
 
+// Swagger API Documentation (Tài liệu OpenAPI 3.0)
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 // Base API v1 Routes
 app.use('/api/v1', healthRoutes);
 app.use('/api/v1/auth', authRoutes);
@@ -67,6 +77,7 @@ app.use('/api/v1/saving-goals', savingGoalRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/chat', chatbotRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // 404 Handler
 app.use((req, res) => {
