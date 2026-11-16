@@ -52,10 +52,14 @@ Test health check:
 curl http://localhost:5000/api/v1/health
 ```
 
+### 📖 API Documentation (Swagger UI)
+Truy cập tài liệu API trực quan tại:
+👉 `http://localhost:5000/api/docs`
+
 ### 👤 Demo Credentials after Seeding
 - **Admin**: `admin@pocketly.com` / `Admin@123` (Role: ADMIN)
-- **Demo User 1**: `user1@pocketly.com` / `User@123` (~150 realistic student transactions)
-- **Demo User 2**: `user2@pocketly.com` / `User@123` (~150 realistic student transactions)
+- **Demo User 1**: `user1@pocketly.com` / `User@123` (~160 realistic student transactions)
+- **Demo User 2**: `user2@pocketly.com` / `User@123` (~160 realistic student transactions)
 
 ### 4. Setup Client
 ```bash
