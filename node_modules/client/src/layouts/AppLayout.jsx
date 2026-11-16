@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ThemeToggle, Avatar, Dropdown } from '../components/ui';
+import { NotificationBellDropdown } from '../components/notifications/NotificationBellDropdown';
+import { FloatingChatWidget } from '../components/chat/FloatingChatWidget';
 import {
   LayoutDashboard,
   ReceiptText,
@@ -126,15 +128,8 @@ export const AppLayout = () => {
           </div>
 
           <div className="flex items-center gap-3 ml-auto">
-            {/* Notification Bell */}
-            <Link
-              to="/notifications"
-              className="p-2.5 rounded-full border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark hover:scale-105 transition-all shadow-soft relative"
-              aria-label="Thông báo"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="w-2 h-2 rounded-full bg-tangerine absolute top-2 right-2" />
-            </Link>
+            {/* Notification Bell Dropdown */}
+            <NotificationBellDropdown />
 
             {/* Theme Toggle */}
             <ThemeToggle />
@@ -155,6 +150,9 @@ export const AppLayout = () => {
         <main className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
+
+        {/* Floating Chatbot Widget on Every App Page */}
+        <FloatingChatWidget />
 
         {/* Mobile Bottom Navigation Bar */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border-t border-border-light dark:border-border-dark flex items-center justify-around py-2 px-1">

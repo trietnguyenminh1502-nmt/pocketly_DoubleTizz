@@ -29,6 +29,9 @@ import { WalletsPage } from './pages/WalletsPage';
 import { BudgetsPage } from './pages/BudgetsPage';
 import { SavingGoalsPage } from './pages/SavingGoalsPage';
 import { ReportsPage } from './pages/ReportsPage';
+import { ChatPage } from './pages/ChatPage';
+import { NotificationsPage } from './pages/NotificationsPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { DashboardPlaceholder, AdminPlaceholder } from './pages/Placeholders';
 
 // Khởi tạo React Query Client
@@ -75,9 +78,9 @@ export default function App() {
                     <Route path="/budgets" element={<BudgetsPage />} />
                     <Route path="/goals" element={<SavingGoalsPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
-                    <Route path="/chat" element={<DashboardPlaceholder />} />
-                    <Route path="/notifications" element={<DashboardPlaceholder />} />
-                    <Route path="/profile" element={<DashboardPlaceholder />} />
+                    <Route path="/chat" element={<ChatPage />} />
+                    <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
                   </Route>
                 </Route>
 
