@@ -22,6 +22,8 @@ import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import { VerifyEmailPage } from './pages/auth/VerifyEmailPage';
 import { NotFoundPage, ForbiddenPage, LegalPage } from './pages/StaticPages';
 import { DesignPreviewPage } from './pages/DesignPreviewPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { TransactionsPage } from './pages/TransactionsPage';
 import { DashboardPlaceholder, AdminPlaceholder } from './pages/Placeholders';
 
 // Khởi tạo React Query Client
@@ -61,8 +63,8 @@ export default function App() {
                 {/* 3. Protected User App Routes */}
                 <Route element={<ProtectedRoute />}>
                   <Route element={<AppLayout />}>
-                    <Route path="/dashboard" element={<DashboardPlaceholder />} />
-                    <Route path="/transactions" element={<DashboardPlaceholder />} />
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/transactions" element={<TransactionsPage />} />
                     <Route path="/wallets" element={<DashboardPlaceholder />} />
                     <Route path="/budgets" element={<DashboardPlaceholder />} />
                     <Route path="/goals" element={<DashboardPlaceholder />} />
