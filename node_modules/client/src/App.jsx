@@ -32,7 +32,11 @@ import { ReportsPage } from './pages/ReportsPage';
 import { ChatPage } from './pages/ChatPage';
 import { NotificationsPage } from './pages/NotificationsPage';
 import { ProfilePage } from './pages/ProfilePage';
-import { DashboardPlaceholder, AdminPlaceholder } from './pages/Placeholders';
+import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
+import { AdminUsersPage } from './pages/admin/AdminUsersPage';
+import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
+import { AdminChatbotPage } from './pages/admin/AdminChatbotPage';
+import { AdminAuditLogsPage } from './pages/admin/AdminAuditLogsPage';
 
 // Khởi tạo React Query Client
 const queryClient = new QueryClient({
@@ -87,8 +91,11 @@ export default function App() {
                 {/* 4. Protected Admin Routes */}
                 <Route element={<AdminRoute />}>
                   <Route element={<AdminLayout />}>
-                    <Route path="/admin" element={<AdminPlaceholder />} />
-                    <Route path="/admin/*" element={<AdminPlaceholder />} />
+                    <Route path="/admin" element={<AdminDashboardPage />} />
+                    <Route path="/admin/users" element={<AdminUsersPage />} />
+                    <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+                    <Route path="/admin/chatbot" element={<AdminChatbotPage />} />
+                    <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
                   </Route>
                 </Route>
 
