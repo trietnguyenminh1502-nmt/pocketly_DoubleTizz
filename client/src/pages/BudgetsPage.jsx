@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { budgetApi, categoryApi } from '../api/finance';
+import { budgetApi, categoryApi } from '@/api/finance';
 import {
   Card,
   CardHeader,
@@ -15,7 +15,7 @@ import {
   Skeleton,
   EmptyState,
   useToast
-} from '../components/ui';
+} from '@/components/ui';
 import {
   PiggyBank,
   Plus,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChatInterface } from './ChatInterface';
+import { ChatInterface } from '@/components/chat/ChatInterface';
 import { Bot, X } from 'lucide-react';
 
 export const FloatingChatWidget = () => {

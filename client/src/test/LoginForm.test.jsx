@@ -2,11 +2,11 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { LoginPage } from '../pages/auth/LoginPage';
+import { LoginPage } from '@/pages/auth/LoginPage';
 
 // Mock AuthContext
 const mockLogin = vi.fn();
-vi.mock('../context/AuthContext', () => ({
+vi.mock('@/context/AuthContext', () => ({
   useAuth: () => ({
     login: mockLogin,
     user: null
@@ -15,7 +15,7 @@ vi.mock('../context/AuthContext', () => ({
 
 // Mock Toast
 const mockAddToast = vi.fn();
-vi.mock('../components/ui', async (importOriginal) => {
+vi.mock('@/components/ui', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,

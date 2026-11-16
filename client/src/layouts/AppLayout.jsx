@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { ThemeToggle, Avatar, Dropdown } from '../components/ui';
-import { NotificationBellDropdown } from '../components/notifications/NotificationBellDropdown';
-import { FloatingChatWidget } from '../components/chat/FloatingChatWidget';
+import { useAuth } from '@/context/AuthContext';
+import { ThemeToggle, Avatar, Dropdown } from '@/components/ui';
+import { NotificationBellDropdown } from '@/components/notifications/NotificationBellDropdown';
+import { FloatingChatWidget } from '@/components/chat/FloatingChatWidget';
 import {
   LayoutDashboard,
   ReceiptText,
@@ -21,7 +21,7 @@ import {
   BarChart3,
   Tags
 } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { cn } from '@/utils/cn';
 
 export const AppLayout = () => {
   const { user, logout, isAdmin } = useAuth();

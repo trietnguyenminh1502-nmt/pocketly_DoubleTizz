@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { authApi } from '../../api/auth';
-import { AuthSplitLayout } from '../../layouts/AuthSplitLayout';
-import { Input, Button, useToast } from '../../components/ui';
+import { authApi } from '@/api/auth';
+import { AuthSplitLayout } from '@/layouts/AuthSplitLayout';
+import { Input, Button, useToast } from '@/components/ui';
 import { Lock, Check } from 'lucide-react';
 
 export const ResetPasswordPage = () => {

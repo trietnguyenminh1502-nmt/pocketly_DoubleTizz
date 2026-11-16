@@ -26,7 +26,7 @@ import {
   Money,
   ThemeToggle,
   useToast
-} from '../components/ui';
+} from '@/components/ui';
 import {
   Wallet,
   Sparkles,

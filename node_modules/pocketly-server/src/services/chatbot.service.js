@@ -192,12 +192,13 @@ ${financialContext}
       ]);
 
       assistantReply = response.text || 'Xin lỗi, mình chưa kịp phân tích câu hỏi của bạn. Bạn thử hỏi lại nhé!';
-    } catch (apiError) {
-      console.error('❌ Lỗi gọi Gemini API:', apiError.message);
-      if (apiError.message.includes('API_KEY')) {
+    } catch (error) {
+      console.error(error.status, error.message, error?.response?.data);
+      console.error('❌ Lỗi gọi Gemini API:', error.message);
+      if (error.message.includes('API_KEY')) {
         assistantReply =
           '⚠️ Chatbot chưa thể kết nối do hệ thống chưa cấu hình Gemini API Key hợp lệ trong file .env. Vui lòng liên hệ quản trị viên!';
-      } else if (apiError.message.includes('Timeout')) {
+      } else if (error.message.includes('Timeout')) {
         assistantReply =
           '⏱️ Máy chủ AI phản hồi hơi lâu do mạng bận. Bạn vui lòng thử gửi lại câu hỏi sau vài giây nhé!';
       } else {

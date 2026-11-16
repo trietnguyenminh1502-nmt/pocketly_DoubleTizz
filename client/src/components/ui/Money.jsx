@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 /**
  * Component hiển thị tiền tệ định dạng chuẩn Intl.NumberFormat

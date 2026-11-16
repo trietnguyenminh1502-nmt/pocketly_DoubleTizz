@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { ThemeToggle, Button } from '../components/ui';
+import { ThemeToggle, Button } from '@/components/ui';
 
 export const PublicLayout = () => {
   return (

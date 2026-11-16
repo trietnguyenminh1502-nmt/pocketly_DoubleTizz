@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { authApi } from '../../api/auth';
-import { AuthSplitLayout } from '../../layouts/AuthSplitLayout';
-import { Button } from '../../components/ui';
+import { authApi } from '@/api/auth';
+import { AuthSplitLayout } from '@/layouts/AuthSplitLayout';
+import { Button } from '@/components/ui';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
 export const VerifyEmailPage = () => {

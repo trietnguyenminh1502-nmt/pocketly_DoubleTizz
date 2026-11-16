@@ -2,8 +2,8 @@ import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ToastProvider } from '../components/ui/Toast';
-import { TransactionFormModal } from '../components/finance/TransactionFormModal';
+import { ToastProvider } from '@/components/ui/Toast';
+import { TransactionFormModal } from '@/components/finance/TransactionFormModal';
 
 const mockCategories = [
   { id: 'cat-1', name: 'Ăn uống', type: 'EXPENSE', icon: 'Utensils', color: '#FF6A2B' },

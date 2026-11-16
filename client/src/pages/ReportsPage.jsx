@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { reportApi } from '../api/finance';
+import { reportApi } from '@/api/finance';
 import {
   Card,
   CardHeader,
@@ -10,7 +10,7 @@ import {
   Skeleton,
   EmptyState,
   useToast
-} from '../components/ui';
+} from '@/components/ui';
 import {
   FileSpreadsheet,
   TrendingUp,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 export const Tabs = ({ tabs = [], activeTab, onChange, className = '' }) => {
   return (

@@ -1,42 +1,42 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from './context/ThemeContext';
-import { ToastProvider } from './components/ui/Toast';
-import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { ToastProvider } from '@/components/ui/Toast';
+import { AuthProvider } from '@/context/AuthContext';
 
 // Layouts
-import { PublicLayout } from './layouts/PublicLayout';
-import { AppLayout } from './layouts/AppLayout';
-import { AdminLayout } from './layouts/AdminLayout';
+import { PublicLayout } from '@/layouts/PublicLayout';
+import { AppLayout } from '@/layouts/AppLayout';
+import { AdminLayout } from '@/layouts/AdminLayout';
 
 // Guards
-import { ProtectedRoute, AdminRoute } from './routes/GuardRoutes';
+import { ProtectedRoute, AdminRoute } from '@/routes/GuardRoutes';
 
 // Pages
-import { LandingPage } from './pages/LandingPage';
-import { LoginPage } from './pages/auth/LoginPage';
-import { RegisterPage } from './pages/auth/RegisterPage';
-import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
-import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
-import { VerifyEmailPage } from './pages/auth/VerifyEmailPage';
-import { NotFoundPage, ForbiddenPage, LegalPage } from './pages/StaticPages';
-import { DesignPreviewPage } from './pages/DesignPreviewPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { TransactionsPage } from './pages/TransactionsPage';
-import { CategoriesPage } from './pages/CategoriesPage';
-import { WalletsPage } from './pages/WalletsPage';
-import { BudgetsPage } from './pages/BudgetsPage';
-import { SavingGoalsPage } from './pages/SavingGoalsPage';
-import { ReportsPage } from './pages/ReportsPage';
-import { ChatPage } from './pages/ChatPage';
-import { NotificationsPage } from './pages/NotificationsPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
-import { AdminUsersPage } from './pages/admin/AdminUsersPage';
-import { AdminCategoriesPage } from './pages/admin/AdminCategoriesPage';
-import { AdminChatbotPage } from './pages/admin/AdminChatbotPage';
-import { AdminAuditLogsPage } from './pages/admin/AdminAuditLogsPage';
+import { LandingPage } from '@/pages/LandingPage';
+import { LoginPage } from '@/pages/auth/LoginPage';
+import { RegisterPage } from '@/pages/auth/RegisterPage';
+import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
+import { VerifyEmailPage } from '@/pages/auth/VerifyEmailPage';
+import { NotFoundPage, ForbiddenPage, LegalPage } from '@/pages/StaticPages';
+import { DesignPreviewPage } from '@/pages/DesignPreviewPage';
+import { DashboardPage } from '@/pages/DashboardPage';
+import { TransactionsPage } from '@/pages/TransactionsPage';
+import { CategoriesPage } from '@/pages/CategoriesPage';
+import { WalletsPage } from '@/pages/WalletsPage';
+import { BudgetsPage } from '@/pages/BudgetsPage';
+import { SavingGoalsPage } from '@/pages/SavingGoalsPage';
+import { ReportsPage } from '@/pages/ReportsPage';
+import { ChatPage } from '@/pages/ChatPage';
+import { NotificationsPage } from '@/pages/NotificationsPage';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { AdminDashboardPage } from '@/pages/admin/AdminDashboardPage';
+import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
+import { AdminCategoriesPage } from '@/pages/admin/AdminCategoriesPage';
+import { AdminChatbotPage } from '@/pages/admin/AdminChatbotPage';
+import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage';
 
 // Khởi tạo React Query Client
 const queryClient = new QueryClient({

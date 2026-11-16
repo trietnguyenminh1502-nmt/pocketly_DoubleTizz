@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import { userApi } from '../api/chatNotificationUser';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import { userApi } from '@/api/chatNotificationUser';
 import {
   Card,
   CardHeader,
@@ -13,7 +13,7 @@ import {
   Modal,
   ConfirmDialog,
   useToast
-} from '../components/ui';
+} from '@/components/ui';
 import {
   User,
   Lock,

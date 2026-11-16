@@ -1,5 +1,5 @@
 import React, { useId } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 export const Input = React.forwardRef(
   ({ id, label, error, helperText, icon: Icon, className = '', containerClassName = '', ...props }, ref) => {

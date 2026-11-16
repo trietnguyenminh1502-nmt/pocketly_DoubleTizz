@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { authApi } from '../../api/auth';
-import { AuthSplitLayout } from '../../layouts/AuthSplitLayout';
-import { Input, Button } from '../../components/ui';
+import { authApi } from '@/api/auth';
+import { AuthSplitLayout } from '@/layouts/AuthSplitLayout';
+import { Input, Button } from '@/components/ui';
 import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export const ForgotPasswordPage = () => {

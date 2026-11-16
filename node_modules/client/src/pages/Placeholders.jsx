@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { Card, CardHeader, Money, Button } from '../components/ui';
+import { useAuth } from '@/context/AuthContext';
+import { Card, CardHeader, Money, Button } from '@/components/ui';
 import { Plus, ArrowUpRight, ArrowDownLeft, Wallet, Bot } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { reportApi, budgetApi, savingGoalApi, transactionApi, categoryApi, walletApi } from '../api/finance';
-import { Card, CardHeader, Money, Button, ProgressBar, Badge, Skeleton, EmptyState } from '../components/ui';
-import { TransactionFormModal } from '../components/finance/TransactionFormModal';
+import { reportApi, budgetApi, savingGoalApi, transactionApi, categoryApi, walletApi } from '@/api/finance';
+import { Card, CardHeader, Money, Button, ProgressBar, Badge, Skeleton, EmptyState } from '@/components/ui';
+import { TransactionFormModal } from '@/components/finance/TransactionFormModal';
 import {
   ResponsiveContainer,
   PieChart,

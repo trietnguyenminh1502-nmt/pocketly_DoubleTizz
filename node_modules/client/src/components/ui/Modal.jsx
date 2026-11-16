@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, AlertTriangle } from 'lucide-react';
-import { Button } from './Button';
-import { cn } from '../../utils/cn';
+import { Button } from '@/components/ui/Button';
+import { cn } from '@/utils/cn';
 
 export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-md', className = '' }) => {
   useEffect(() => {

@@ -3,8 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { transactionApi } from '../../api/finance';
-import { Modal, Button, Input, Select, Textarea, useToast } from '../ui';
+import { transactionApi } from '@/api/finance';
+import { Modal, Button, Input, Select, Textarea, useToast } from '@/components/ui';
 import { Plus, Edit2 } from 'lucide-react';
 
 const transactionSchema = z.object({

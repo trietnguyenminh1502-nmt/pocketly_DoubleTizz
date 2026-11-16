@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 export const Dropdown = ({ trigger, items = [], align = 'right', className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);

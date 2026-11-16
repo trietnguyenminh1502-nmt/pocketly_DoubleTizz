@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { adminApi } from '../../api/admin';
+import { adminApi } from '@/api/admin';
 import {
   Card,
   CardHeader,
@@ -14,7 +14,7 @@ import {
   Skeleton,
   EmptyState,
   Avatar
-} from '../../components/ui';
+} from '@/components/ui';
 import {
   Bot,
   MessageSquare,

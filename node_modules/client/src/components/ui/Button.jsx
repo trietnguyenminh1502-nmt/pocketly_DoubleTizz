@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 /**
  * Reusable Button Component (Pill buttons, không dùng default blue)

@@ -1,4 +1,4 @@
-import { api } from './axios';
+import { api } from '@/api/axios';
 
 export const authApi = {
   login: (credentials) => api.post('/auth/login', credentials),

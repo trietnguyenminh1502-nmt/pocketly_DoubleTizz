@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { transactionApi, categoryApi, walletApi } from '../api/finance';
+import { transactionApi, categoryApi, walletApi } from '@/api/finance';
 import {
   Card,
   CardHeader,
@@ -20,8 +20,8 @@ import {
   EmptyState,
   ConfirmDialog,
   useToast
-} from '../components/ui';
-import { TransactionFormModal } from '../components/finance/TransactionFormModal';
+} from '@/components/ui';
+import { TransactionFormModal } from '@/components/finance/TransactionFormModal';
 import {
   Search,
   Plus,

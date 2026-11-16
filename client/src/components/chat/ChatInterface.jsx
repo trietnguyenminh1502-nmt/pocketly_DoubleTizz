@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ReactMarkdown from 'react-markdown';
-import { chatApi } from '../api/chatNotificationUser';
-import { Button, Input, Skeleton, useToast } from '../components/ui';
+import { chatApi } from '@/api/chatNotificationUser';
+import { Button, Input, Skeleton, useToast } from '@/components/ui';
 import {
   Bot,
   Send,

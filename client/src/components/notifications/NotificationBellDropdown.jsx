@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { notificationApi } from '../../api/chatNotificationUser';
+import { notificationApi } from '@/api/chatNotificationUser';
 import { Bell, Check, CheckCheck, Trash2, Info, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

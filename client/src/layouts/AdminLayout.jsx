@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { ThemeToggle, Avatar } from '../components/ui';
+import { useAuth } from '@/context/AuthContext';
+import { ThemeToggle, Avatar } from '@/components/ui';
 import {
   LayoutDashboard,
   Users,
@@ -11,7 +11,7 @@ import {
   ArrowLeft,
   LogOut
 } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { cn } from '@/utils/cn';
 
 export const AdminLayout = () => {
   const { user, logout } = useAuth();

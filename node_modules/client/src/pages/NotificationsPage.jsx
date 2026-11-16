@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { notificationApi } from '../api/chatNotificationUser';
+import { notificationApi } from '@/api/chatNotificationUser';
 import {
   Card,
   CardHeader,
@@ -10,7 +10,7 @@ import {
   Skeleton,
   EmptyState,
   useToast
-} from '../components/ui';
+} from '@/components/ui';
 import {
   Bell,
   CheckCheck,

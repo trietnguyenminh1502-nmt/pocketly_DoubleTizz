@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '../components/ui';
+import { Button } from '@/components/ui';
 import { Home, ArrowLeft } from 'lucide-react';
 
 export const NotFoundPage = () => {

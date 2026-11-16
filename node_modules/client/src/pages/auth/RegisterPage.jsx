@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { AuthSplitLayout } from '../../layouts/AuthSplitLayout';
-import { Input, Button, useToast, ProgressBar } from '../../components/ui';
+import { useAuth } from '@/context/AuthContext';
+import { AuthSplitLayout } from '@/layouts/AuthSplitLayout';
+import { Input, Button, useToast, ProgressBar } from '@/components/ui';
 import { Mail, Lock, User, UserPlus, Check, X } from 'lucide-react';
 
 export const RegisterPage = () => {
