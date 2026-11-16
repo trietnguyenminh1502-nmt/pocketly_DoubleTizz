@@ -1,0 +1,24 @@
+{
+  "name": "pocketly-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pocketly - Student Expense Tracker with AI Chatbot",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "lint": "eslint . --ext .js,.jsx",
+    "format": "prettier --write \"**/*.{js,jsx,json,md,css}\"",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "db:migrate": "npm --prefix server run db:migrate",
+    "db:generate": "npm --prefix server run db:generate"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  }
+}
