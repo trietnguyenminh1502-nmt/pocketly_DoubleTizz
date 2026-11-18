@@ -1,15 +1,8 @@
-import { GoogleGenAI } from '@google/genai';
+import dotenv from 'dotenv';
 import { prisma } from '../config/prisma.js';
 import { config } from '../config/index.js';
 import { ChatContextBuilder } from './chatContext.service.js';
-
-// Khởi tạo Google Gemini Client
-const getGeminiClient = () => {
-  if (!config.gemini.apiKey) {
-    throw new Error('GEMINI_API_KEY chưa được cấu hình trong file .env của backend');
-  }
-  return new GoogleGenAI({ apiKey: config.gemini.apiKey });
-};
+import { GeminiProvider, GroqProvider } from './providers/index.js';
 
 export class ChatbotService {
   /**
@@ -96,7 +89,7 @@ export class ChatbotService {
       throw err;
     }
 
-    await prisma.chatSession.delete({
+    await prisma.chatMessage.delete({
       where: { id: sessionId }
     });
 
@@ -104,9 +97,11 @@ export class ChatbotService {
   }
 
   /**
-   * Gửi tin nhắn và nhận câu trả lời tư vấn tài chính từ Gemini API
+   * Gửi tin nhắn và nhận câu trả lời tư vấn tài chính từ AI Providers hoặc Rule-based Fallback
    */
   static async sendMessage(userId, sessionId, content) {
+    dotenv.config();
+
     // 1. Kiểm tra session thuộc về user
     const session = await prisma.chatSession.findFirst({
       where: { id: sessionId, userId }
@@ -148,7 +143,7 @@ export class ChatbotService {
     });
     recentDbMessages.reverse();
 
-    // 5. System Prompt chặt chẽ theo yêu cầu dự án
+    // 5. System Prompt chặt chẽ theo yêu cầu dự án (giữ nguyên quy tắc và format)
     const systemInstruction = `
 Bạn là "Pocketly AI" - Trợ lý cố vấn tài chính cá nhân thông minh, thân thiện, mang phong cách Gen-Z hiện đại dành riêng cho sinh viên.
 
@@ -164,50 +159,54 @@ DƯỚI ĐÂY LÀ DỮ LIỆU TÀI CHÍNH THỰC TẾ CỦA NGƯỜI DÙNG NÀY:
 ${financialContext}
 `.trim();
 
-    // 6. Chuẩn bị danh sách contents cho Gemini API
-    const contents = recentDbMessages.map((msg) => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }]
+    // Chuẩn bị danh sách messages cho các provider
+    const messages = recentDbMessages.map((msg) => ({
+      role: msg.role,
+      content: msg.content
     }));
 
+    // Đảm bảo tin nhắn hiện tại có mặt ở cuối
+    if (messages.length === 0 || messages[messages.length - 1].content !== content.trim()) {
+      messages.push({
+        role: 'user',
+        content: content.trim()
+      });
+    }
+
+    // 6. Lựa chọn Primary Provider và Fallback Provider
+    const configuredProvider = (process.env.AI_PROVIDER || config.aiProvider || 'gemini').toLowerCase().trim();
+    const isGroqPrimary = configuredProvider === 'groq';
+
+    const primary = isGroqPrimary
+      ? { name: 'Groq', provider: GroqProvider }
+      : { name: 'Gemini', provider: GeminiProvider };
+
+    const secondary = isGroqPrimary
+      ? { name: 'Gemini', provider: GeminiProvider }
+      : { name: 'Groq', provider: GroqProvider };
+
     let assistantReply = '';
+    let answeredBy = null;
 
     try {
-      // 7. Gọi Gemini API với timeout bảo vệ (15s)
-      const ai = getGeminiClient();
-
-      const response = await Promise.race([
-        ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents,
-          config: {
-            systemInstruction,
-            temperature: 0.7,
-            maxOutputTokens: 1000
-          }
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Yêu cầu tới AI đã hết thời gian chờ (Timeout)')), 15000)
-        )
-      ]);
-
-      assistantReply = response.text || 'Xin lỗi, mình chưa kịp phân tích câu hỏi của bạn. Bạn thử hỏi lại nhé!';
-    } catch (error) {
-      console.error(error.status, error.message, error?.response?.data);
-      console.error('❌ Lỗi gọi Gemini API:', error.message);
-      if (error.message.includes('API_KEY')) {
-        assistantReply =
-          '⚠️ Chatbot chưa thể kết nối do hệ thống chưa cấu hình Gemini API Key hợp lệ trong file .env. Vui lòng liên hệ quản trị viên!';
-      } else if (error.message.includes('Timeout')) {
-        assistantReply =
-          '⏱️ Máy chủ AI phản hồi hơi lâu do mạng bận. Bạn vui lòng thử gửi lại câu hỏi sau vài giây nhé!';
-      } else {
-        assistantReply =
-          'Xin lỗi bạn nha, hiện tại mình đang gặp sự cố kết nối tới máy chủ trí tuệ nhân tạo. Bạn hãy thử lại sau ít phút nhé!';
+      assistantReply = await primary.provider.generateReply(messages, systemInstruction);
+      answeredBy = primary.name;
+      console.log(`🤖 AI Provider answered: ${primary.name}`);
+    } catch (primaryErr) {
+      console.warn(`⚠️ [AI Provider] ${primary.name} gặp sự cố (${primaryErr.status || primaryErr.code || primaryErr.message}). Tự động chuyển đổi sang ${secondary.name}...`);
+      try {
+        assistantReply = await secondary.provider.generateReply(messages, systemInstruction);
+        answeredBy = secondary.name;
+        console.log(`🤖 AI Provider answered: ${secondary.name} (fallback from ${primary.name})`);
+      } catch (secondaryErr) {
+        console.warn(`⚠️ [AI Provider] Cả 2 nhà cung cấp (${primary.name} & ${secondary.name}) đều không khả dụng. Đang kích hoạt Rule-based Fallback trực tiếp từ cơ sở dữ liệu...`);
+        assistantReply = await ChatContextBuilder.generateRuleBasedFallback(userId, content);
+        answeredBy = 'Rule-based fallback';
+        console.log('🤖 AI Provider answered: Rule-based fallback');
       }
     }
 
-    // 8. Lưu câu trả lời của trợ lý vào database
+    // 7. Lưu câu trả lời của trợ lý vào database
     const assistantMessage = await prisma.chatMessage.create({
       data: {
         sessionId,
@@ -224,7 +223,8 @@ ${financialContext}
 
     return {
       userMessage,
-      assistantMessage
+      assistantMessage,
+      answeredBy
     };
   }
 }

@@ -1,16 +1,27 @@
 import { api } from '@/api/axios';
 
+const cleanParams = (params) => {
+  if (!params) return {};
+  const cleaned = {};
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== '' && value !== null && value !== undefined) {
+      cleaned[key] = value;
+    }
+  });
+  return cleaned;
+};
+
 export const transactionApi = {
-  list: (params) => api.get('/transactions', { params }),
+  list: (params) => api.get('/transactions', { params: cleanParams(params) }),
   getById: (id) => api.get(`/transactions/${id}`),
   create: (data) => api.post('/transactions', data),
   update: (id, data) => api.patch(`/transactions/${id}`, data),
   delete: (id) => api.delete(`/transactions/${id}`),
   bulkDelete: (ids) => api.post('/transactions/bulk-delete', { ids }),
   exportExcel: (params) =>
-    api.get('/transactions/export/excel', { params, responseType: 'blob' }),
+    api.get('/transactions/export/excel', { params: cleanParams(params), responseType: 'blob' }),
   exportCSV: (params) =>
-    api.get('/transactions/export/csv', { params, responseType: 'blob' })
+    api.get('/transactions/export/csv', { params: cleanParams(params), responseType: 'blob' })
 };
 
 export const categoryApi = {

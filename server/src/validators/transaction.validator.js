@@ -17,17 +17,19 @@ export const bulkDeleteTransactionSchema = z.object({
   ids: z.array(z.string().uuid()).min(1, 'Danh sách mã giao dịch không được để trống')
 });
 
+const emptyToUndefined = (val) => (typeof val === 'string' && val.trim() === '' ? undefined : val);
+
 export const transactionFilterSchema = z.object({
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  categoryId: z.string().uuid().optional(),
-  type: z.enum(['INCOME', 'EXPENSE']).optional(),
-  walletId: z.string().uuid().optional(),
-  minAmount: z.coerce.number().optional(),
-  maxAmount: z.coerce.number().optional(),
-  search: z.string().optional(),
-  sortBy: z.enum(['date', 'amount', 'createdAt']).default('date').optional(),
-  order: z.enum(['asc', 'desc']).default('desc').optional(),
-  page: z.coerce.number().int().positive().default(1).optional(),
-  limit: z.coerce.number().int().positive().max(100).default(20).optional()
+  startDate: z.preprocess(emptyToUndefined, z.string().optional()),
+  endDate: z.preprocess(emptyToUndefined, z.string().optional()),
+  categoryId: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
+  type: z.preprocess(emptyToUndefined, z.enum(['INCOME', 'EXPENSE']).optional()),
+  walletId: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
+  minAmount: z.preprocess(emptyToUndefined, z.coerce.number().optional()),
+  maxAmount: z.preprocess(emptyToUndefined, z.coerce.number().optional()),
+  search: z.preprocess(emptyToUndefined, z.string().optional()),
+  sortBy: z.preprocess(emptyToUndefined, z.enum(['date', 'amount', 'createdAt']).default('date').optional()),
+  order: z.preprocess(emptyToUndefined, z.enum(['asc', 'desc']).default('desc').optional()),
+  page: z.preprocess(emptyToUndefined, z.coerce.number().int().positive().default(1).optional()),
+  limit: z.preprocess(emptyToUndefined, z.coerce.number().int().positive().max(100).default(20).optional())
 });

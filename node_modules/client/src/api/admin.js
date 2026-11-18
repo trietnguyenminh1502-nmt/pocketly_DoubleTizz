@@ -1,8 +1,19 @@
 import { api } from '@/api/axios';
 
+const cleanParams = (params) => {
+  if (!params) return {};
+  const cleaned = {};
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== '' && value !== null && value !== undefined) {
+      cleaned[key] = value;
+    }
+  });
+  return cleaned;
+};
+
 export const adminApi = {
   getDashboardStats: () => api.get('/admin/dashboard'),
-  listUsers: (params) => api.get('/admin/users', { params }),
+  listUsers: (params) => api.get('/admin/users', { params: cleanParams(params) }),
   getUserDetail: (id) => api.get(`/admin/users/${id}`),
   updateUserStatus: (id, status) => api.patch(`/admin/users/${id}/status`, { status }),
   updateUserRole: (id, role) => api.patch(`/admin/users/${id}/role`, { role }),

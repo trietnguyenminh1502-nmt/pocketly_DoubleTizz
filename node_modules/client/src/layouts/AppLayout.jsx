@@ -101,15 +101,21 @@ export const AppLayout = () => {
 
         {/* User Card at Bottom of Sidebar */}
         <div className="p-3 border-t border-border-light dark:border-border-dark">
-          <div className="flex items-center gap-3 p-2 rounded-20 bg-sand/30 dark:bg-surface-dark">
+          <Link
+            to="/profile"
+            className="flex items-center gap-3 p-2 rounded-20 bg-sand/30 dark:bg-surface-dark hover:bg-sand/60 dark:hover:bg-white/10 transition-colors group cursor-pointer"
+            title="Chỉnh sửa thông tin hồ sơ"
+          >
             <Avatar src={user?.avatarUrl} fallback={user?.fullName?.charAt(0) || 'U'} size="sm" />
             {!collapsed && (
               <div className="overflow-hidden flex-1">
-                <p className="text-xs font-bold truncate text-ink-light dark:text-ink-dark">{user?.fullName}</p>
+                <p className="text-xs font-bold truncate text-ink-light dark:text-ink-dark group-hover:text-primary dark:group-hover:text-lime transition-colors">
+                  {user?.fullName}
+                </p>
                 <p className="text-[10px] text-ink-muted truncate">{user?.email}</p>
               </div>
             )}
-          </div>
+          </Link>
         </div>
       </aside>
 

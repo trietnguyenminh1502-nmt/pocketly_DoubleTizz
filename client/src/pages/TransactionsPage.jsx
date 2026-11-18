@@ -63,7 +63,7 @@ export const TransactionsPage = () => {
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
   // 1. Fetch Danh sách Giao dịch
-  const { data: txRes, isLoading, isFetching } = useQuery({
+  const { data: txRes, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['transactions', filters],
     queryFn: () => transactionApi.list(filters)
   });
@@ -353,6 +353,20 @@ export const TransactionsPage = () => {
             <Skeleton className="h-10" />
             <Skeleton className="h-10" />
             <Skeleton className="h-10" />
+          </div>
+        ) : isError ? (
+          <div className="py-12 px-6 text-center">
+            <p className="text-sm text-coral font-medium">
+              Không thể tải danh sách giao dịch: {error?.response?.data?.message || error?.message}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="mt-3"
+            >
+              Thử tải lại
+            </Button>
           </div>
         ) : transactions.length === 0 ? (
           <EmptyState

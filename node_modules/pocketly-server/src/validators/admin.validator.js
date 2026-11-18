@@ -1,11 +1,13 @@
 import { z } from 'zod';
 
+const emptyToUndefined = (val) => (typeof val === 'string' && val.trim() === '' ? undefined : val);
+
 export const userFilterSchema = z.object({
-  search: z.string().optional(),
-  role: z.enum(['USER', 'ADMIN']).optional(),
-  status: z.enum(['ACTIVE', 'LOCKED']).optional(),
-  page: z.coerce.number().int().positive().default(1).optional(),
-  limit: z.coerce.number().int().positive().max(100).default(20).optional()
+  search: z.preprocess(emptyToUndefined, z.string().optional()),
+  role: z.preprocess(emptyToUndefined, z.enum(['USER', 'ADMIN']).optional()),
+  status: z.preprocess(emptyToUndefined, z.enum(['ACTIVE', 'LOCKED']).optional()),
+  page: z.preprocess(emptyToUndefined, z.coerce.number().int().positive().default(1).optional()),
+  limit: z.preprocess(emptyToUndefined, z.coerce.number().int().positive().max(100).default(20).optional())
 });
 
 export const updateStatusSchema = z.object({
