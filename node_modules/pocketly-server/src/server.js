@@ -1,12 +1,16 @@
 import app from './app.js';
 import { config } from './config/index.js';
 import { prisma } from './config/prisma.js';
+import { SupportService } from './services/support.service.js';
 
 const startServer = async () => {
   try {
     // Verify database connection on startup
     await prisma.$connect();
     console.info('✅ Kết nối cơ sở dữ liệu PostgreSQL thành công.');
+
+    // Tự động khởi tạo bảng support_tickets nếu chưa có
+    await SupportService.ensureTable();
 
     // Tự động sửa tên người dùng nếu bị lỗi font mã hóa dấu '?'
     await prisma.user.updateMany({

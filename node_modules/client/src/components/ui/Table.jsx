@@ -1,11 +1,50 @@
 import React from 'react';
 import { cn } from '@/utils/cn';
 
-export const Table = ({ children, className = '' }) => {
+export const Table = ({ children, columns, data, className = '' }) => {
   return (
     <div className="w-full overflow-x-auto rounded-16 border border-border-light dark:border-border-dark">
       <table className={cn('w-full text-left text-sm border-collapse', className)}>
-        {children}
+        {columns && data ? (
+          <>
+            <TableHeader>
+              <TableRow>
+                {columns.map((col, idx) => (
+                  <TableHead
+                    key={col.key || idx}
+                    className={cn(
+                      col.align === 'right' && 'text-right',
+                      col.align === 'center' && 'text-center',
+                      col.className
+                    )}
+                  >
+                    {col.header}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.map((row, rowIdx) => (
+                <TableRow key={row.id || rowIdx}>
+                  {columns.map((col, colIdx) => (
+                    <TableCell
+                      key={col.key || colIdx}
+                      className={cn(
+                        col.align === 'right' && 'text-right',
+                        col.align === 'center' && 'text-center',
+                        col.cellClassName
+                      )}
+                    >
+                      {col.render ? col.render(row, rowIdx) : row[col.accessor || col.key]}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </>
+        ) : (
+          children
+        )}
       </table>
     </div>
   );

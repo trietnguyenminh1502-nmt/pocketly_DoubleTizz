@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { authApi } from '@/api/auth';
 import { AuthSplitLayout } from '@/layouts/AuthSplitLayout';
 import { Input, Button, useToast } from '@/components/ui';
-import { Lock, Check } from 'lucide-react';
+import { Lock, Check, XCircle } from 'lucide-react';
 
 export const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +15,26 @@ export const ResetPasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Token không tồn tại trong URL → báo lỗi ngay
+  if (!token) {
+    return (
+      <AuthSplitLayout
+        title="Liên kết không hợp lệ"
+        subtitle="Yêu cầu đặt lại mật khẩu không hợp lệ hoặc đã hết hạn"
+      >
+        <div className="text-center space-y-4 p-6 rounded-24 bg-coral/10 border border-coral/30">
+          <XCircle className="w-10 h-10 text-coral mx-auto" />
+          <p className="text-sm text-ink-muted">
+            Liên kết này không hợp lệ hoặc đã hết hạn (1 giờ). Vui lòng gửi lại yêu cầu.
+          </p>
+          <Link to="/forgot-password">
+            <Button variant="primary" size="sm">Gửi lại yêu cầu</Button>
+          </Link>
+        </div>
+      </AuthSplitLayout>
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,14 +73,8 @@ export const ResetPasswordPage = () => {
           </div>
         )}
 
-        <Input
-          label="Mã xác thực (Token)"
-          type="text"
-          value={token}
-          placeholder="Nhập mã token từ email"
-          readOnly={!!token}
-          required
-        />
+        {/* Token ẩn – lấy từ URL, không hiển thị cho người dùng */}
+        <input type="hidden" value={token} />
 
         <Input
           label="Mật khẩu mới"

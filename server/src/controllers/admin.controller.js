@@ -151,12 +151,25 @@ export class AdminController {
   static async getChatbotStats(req, res, next) {
     try {
       const page = req.query.page ? parseInt(req.query.page, 10) : 1;
-      const limit = req.query.limit ? parseInt(req.query.limit, 10) : 20;
+      const limit = req.query.limit ? parseInt(req.query.limit, 10) : 15;
+      const search = req.query.search || '';
 
-      const data = await AdminService.getChatbotStats({ page, limit });
+      const data = await AdminService.getChatbotStats({ page, limit, search });
       return successResponse(res, {
         message: 'Lấy thống kê sử dụng AI Chatbot thành công',
         data
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async deleteChatSession(req, res, next) {
+    try {
+      const { id } = req.params;
+      await AdminService.deleteChatSession(id);
+      return successResponse(res, {
+        message: 'Xóa phiên hội thoại AI thành công'
       });
     } catch (error) {
       next(error);

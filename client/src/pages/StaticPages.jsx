@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, Input, Textarea, Select, useToast } from '@/components/ui';
 import { Home, ArrowLeft, Mail, Phone, MapPin, MessageSquare, Send, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { supportApi } from '@/api/support';
 
 export const NotFoundPage = () => {
   return (
@@ -167,23 +168,30 @@ export const ContactSupportPage = () => {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.message.trim()) {
       addToast({ message: 'Vui lòng điền đầy đủ các thông tin bắt buộc!', type: 'error' });
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      setLoading(true);
+      await supportApi.sendEmail(formData);
       setSubmitted(true);
       addToast({
-        message: 'Gửi yêu cầu hỗ trợ thành công! Đội ngũ Pocketly sẽ liên hệ qua email trong vòng 24h.',
+        message: 'Gửi email hỗ trợ thành công! Đội ngũ Pocketly sẽ liên hệ qua email trong vòng 24h.',
         type: 'success'
       });
       setFormData({ fullName: '', email: '', topic: 'general', message: '' });
-    }, 600);
+    } catch (error) {
+      addToast({
+        message: error?.response?.data?.message || error.message || 'Không thể gửi yêu cầu lúc này, vui lòng thử lại sau!',
+        type: 'error'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const faqs = [
@@ -237,8 +245,8 @@ export const ContactSupportPage = () => {
                 <div>
                   <h3 className="font-semibold text-ink-light dark:text-ink-dark">Email hỗ trợ</h3>
                   <p className="text-xs text-ink-muted mt-0.5">Phản hồi nhanh trong vòng 24 giờ</p>
-                  <a href="mailto:support@pocketly.com" className="text-xs font-bold text-primary dark:text-lime hover:underline mt-1 inline-block">
-                    support@pocketly.com
+                  <a href="mailto:tvocabs1502@gmail.com" className="text-xs font-bold text-primary dark:text-lime hover:underline mt-1 inline-block">
+                    tvocabs1502@gmail.com
                   </a>
                 </div>
               </div>
@@ -250,8 +258,8 @@ export const ContactSupportPage = () => {
                 <div>
                   <h3 className="font-semibold text-ink-light dark:text-ink-dark">Đường dây nóng</h3>
                   <p className="text-xs text-ink-muted mt-0.5">Thứ 2 - Thứ 7 (8:00 - 18:00)</p>
-                  <a href="tel:02812345678" className="text-xs font-bold text-ink-light dark:text-ink-dark hover:underline mt-1 inline-block">
-                    (+84) 028 1234 5678
+                  <a href="tel:0385814985" className="text-xs font-bold text-ink-light dark:text-ink-dark hover:underline mt-1 inline-block">
+                    (+84) 038 5814 985
                   </a>
                 </div>
               </div>
@@ -263,7 +271,7 @@ export const ContactSupportPage = () => {
                 <div>
                   <h3 className="font-semibold text-ink-light dark:text-ink-dark">Địa chỉ nghiên cứu & phát triển</h3>
                   <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">
-                    Khu Công Nghệ Phần Mềm (ITP) - Đại học Quốc gia TP.HCM, Phường Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh
+                    Trường Đại học Công nghệ Kỹ thuật TP.HCM, Số 1 Võ Văn Ngân, Thành phố Thủ Đức
                   </p>
                 </div>
               </div>

@@ -31,6 +31,29 @@ import {
 import { Link } from 'react-router-dom';
 
 // Custom Tooltip cho Biểu đồ Tròn & Cột (Sử dụng bảng màu dự án)
+const CATEGORY_COLOR_MAP = {
+  'Tiền thuê trọ': '#3B82F6',        // Xanh dương
+  'Mua sắm cá nhân': '#8B5CF6',     // Tím
+  'Ăn uống': '#F97316',             // Cam tươi
+  'Di chuyển': '#06B6D4',           // Xanh lơ cyan
+  'Học tập & Giáo trình': '#10B981',// Xanh ngọc
+  'Giải trí & Phim ảnh': '#F59E0B', // Vàng nghệ
+  'Sức khỏe & Y tế': '#EC4899',     // Hồng cánh sen
+  'Du Lịch': '#14B8A6'              // Xanh teal
+};
+
+const DISTINCT_COLORS = [
+  '#3B82F6', // Blue
+  '#8B5CF6', // Purple
+  '#F97316', // Orange
+  '#06B6D4', // Cyan
+  '#10B981', // Emerald
+  '#F59E0B', // Amber
+  '#EC4899', // Pink
+  '#14B8A6', // Teal
+  '#6366F1'  // Indigo
+];
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -95,7 +118,11 @@ export const DashboardPage = () => {
   });
 
   const summary = summaryRes?.data;
-  const categoryData = categorySpendingRes?.data?.categories || [];
+  const rawCategories = categorySpendingRes?.data?.categories || [];
+  const categoryData = rawCategories.map((cat, idx) => ({
+    ...cat,
+    color: CATEGORY_COLOR_MAP[cat.name] || cat.color || DISTINCT_COLORS[idx % DISTINCT_COLORS.length]
+  }));
   const trendsData = trendsRes?.data?.trends || [];
   const budgets = budgetsRes?.data?.budgets || [];
   const savingGoals = savingGoalsRes?.data?.goals || [];
@@ -211,7 +238,7 @@ export const DashboardPage = () => {
       {/* 3. Charts Row: Donut Chart & Trends Bar Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Donut Chart: Cơ cấu chi tiêu theo danh mục */}
-        <Card className="lg:col-span-5 flex flex-col">
+        <Card className="lg:col-span-5 flex flex-col p-6 sm:p-7">
           <CardHeader
             title="Cơ Cấu Chi Tiêu Tháng Này"
             subtitle="Phân bổ tiền theo các danh mục ăn uống, học tập..."
@@ -221,8 +248,8 @@ export const DashboardPage = () => {
           ) : categoryData.length === 0 ? (
             <EmptyState title="Chưa có chi tiêu tháng này" description="Hãy ghi nhận các khoản chi để hiển thị biểu đồ" className="my-auto py-8" />
           ) : (
-            <div className="space-y-4 my-auto">
-              <div className="h-56 w-full">
+            <div className="flex flex-col flex-1 justify-between space-y-6">
+              <div className="h-60 sm:h-64 w-full flex items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -231,12 +258,13 @@ export const DashboardPage = () => {
                       nameKey="name"
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={88}
-                      paddingAngle={3}
+                      innerRadius={68}
+                      outerRadius={98}
+                      paddingAngle={4}
+                      stroke="none"
                     >
                       {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color || '#FF6A2B'} />
+                        <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip content={<CustomTooltip />} />
@@ -245,14 +273,21 @@ export const DashboardPage = () => {
               </div>
 
               {/* Legend List */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border-light/60 dark:border-border-dark/60 text-xs">
-                {categoryData.slice(0, 4).map((cat) => (
-                  <div key={cat.categoryId} className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
-                    <span className="truncate text-ink-muted">{cat.name}:</span>
-                    <strong className="text-ink-light dark:text-ink-dark">{cat.percentage}%</strong>
-                  </div>
-                ))}
+              <div className="pt-4 border-t border-border-light/60 dark:border-border-dark/60">
+                <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm">
+                  {categoryData.slice(0, 4).map((cat, idx) => (
+                    <div key={cat.categoryId || idx} className="flex items-center gap-2">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: cat.color }}
+                      />
+                      <span className="truncate text-ink-muted text-xs sm:text-sm">{cat.name}:</span>
+                      <strong className="text-ink-light dark:text-ink-dark text-xs sm:text-sm font-bold shrink-0">
+                        {cat.percentage}%
+                      </strong>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}

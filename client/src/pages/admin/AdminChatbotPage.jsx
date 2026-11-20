@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import ReactMarkdown from 'react-markdown';
 import { adminApi } from '@/api/admin';
 import {
   Card,
@@ -13,32 +14,41 @@ import {
   Pagination,
   Skeleton,
   EmptyState,
-  Avatar
+  Avatar,
+  useToast
 } from '@/components/ui';
 import {
   Bot,
   MessageSquare,
   Sparkles,
   BarChart3,
-  Clock,
   User,
   Search,
   ExternalLink,
-  Cpu
+  Cpu,
+  Trash2,
+  Calendar,
+  Clock,
+  MessageCircle,
+  Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 export const AdminChatbotPage = () => {
   const [page, setPage] = useState(1);
-  const [roleFilter, setRoleFilter] = useState('ALL'); // ALL, user, model
+  const [filterType, setFilterType] = useState('ALL'); // ALL, WITH_MESSAGES, EMPTY
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedLog, setSelectedLog] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [sessionToDelete, setSessionToDelete] = useState(null);
 
-  // Fetch Chatbot stats & logs
+  const queryClient = useQueryClient();
+  const { showSuccess, showError } = useToast();
+
+  // Fetch Chatbot stats & sessions
   const { data: chatbotRes, isLoading } = useQuery({
-    queryKey: ['adminChatbotStats', page],
-    queryFn: () => adminApi.getChatbotStats({ page, limit: 15 }),
+    queryKey: ['adminChatbotSessions', page, searchQuery],
+    queryFn: () => adminApi.getChatbotStats({ page, limit: 12, search: searchQuery }),
     keepPreviousData: true
   });
 
@@ -47,34 +57,51 @@ export const AdminChatbotPage = () => {
     totalSessions: 0,
     averageMessagesPerSession: 0
   };
-  const logs = chatbotRes?.data?.recentLogs || [];
-  const meta = chatbotRes?.data?.meta || { totalPages: 1, page: 1 };
+  const sessions = chatbotRes?.data?.sessions || [];
+  const meta = chatbotRes?.data?.meta || { totalPages: 1, page: 1, total: 0 };
 
-  // Filter logs locally if search query or role filter is applied
-  const filteredLogs = logs.filter((log) => {
-    if (roleFilter !== 'ALL' && log.role !== roleFilter) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const contentMatch = log.content?.toLowerCase().includes(q);
-      const userMatch = log.session?.user?.fullName?.toLowerCase().includes(q) ||
-        log.session?.user?.email?.toLowerCase().includes(q);
-      const sessionMatch = log.session?.title?.toLowerCase().includes(q);
-      return contentMatch || userMatch || sessionMatch;
+  // Xóa phiên hội thoại
+  const deleteMutation = useMutation({
+    mutationFn: (id) => adminApi.deleteChatSession(id),
+    onSuccess: () => {
+      showSuccess('Xóa cuộc trò chuyện thành công!');
+      setSessionToDelete(null);
+      if (selectedSession?.id === sessionToDelete?.id) {
+        setSelectedSession(null);
+      }
+      queryClient.invalidateQueries(['adminChatbotSessions']);
+    },
+    onError: (err) => {
+      showError(err.response?.data?.message || 'Không thể xóa cuộc trò chuyện');
     }
+  });
+
+  const isAiRole = (role) => role === 'model' || role === 'assistant';
+
+  // Lọc theo trạng thái số lượng tin nhắn
+  const filteredSessions = sessions.filter((s) => {
+    const msgCount = s._count?.messages || s.messages?.length || 0;
+    if (filterType === 'WITH_MESSAGES' && msgCount === 0) return false;
+    if (filterType === 'EMPTY' && msgCount > 0) return false;
     return true;
   });
 
   const columns = [
     {
-      header: 'Người dùng',
-      render: (log) => {
-        const u = log.session?.user;
+      header: 'Sinh viên / Người dùng',
+      render: (s) => {
+        const u = s.user;
         return (
-          <div className="flex items-center gap-2.5">
-            <Avatar fallback={u?.fullName?.[0] || 'U'} size="sm" className="bg-sand text-ink-light" />
+          <div className="flex items-center gap-3">
+            <Avatar
+              fallback={u?.fullName?.[0] || 'U'}
+              src={u?.avatarUrl}
+              size="md"
+              className="bg-sand text-ink-light font-bold"
+            />
             <div>
               <p className="font-bold text-xs text-ink-light dark:text-ink-dark line-clamp-1">
-                {u?.fullName || 'Khách ẩn danh'}
+                {u?.fullName || 'Người dùng ẩn danh'}
               </p>
               <p className="text-[11px] text-ink-muted line-clamp-1">{u?.email || 'N/A'}</p>
             </div>
@@ -83,64 +110,80 @@ export const AdminChatbotPage = () => {
       }
     },
     {
-      header: 'Phiên Chat',
-      render: (log) => (
-        <span className="text-xs font-semibold text-ink-muted line-clamp-1 max-w-[140px]" title={log.session?.title}>
-          {log.session?.title || 'Trò chuyện tài chính'}
-        </span>
-      )
+      header: 'Cuộc trò chuyện & Trích đoạn',
+      render: (s) => {
+        const lastMsg = s.messages && s.messages.length > 0 ? s.messages[s.messages.length - 1] : null;
+        return (
+          <div className="max-w-md py-1">
+            <div className="flex items-center gap-1.5 font-bold text-xs text-ink-light dark:text-ink-dark line-clamp-1">
+              <MessageSquare className="w-3.5 h-3.5 text-primary dark:text-lime shrink-0" />
+              <span>{s.title || 'Trò chuyện tài chính thông minh'}</span>
+            </div>
+            {lastMsg ? (
+              <p className="text-[11px] text-ink-muted line-clamp-1 mt-1 font-sans">
+                <span className="font-semibold text-ink-light dark:text-ink-dark">
+                  {isAiRole(lastMsg.role) ? 'Pocket AI: ' : 'Sinh viên: '}
+                </span>
+                {lastMsg.content}
+              </p>
+            ) : (
+              <span className="text-[10px] text-ink-muted italic mt-1 block">Chưa có tin nhắn nào</span>
+            )}
+          </div>
+        );
+      }
     },
     {
-      header: 'Vai trò',
-      render: (log) => (
-        <Badge
-          variant={log.role === 'model' ? 'lime' : 'neutral'}
-          size="sm"
-          className="flex items-center gap-1 w-fit"
-        >
-          {log.role === 'model' ? (
-            <>
-              <Bot className="w-3 h-3 text-forest" />
-              <span>Pocket AI</span>
-            </>
-          ) : (
-            <>
-              <User className="w-3 h-3" />
-              <span>Người dùng</span>
-            </>
-          )}
-        </Badge>
-      )
+      header: 'Số tin nhắn',
+      align: 'center',
+      render: (s) => {
+        const count = s._count?.messages ?? s.messages?.length ?? 0;
+        return (
+          <Badge
+            variant={count > 0 ? 'lime' : 'neutral'}
+            size="sm"
+            className="font-bold text-xs px-2.5 py-0.5"
+          >
+            {count} tin nhắn
+          </Badge>
+        );
+      }
     },
     {
-      header: 'Trích đoạn Tin nhắn',
-      render: (log) => (
-        <p className="text-xs text-ink-light dark:text-ink-dark line-clamp-2 max-w-md font-mono bg-sand/20 dark:bg-white/5 p-1.5 rounded-12">
-          {log.content}
-        </p>
-      )
-    },
-    {
-      header: 'Thời gian',
-      render: (log) => (
-        <span className="text-xs text-ink-muted whitespace-nowrap">
-          {log.createdAt ? format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi }) : 'N/A'}
-        </span>
+      header: 'Cập nhật lần cuối',
+      render: (s) => (
+        <div className="text-xs text-ink-muted whitespace-nowrap">
+          <p className="font-semibold text-ink-light dark:text-ink-dark">
+            {s.updatedAt ? format(new Date(s.updatedAt), 'dd/MM/yyyy HH:mm', { locale: vi }) : 'N/A'}
+          </p>
+          <span className="text-[10px] text-ink-muted">
+            Tạo lúc: {s.createdAt ? format(new Date(s.createdAt), 'dd/MM/yyyy', { locale: vi }) : ''}
+          </span>
+        </div>
       )
     },
     {
       header: 'Thao tác',
       align: 'right',
-      render: (log) => (
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setSelectedLog(log)}
-          leftIcon={<ExternalLink className="w-3.5 h-3.5" />}
-          className="text-xs text-primary dark:text-lime hover:underline"
-        >
-          Chi tiết
-        </Button>
+      render: (s) => (
+        <div className="flex items-center justify-end gap-1.5">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setSelectedSession(s)}
+            leftIcon={<Eye className="w-3.5 h-3.5" />}
+            className="text-xs text-primary dark:text-lime hover:underline whitespace-nowrap font-bold"
+          >
+            Xem hội thoại
+          </Button>
+          <button
+            onClick={() => setSessionToDelete(s)}
+            title="Xóa cuộc trò chuyện này"
+            className="p-1.5 text-ink-muted hover:text-red-500 hover:bg-red-500/10 rounded-8 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       )
     }
   ];
@@ -153,7 +196,7 @@ export const AdminChatbotPage = () => {
           <span>🤖</span> Nhật ký & Thống kê AI Chatbot
         </h1>
         <p className="text-sm text-ink-muted mt-1">
-          Theo dõi lưu lượng tương tác, hội thoại tài chính sinh viên và hiệu suất mô hình Google Gemini.
+          Theo dõi các cuộc hội thoại tài chính sinh viên được lưu trữ theo từng phiên tương tác với Pocket AI.
         </p>
       </div>
 
@@ -176,7 +219,7 @@ export const AdminChatbotPage = () => {
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-muted uppercase">Số phiên trò chuyện</p>
+            <p className="text-xs font-bold text-ink-muted uppercase">Số cuộc trò chuyện</p>
             <h3 className="text-2xl font-heading font-extrabold text-ink-light dark:text-ink-dark mt-0.5">
               {stats.totalSessions.toLocaleString('vi-VN')}
             </h3>
@@ -212,55 +255,58 @@ export const AdminChatbotPage = () => {
       {/* Filters & Search */}
       <Card className="p-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="w-full sm:w-72">
+          <div className="w-full sm:w-80">
             <Input
-              placeholder="Tìm kiếm nội dung, email..."
+              placeholder="Tìm theo tiêu đề, sinh viên, email, nội dung chat..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPage(1);
+              }}
               leftIcon={<Search className="w-4 h-4 text-ink-muted" />}
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs font-bold text-ink-muted whitespace-nowrap">Lọc đối tượng:</span>
+            <span className="text-xs font-bold text-ink-muted whitespace-nowrap">Bộ lọc:</span>
             <Select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
               options={[
-                { label: 'Tất cả đối tượng', value: 'ALL' },
-                { label: 'Chỉ người dùng (User)', value: 'user' },
-                { label: 'Chỉ AI Trả lời (Pocket AI)', value: 'model' }
+                { label: 'Tất cả cuộc trò chuyện', value: 'ALL' },
+                { label: 'Đã có tin nhắn trao đổi', value: 'WITH_MESSAGES' },
+                { label: 'Phiên chưa nhắn (0 tin)', value: 'EMPTY' }
               ]}
-              className="w-48"
+              className="w-52"
             />
           </div>
         </div>
       </Card>
 
-      {/* Logs Table */}
+      {/* Sessions Table */}
       <Card className="overflow-hidden">
         <CardHeader
-          title="Nhật ký tương tác gần đây"
-          description="Các đoạn hội thoại được ghi nhận tự động theo thời gian thực."
+          title={`Danh sách các cuộc trò chuyện AI (${meta.total || filteredSessions.length} phiên)`}
+          description="Lưu vết đầy đủ nội dung hỏi đáp của sinh viên và câu trả lời tư vấn của Pocket AI."
         />
 
         {isLoading ? (
           <div className="p-6 space-y-3">
             {[1, 2, 3, 4, 5].map((n) => (
-              <Skeleton key={n} className="h-12 rounded-16" />
+              <Skeleton key={n} className="h-14 rounded-16" />
             ))}
           </div>
-        ) : filteredLogs.length === 0 ? (
+        ) : filteredSessions.length === 0 ? (
           <div className="p-8">
             <EmptyState
-              icon={Bot}
-              title="Không tìm thấy nhật ký tương tác"
-              description="Chưa có tin nhắn nào phù hợp với bộ lọc hiện tại hoặc chưa phát sinh trao đổi AI."
+              icon={MessageCircle}
+              title="Không tìm thấy cuộc trò chuyện nào"
+              description="Chưa có cuộc trò chuyện nào phù hợp với bộ lọc tìm kiếm hiện tại."
             />
           </div>
         ) : (
           <div>
-            <Table columns={columns} data={filteredLogs} />
+            <Table columns={columns} data={filteredSessions} />
 
             {/* Phân trang */}
             {meta.totalPages > 1 && (
@@ -276,59 +322,178 @@ export const AdminChatbotPage = () => {
         )}
       </Card>
 
-      {/* Modal Xem chi tiết tin nhắn */}
+      {/* Modal Xem toàn bộ nội dung cuộc trò chuyện */}
       <Modal
-        isOpen={Boolean(selectedLog)}
-        onClose={() => setSelectedLog(null)}
-        title="Chi tiết Nhật ký Hội thoại"
-        size="lg"
+        isOpen={Boolean(selectedSession)}
+        onClose={() => setSelectedSession(null)}
+        title="Nội dung Cuộc trò chuyện AI"
+        size="xl"
       >
-        {selectedLog && (
+        {selectedSession && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-sand/20 dark:bg-white/5 rounded-16 border border-border-light dark:border-border-dark">
-              <div className="flex items-center gap-2.5">
+            {/* Header info bar */}
+            <div className="p-4 bg-sand/30 dark:bg-white/5 rounded-20 border border-border-light dark:border-border-dark flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
                 <Avatar
-                  fallback={selectedLog.session?.user?.fullName?.[0] || 'U'}
-                  size="sm"
-                  className="bg-sand text-ink-light"
+                  fallback={selectedSession.user?.fullName?.[0] || 'U'}
+                  src={selectedSession.user?.avatarUrl}
+                  size="md"
+                  className="bg-sand text-ink-light font-bold"
                 />
                 <div>
-                  <p className="font-bold text-sm text-ink-light dark:text-ink-dark">
-                    {selectedLog.session?.user?.fullName || 'Người dùng ẩn danh'}
-                  </p>
-                  <p className="text-xs text-ink-muted">{selectedLog.session?.user?.email}</p>
+                  <h4 className="font-bold text-sm text-ink-light dark:text-ink-dark">
+                    {selectedSession.user?.fullName || 'Người dùng ẩn danh'}
+                  </h4>
+                  <p className="text-xs text-ink-muted">{selectedSession.user?.email}</p>
                 </div>
               </div>
 
-              <div className="text-right">
-                <Badge variant={selectedLog.role === 'model' ? 'lime' : 'neutral'}>
-                  {selectedLog.role === 'model' ? 'Pocket AI Assistant' : 'Học sinh / Sinh viên'}
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="lime" size="sm" className="font-bold">
+                  {selectedSession.messages?.length || 0} tin nhắn
                 </Badge>
-                <p className="text-[11px] text-ink-muted mt-1">
-                  {selectedLog.createdAt
-                    ? format(new Date(selectedLog.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: vi })
+                <span className="text-xs text-ink-muted">
+                  Bắt đầu:{' '}
+                  {selectedSession.createdAt
+                    ? format(new Date(selectedSession.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })
                     : ''}
-                </p>
+                </span>
               </div>
             </div>
 
-            <div>
-              <p className="text-xs font-bold text-ink-muted uppercase mb-1.5">Tiêu đề phiên hội thoại:</p>
-              <p className="text-sm font-semibold text-ink-light dark:text-ink-dark p-2 bg-sand/10 dark:bg-white/5 rounded-12">
-                {selectedLog.session?.title || 'Trò chuyện tài chính thông minh'}
-              </p>
+            {/* Tiêu đề phiên */}
+            <div className="px-1 flex items-center gap-2">
+              <span className="text-xs font-bold text-ink-muted uppercase">Chủ đề:</span>
+              <span className="text-sm font-semibold text-primary dark:text-lime">
+                {selectedSession.title || 'Trò chuyện tài chính thông minh'}
+              </span>
             </div>
 
-            <div>
-              <p className="text-xs font-bold text-ink-muted uppercase mb-1.5">Toàn bộ nội dung tin nhắn:</p>
-              <div className="p-4 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-20 max-h-72 overflow-y-auto text-sm leading-relaxed whitespace-pre-wrap font-sans text-ink-light dark:text-ink-dark">
-                {selectedLog.content}
-              </div>
+            {/* Khung chat trực quan hiển thị toàn bộ luồng hội thoại */}
+            <div className="max-h-[62vh] overflow-y-auto space-y-4 p-4 bg-sand/15 dark:bg-black/25 rounded-20 border border-border-light dark:border-border-dark">
+              {!selectedSession.messages || selectedSession.messages.length === 0 ? (
+                <div className="py-12 text-center text-ink-muted">
+                  <Bot className="w-10 h-10 mx-auto text-ink-muted/50 mb-2" />
+                  <p className="text-sm font-medium">Phiên này chưa phát sinh tin nhắn trao đổi nào.</p>
+                </div>
+              ) : (
+                selectedSession.messages.map((m, index) => {
+                  const isUser = m.role === 'user';
+                  return (
+                    <div
+                      key={m.id || index}
+                      className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
+                    >
+                      {/* Avatar */}
+                      <div className="shrink-0 pt-0.5">
+                        {isUser ? (
+                          <Avatar
+                            fallback={selectedSession.user?.fullName?.[0] || 'U'}
+                            src={selectedSession.user?.avatarUrl}
+                            size="sm"
+                            className="bg-primary text-white font-bold"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-lime/30 text-forest dark:text-lime flex items-center justify-center font-bold text-xs border border-lime/40 shadow-sm">
+                            <Bot className="w-4 h-4" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Bubble */}
+                      <div className={`max-w-[85%] sm:max-w-[78%] space-y-1 ${isUser ? 'text-right' : 'text-left'}`}>
+                        <div className="flex items-center gap-2 px-1 text-[11px] text-ink-muted">
+                          {isUser ? (
+                            <>
+                              <span className="font-semibold text-ink-light dark:text-ink-dark">
+                                {selectedSession.user?.fullName || 'Sinh viên'}
+                              </span>
+                              <span>•</span>
+                              <span>
+                                {m.createdAt
+                                  ? format(new Date(m.createdAt), 'HH:mm dd/MM/yyyy', { locale: vi })
+                                  : ''}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-bold text-primary dark:text-lime flex items-center gap-1">
+                                Pocket AI
+                              </span>
+                              <Badge variant="lime" size="xs" className="text-[9px] py-0 px-1 font-semibold">
+                                Gemini 2.5 Flash
+                              </Badge>
+                              <span>•</span>
+                              <span>
+                                {m.createdAt
+                                  ? format(new Date(m.createdAt), 'HH:mm dd/MM/yyyy', { locale: vi })
+                                  : ''}
+                              </span>
+                            </>
+                          )}
+                        </div>
+
+                        <div
+                          className={`rounded-20 px-4 py-3 text-xs leading-relaxed ${
+                            isUser
+                              ? 'bg-primary text-white dark:bg-lime dark:text-ink-light rounded-tr-none shadow-sm text-left'
+                              : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark rounded-tl-none shadow-sm prose prose-xs dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-sand/30 dark:prose-pre:bg-white/5'
+                          }`}
+                        >
+                          {isUser ? (
+                            <p className="whitespace-pre-wrap">{m.content}</p>
+                          ) : (
+                            <ReactMarkdown>{m.content}</ReactMarkdown>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
 
-            <div className="flex justify-end pt-3 border-t border-border-light dark:border-border-dark">
-              <Button variant="ghost" onClick={() => setSelectedLog(null)}>
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between pt-3 border-t border-border-light dark:border-border-dark">
+              <span className="text-xs text-ink-muted">
+                Toàn bộ luồng hội thoại gồm <b>{selectedSession.messages?.length || 0}</b> tin nhắn.
+              </span>
+              <Button variant="ghost" onClick={() => setSelectedSession(null)}>
                 Đóng
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Modal Xác nhận Xóa phiên */}
+      <Modal
+        isOpen={Boolean(sessionToDelete)}
+        onClose={() => setSessionToDelete(null)}
+        title="Xác nhận xóa cuộc trò chuyện"
+        size="sm"
+      >
+        {sessionToDelete && (
+          <div className="space-y-4">
+            <p className="text-sm text-ink-light dark:text-ink-dark">
+              Bạn có chắc chắn muốn xóa cuộc trò chuyện{' '}
+              <b>"{sessionToDelete.title || 'Trò chuyện tài chính'}"</b> của sinh viên{' '}
+              <b>{sessionToDelete.user?.fullName}</b> không?
+            </p>
+            <p className="text-xs text-red-500">
+              Hành động này sẽ xóa vĩnh viễn toàn bộ {sessionToDelete._count?.messages || 0} tin nhắn bên trong và
+              không thể khôi phục.
+            </p>
+            <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+              <Button variant="ghost" onClick={() => setSessionToDelete(null)}>
+                Hủy
+              </Button>
+              <Button
+                variant="danger"
+                isLoading={deleteMutation.isLoading}
+                onClick={() => deleteMutation.mutate(sessionToDelete.id)}
+              >
+                Xóa vĩnh viễn
               </Button>
             </div>
           </div>

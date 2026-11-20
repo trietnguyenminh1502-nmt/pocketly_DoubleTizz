@@ -53,17 +53,18 @@ const ICON_OPTIONS = [
 ];
 
 const COLOR_PALETTE = [
-  '#FF6A2B', // Tangerine
-  '#FF8A7A', // Coral
-  '#123D2F', // Forest Green
-  '#D4F05A', // Lime
-  '#2D6A4F', // Deep Green
-  '#40916C', // Medium Green
-  '#E57373', // Red Coral
-  '#D4A373', // Sand Earth
-  '#FF9F1C', // Amber
-  '#E07A5F', // Terra Cotta
-  '#BFE8D6'  // Mint
+  '#FF6A2B', // Tangerine (Cam tươi)
+  '#3B82F6', // Blue (Xanh dương)
+  '#8B5CF6', // Purple (Tím Violet)
+  '#06B6D4', // Cyan (Xanh lơ)
+  '#10B981', // Emerald (Xanh ngọc lục bảo)
+  '#F59E0B', // Amber (Vàng nghệ)
+  '#EC4899', // Pink (Hồng cánh sen)
+  '#123D2F', // Forest Green (Xanh rừng đậm)
+  '#D4F05A', // Lime (Xanh chuối neon)
+  '#14B8A6', // Teal (Xanh mòng két)
+  '#E57373', // Red Coral (Đỏ san hô)
+  '#64748B'  // Slate (Xám đá)
 ];
 
 export const CategoriesPage = () => {

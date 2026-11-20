@@ -25,6 +25,10 @@ router.post('/forgot-password', authLimiter, AuthController.forgotPassword);
 router.post('/reset-password', authLimiter, AuthController.resetPassword);
 router.post('/verify-email', AuthController.verifyEmail);
 
+// Magic link confirmation
+router.get('/confirm-reset', AuthController.confirmReset);
+router.post('/check-reset-status', AuthController.checkResetStatus);
+
 // Yêu cầu xác thực JWT
 router.get('/me', authenticate, AuthController.getMe);
 

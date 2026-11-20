@@ -4,7 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { AuthSplitLayout } from '@/layouts/AuthSplitLayout';
 import { Input, Button, useToast } from '@/components/ui';
 import { Mail, Lock, LogIn } from 'lucide-react';
-
 export const LoginPage = () => {
   const { login } = useAuth();
   const { addToast } = useToast();
@@ -72,7 +71,7 @@ export const LoginPage = () => {
             <input type="checkbox" className="rounded accent-primary" defaultChecked />
             <span>Ghi nhớ phiên đăng nhập</span>
           </label>
-          <Link to="/forgot-password" className="text-tangerine font-semibold hover:underline">
+          <Link to="/forgot-password" state={{ email: formData.email }} className="text-tangerine font-semibold hover:underline">
             Quên mật khẩu?
           </Link>
         </div>

@@ -86,13 +86,23 @@ export class ReportService {
   /**
    * Cơ cấu chi tiêu theo danh mục (cho Biểu đồ Donut / Pie)
    */
-  static async getSpendingByCategory(userId, { month, year } = {}) {
+  static async getSpendingByCategory(userId, { month, year, fromMonth, toMonth } = {}) {
     const now = new Date();
-    const targetMonth = month || now.getMonth() + 1;
-    const targetYear = year || now.getFullYear();
+    const targetYear = year ? parseInt(year, 10) : now.getFullYear();
 
-    const startOfMonth = new Date(targetYear, targetMonth - 1, 1);
-    const endOfMonth = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999);
+    let startOfMonth, endOfMonth, labelPeriod;
+    if (fromMonth && toMonth) {
+      const fM = Math.max(1, Math.min(12, parseInt(fromMonth, 10)));
+      const tM = Math.max(fM, Math.min(12, parseInt(toMonth, 10)));
+      startOfMonth = new Date(targetYear, fM - 1, 1);
+      endOfMonth = new Date(targetYear, tM, 0, 23, 59, 59, 999);
+      labelPeriod = `Tháng ${fM} - ${tM}/${targetYear}`;
+    } else {
+      const targetMonth = month ? parseInt(month, 10) : now.getMonth() + 1;
+      startOfMonth = new Date(targetYear, targetMonth - 1, 1);
+      endOfMonth = new Date(targetYear, targetMonth, 0, 23, 59, 59, 999);
+      labelPeriod = `Tháng ${targetMonth}/${targetYear}`;
+    }
 
     const expenses = await prisma.transaction.findMany({
       where: {
@@ -135,21 +145,63 @@ export class ReportService {
     categories.sort((a, b) => b.amount - a.amount);
 
     return {
-      month: targetMonth,
+      month: month || now.getMonth() + 1,
       year: targetYear,
+      period: labelPeriod,
       totalExpense,
       categories
     };
   }
 
   /**
-   * Xu hướng Thu - Chi qua các tháng gần nhất (6 - 12 tháng, cho biểu đồ cột / BarChart)
+   * Xu hướng Thu - Chi qua các tháng (hoặc khoảng tháng fromMonth -> toMonth của year)
    */
-  static async getMonthlyTrends(userId, { months = 6 } = {}) {
+  static async getMonthlyTrends(userId, { months, year, fromMonth, toMonth } = {}) {
     const now = new Date();
     const result = [];
 
-    for (let i = months - 1; i >= 0; i--) {
+    // Nếu có chọn năm và khoảng tháng (từ tháng ... đến tháng ...)
+    if (year && fromMonth && toMonth) {
+      const y = parseInt(year, 10);
+      const fM = Math.max(1, Math.min(12, parseInt(fromMonth, 10)));
+      const tM = Math.max(fM, Math.min(12, parseInt(toMonth, 10)));
+
+      for (let m = fM; m <= tM; m++) {
+        const start = new Date(y, m - 1, 1);
+        const end = new Date(y, m, 0, 23, 59, 59, 999);
+
+        const txs = await prisma.transaction.groupBy({
+          by: ['type'],
+          where: {
+            userId,
+            date: { gte: start, lte: end }
+          },
+          _sum: { amount: true }
+        });
+
+        let income = 0;
+        let expense = 0;
+        txs.forEach((item) => {
+          if (item.type === 'INCOME') income = Number(item._sum.amount || 0);
+          if (item.type === 'EXPENSE') expense = Number(item._sum.amount || 0);
+        });
+
+        result.push({
+          label: `T${m}/${y}`,
+          month: m,
+          year: y,
+          income,
+          expense,
+          savings: income - expense
+        });
+      }
+
+      return result;
+    }
+
+    // Mặc định: N tháng gần nhất
+    const count = months ? parseInt(months, 10) : 6;
+    for (let i = count - 1; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const m = d.getMonth() + 1;
       const y = d.getFullYear();
@@ -189,34 +241,45 @@ export class ReportService {
   /**
    * Top danh mục chi tiêu nhiều nhất
    */
-  static async getTopCategories(userId, { limit = 5, month, year } = {}) {
-    const data = await this.getSpendingByCategory(userId, { month, year });
+  static async getTopCategories(userId, { limit = 5, month, year, fromMonth, toMonth } = {}) {
+    const data = await this.getSpendingByCategory(userId, { month, year, fromMonth, toMonth });
     return data.categories.slice(0, limit);
   }
 
   /**
    * Xuất báo cáo tài chính tổng hợp sang file Excel (ExcelJS)
    */
-  static async exportReportToExcel(userId, { month, year } = {}) {
+  static async exportReportToExcel(userId, { month, year, fromMonth, toMonth } = {}) {
     const now = new Date();
-    const targetMonth = month || now.getMonth() + 1;
-    const targetYear = year || now.getFullYear();
+    const targetYear = year ? parseInt(year, 10) : now.getFullYear();
 
-    const [summary, categoryReport, trends] = await Promise.all([
-      this.getSummary(userId),
-      this.getSpendingByCategory(userId, { month: targetMonth, year: targetYear }),
-      this.getMonthlyTrends(userId, { months: 6 })
+    const isRange = Boolean(fromMonth && toMonth);
+    const fM = isRange ? parseInt(fromMonth, 10) : (month ? parseInt(month, 10) : now.getMonth() + 1);
+    const tM = isRange ? parseInt(toMonth, 10) : fM;
+
+    const [trends, categoryReport] = await Promise.all([
+      this.getMonthlyTrends(userId, { year: targetYear, fromMonth: fM, toMonth: tM }),
+      this.getSpendingByCategory(userId, { year: targetYear, fromMonth: fM, toMonth: tM })
     ]);
+
+    const totalIncome = trends.reduce((sum, t) => sum + t.income, 0);
+    const totalExpense = trends.reduce((sum, t) => sum + t.expense, 0);
+    const netSavings = totalIncome - totalExpense;
+    const savingsRate = totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100 * 10) / 10 : 0;
 
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Pocketly 🌿';
     workbook.created = new Date();
 
-    // Sheet 1: Báo cáo Tổng quan tháng
-    const sheet1 = workbook.addWorksheet(`Tổng Quan T${targetMonth}-${targetYear}`);
+    const periodTitle = isRange
+      ? `Tháng ${fM} - Tháng ${tM} Năm ${targetYear}`
+      : `Tháng ${fM}/${targetYear}`;
+
+    // Sheet 1: Báo cáo Tổng quan
+    const sheet1 = workbook.addWorksheet(`Tổng Quan`);
     sheet1.columns = [
-      { header: 'Chỉ Số Tài Chính', key: 'metric', width: 30 },
-      { header: 'Giá Trị (VND)', key: 'value', width: 22 }
+      { header: 'Chỉ Số Tài Chính', key: 'metric', width: 34 },
+      { header: 'Giá Trị (VND)', key: 'value', width: 24 }
     ];
 
     sheet1.getRow(1).eachCell((cell) => {
@@ -224,14 +287,13 @@ export class ReportService {
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF123D2F' } };
     });
 
-    sheet1.addRow({ metric: 'Tổng số dư ví hiện có', value: summary.totalBalance });
-    sheet1.addRow({ metric: `Tổng thu nhập T${targetMonth}/${targetYear}`, value: summary.currentMonth.income });
-    sheet1.addRow({ metric: `Tổng chi tiêu T${targetMonth}/${targetYear}`, value: summary.currentMonth.expense });
-    sheet1.addRow({ metric: 'Tiền tiết kiệm ròng', value: summary.currentMonth.netSavings });
-    sheet1.addRow({ metric: 'Tỷ lệ tiết kiệm', value: `${summary.currentMonth.savingsRate}%` });
+    sheet1.addRow({ metric: 'Kỳ báo cáo', value: periodTitle });
+    sheet1.addRow({ metric: 'Tổng thu nhập', value: totalIncome });
+    sheet1.addRow({ metric: 'Tổng chi tiêu', value: totalExpense });
+    sheet1.addRow({ metric: 'Tiền tiết kiệm ròng', value: netSavings });
+    sheet1.addRow({ metric: 'Tỷ lệ tiết kiệm', value: `${savingsRate}%` });
 
-    // Format tiền tệ cho các hàng
-    [2, 3, 4, 5].forEach((rowNum) => {
+    [3, 4, 5].forEach((rowNum) => {
       sheet1.getCell(`B${rowNum}`).numFmt = '#,##0 "₫"';
       sheet1.getCell(`B${rowNum}`).font = { bold: true };
     });
@@ -260,8 +322,8 @@ export class ReportService {
       r.getCell('amount').numFmt = '#,##0 "₫"';
     });
 
-    // Sheet 3: Xu hướng 6 tháng
-    const sheet3 = workbook.addWorksheet(`Xu Hướng 6 Tháng`);
+    // Sheet 3: Xu hướng từng tháng
+    const sheet3 = workbook.addWorksheet(`Xu Hướng Các Tháng`);
     sheet3.columns = [
       { header: 'Tháng', key: 'label', width: 14 },
       { header: 'Thu Nhập (VND)', key: 'income', width: 20 },

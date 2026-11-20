@@ -24,6 +24,7 @@ import notificationRoutes from './routes/notification.routes.js';
 import reportRoutes from './routes/report.routes.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
 import adminRoutes from './routes/admin.routes.js';
+import supportRoutes from './routes/support.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,7 +41,19 @@ app.use(
 );
 app.use(
   cors({
-    origin: config.clientUrl,
+    origin: (origin, callback) => {
+      // Cho phép localhost và IP nội bộ
+      const allowed = [
+        config.clientUrl,
+        'http://localhost:5173',
+        'http://192.168.168.135:5173'
+      ];
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
   })
@@ -92,6 +105,7 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/chat', chatbotRoutes);
 app.use('/api/v1/admin', adminRoutes);
+app.use('/api/v1/support', supportRoutes);
 
 // 404 Handler
 app.use((req, res) => {

@@ -3,7 +3,7 @@ import { cn } from '@/utils/cn';
 
 /**
  * Component hiển thị tiền tệ định dạng chuẩn Intl.NumberFormat
- * Type: income (xanh lá), expense (cam/san hô), neutral
+ * Type: income (xanh lá), expense (đỏ), neutral
  */
 export const Money = ({
   amount = 0,
@@ -20,11 +20,22 @@ export const Money = ({
     maximumFractionDigits: currency === 'VND' ? 0 : 2
   }).format(Math.abs(numericAmount));
 
-  const sign = showSign && numericAmount > 0 ? '+' : showSign && numericAmount < 0 ? '-' : '';
+  let sign = '';
+  if (showSign) {
+    if (type === 'expense') {
+      sign = '-';
+    } else if (type === 'income') {
+      sign = '+';
+    } else {
+      sign = numericAmount > 0 ? '+' : numericAmount < 0 ? '-' : '';
+    }
+  } else if (numericAmount < 0) {
+    sign = '-';
+  }
 
   const colorClasses = {
-    income: 'text-primary dark:text-lime',
-    expense: 'text-tangerine dark:text-coral',
+    income: 'text-emerald-600 dark:text-lime',
+    expense: 'text-red-500 dark:text-red-400',
     neutral: 'text-ink-light dark:text-ink-dark'
   };
 

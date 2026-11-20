@@ -136,11 +136,12 @@ export const BudgetsPage = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           <Select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value, 10))}
-            className="w-32 py-2"
+            containerClassName="w-32 sm:w-36"
+            className="py-2 text-xs sm:text-sm"
           >
             {Array.from({ length: 12 }, (_, i) => (
               <option key={i + 1} value={i + 1}>
@@ -149,7 +150,7 @@ export const BudgetsPage = () => {
             ))}
           </Select>
 
-          <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal}>
+          <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal} className="whitespace-nowrap">
             Thiết lập ngân sách
           </Button>
         </div>

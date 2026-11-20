@@ -24,7 +24,8 @@ export const adminApi = {
   updateDefaultCategory: (id, data) => api.patch(`/admin/categories/${id}`, data),
   deleteDefaultCategory: (id) => api.delete(`/admin/categories/${id}`),
 
-  getChatbotStats: (params) => api.get('/admin/chatbot/stats', { params }),
+  getChatbotStats: (params) => api.get('/admin/chatbot/stats', { params: cleanParams(params) }),
+  deleteChatSession: (id) => api.delete(`/admin/chatbot/sessions/${id}`),
   listAuditLogs: (params) => api.get('/admin/audit-logs', { params }),
   broadcastNotification: (data) => api.post('/admin/broadcast', data)
 };

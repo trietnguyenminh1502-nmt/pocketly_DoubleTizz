@@ -268,25 +268,40 @@ export class AdminService {
   }
 
   /**
-   * 4. Chatbot Logs và Thống kê sử dụng
+   * 4. Chatbot Logs và Thống kê sử dụng theo cuộc trò chuyện (Chat Sessions)
    */
-  static async getChatbotStats({ page = 1, limit = 20 } = {}) {
-    const skip = (page - 1) * limit;
+  static async getChatbotStats({ page = 1, limit = 15, search } = {}) {
+    const skip = (Number(page) - 1) * Number(limit);
 
-    const [totalMessages, totalSessions, recentLogs] = await Promise.all([
+    const where = {};
+    if (search && search.trim()) {
+      const q = search.trim();
+      where.OR = [
+        { title: { contains: q, mode: 'insensitive' } },
+        { user: { fullName: { contains: q, mode: 'insensitive' } } },
+        { user: { email: { contains: q, mode: 'insensitive' } } },
+        { messages: { some: { content: { contains: q, mode: 'insensitive' } } } }
+      ];
+    }
+
+    const [totalMessages, totalSessions, filteredSessionsCount, sessions] = await Promise.all([
       prisma.chatMessage.count(),
       prisma.chatSession.count(),
-      prisma.chatMessage.findMany({
+      prisma.chatSession.count({ where }),
+      prisma.chatSession.findMany({
+        where,
         skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
+        take: Number(limit),
+        orderBy: { updatedAt: 'desc' },
         include: {
-          session: {
-            include: {
-              user: {
-                select: { id: true, fullName: true, email: true }
-              }
-            }
+          user: {
+            select: { id: true, fullName: true, email: true, avatarUrl: true }
+          },
+          _count: {
+            select: { messages: true }
+          },
+          messages: {
+            orderBy: { createdAt: 'asc' }
           }
         }
       })
@@ -298,13 +313,25 @@ export class AdminService {
         totalSessions,
         averageMessagesPerSession: totalSessions > 0 ? (totalMessages / totalSessions).toFixed(1) : 0
       },
-      recentLogs,
+      sessions,
+      // Backward compatibility nếu có nơi đọc recentLogs:
+      recentLogs: sessions.flatMap((s) => s.messages),
       meta: {
-        page,
-        limit,
-        totalPages: Math.ceil(totalMessages / limit)
+        page: Number(page),
+        limit: Number(limit),
+        total: filteredSessionsCount,
+        totalPages: Math.ceil(filteredSessionsCount / Number(limit)) || 1
       }
     };
+  }
+
+  /**
+   * Xóa một phiên hội thoại AI (Dành cho Admin)
+   */
+  static async deleteChatSession(sessionId) {
+    return prisma.chatSession.delete({
+      where: { id: sessionId }
+    });
   }
 
   /**

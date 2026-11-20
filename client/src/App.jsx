@@ -37,6 +37,7 @@ import { AdminUsersPage } from '@/pages/admin/AdminUsersPage';
 import { AdminCategoriesPage } from '@/pages/admin/AdminCategoriesPage';
 import { AdminChatbotPage } from '@/pages/admin/AdminChatbotPage';
 import { AdminAuditLogsPage } from '@/pages/admin/AdminAuditLogsPage';
+import { AdminSupportPage } from '@/pages/admin/AdminSupportPage';
 
 // Khởi tạo React Query Client
 const queryClient = new QueryClient({
@@ -97,6 +98,7 @@ export default function App() {
                     <Route path="/admin/users" element={<AdminUsersPage />} />
                     <Route path="/admin/categories" element={<AdminCategoriesPage />} />
                     <Route path="/admin/chatbot" element={<AdminChatbotPage />} />
+                    <Route path="/admin/support" element={<AdminSupportPage />} />
                     <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
                   </Route>
                 </Route>

@@ -9,6 +9,31 @@ import {
 } from '../utils/token.js';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
 
+// ─── In-memory store: lưu token đã được xác nhận qua email ───────────────────
+// Map: rawToken → { email, confirmedAt }
+const confirmedResetTokens = new Map();
+
+export const confirmResetToken = (rawToken, email) => {
+  confirmedResetTokens.set(rawToken, { email, confirmedAt: Date.now() });
+};
+
+export const checkConfirmedResetToken = (email) => {
+  for (const [token, data] of confirmedResetTokens.entries()) {
+    if (data.email === email) {
+      // Token hết hạn sau 10 phút kể từ lúc xác nhận
+      if (Date.now() - data.confirmedAt < 10 * 60 * 1000) {
+        return token;
+      }
+      confirmedResetTokens.delete(token);
+    }
+  }
+  return null;
+};
+
+export const removeConfirmedResetToken = (rawToken) => {
+  confirmedResetTokens.delete(rawToken);
+};
+
 export class AuthService {
   /**
    * Đăng ký tài khoản người dùng mới

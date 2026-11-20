@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { reportApi } from '@/api/finance';
+import { cn } from '@/utils/cn';
 import {
   Card,
   CardHeader,
@@ -15,11 +16,7 @@ import {
   FileSpreadsheet,
   TrendingUp,
   Calendar,
-  PieChart as PieIcon,
-  BarChart2,
-  ArrowUpRight,
-  ArrowDownLeft,
-  Percent
+  Filter
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -29,51 +26,74 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  PieChart,
-  Pie,
-  Cell
+  Legend
 } from 'recharts';
+
+const CATEGORY_COLOR_MAP = {
+  'Tiền thuê trọ': '#3B82F6',
+  'Mua sắm cá nhân': '#8B5CF6',
+  'Ăn uống': '#F97316',
+  'Di chuyển': '#06B6D4',
+  'Học tập & Giáo trình': '#10B981',
+  'Giải trí & Phim ảnh': '#F59E0B',
+  'Sức khỏe & Y tế': '#EC4899',
+  'Du Lịch': '#14B8A6'
+};
+
+const DISTINCT_COLORS = [
+  '#3B82F6', '#8B5CF6', '#F97316', '#06B6D4', '#10B981', '#F59E0B', '#EC4899', '#14B8A6', '#6366F1'
+];
 
 export const ReportsPage = () => {
   const { addToast } = useToast();
   const now = new Date();
 
-  const [periodTab, setPeriodTab] = useState('monthly'); // monthly, yearly
-  const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
+  // Bộ lọc: Năm và Khoảng tháng (Mặc định 6 tháng gần nhất: Tháng 6 -> Tháng 11/2026)
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [fromMonth, setFromMonth] = useState(Math.max(1, now.getMonth() - 4)); // T6
+  const [toMonth, setToMonth] = useState(now.getMonth() + 1); // T11
 
   // 1. Fetch dữ liệu Thống kê Báo cáo
-  const { data: summaryRes, isLoading: loadingSummary } = useQuery({
+  const { data: summaryRes } = useQuery({
     queryKey: ['reportSummary'],
     queryFn: () => reportApi.getSummary()
   });
 
   const { data: categorySpendingRes, isLoading: loadingCategory } = useQuery({
-    queryKey: ['categorySpending', { month: selectedMonth, year: selectedYear }],
-    queryFn: () => reportApi.getSpendingByCategory({ month: selectedMonth, year: selectedYear })
+    queryKey: ['categorySpending', { year: selectedYear, fromMonth, toMonth }],
+    queryFn: () => reportApi.getSpendingByCategory({ year: selectedYear, fromMonth, toMonth })
   });
 
   const { data: trendsRes, isLoading: loadingTrends } = useQuery({
-    queryKey: ['trends', { months: periodTab === 'yearly' ? 12 : 6 }],
-    queryFn: () => reportApi.getTrends({ months: periodTab === 'yearly' ? 12 : 6 })
+    queryKey: ['trends', { year: selectedYear, fromMonth, toMonth }],
+    queryFn: () => reportApi.getTrends({ year: selectedYear, fromMonth, toMonth })
   });
 
   const { data: topCategoriesRes, isLoading: loadingTop } = useQuery({
-    queryKey: ['topCategories', { month: selectedMonth, year: selectedYear }],
-    queryFn: () => reportApi.getTopCategories({ limit: 5, month: selectedMonth, year: selectedYear })
+    queryKey: ['topCategories', { year: selectedYear, fromMonth, toMonth }],
+    queryFn: () => reportApi.getTopCategories({ limit: 5, year: selectedYear, fromMonth, toMonth })
   });
 
   const summary = summaryRes?.data;
-  const categoryData = categorySpendingRes?.data?.categories || [];
   const trendsData = trendsRes?.data?.trends || [];
-  const topCategories = topCategoriesRes?.data?.topCategories || [];
+  const rawTop = topCategoriesRes?.data?.topCategories || [];
+  const topCategories = rawTop.map((cat, idx) => ({
+    ...cat,
+    color: CATEGORY_COLOR_MAP[cat.name] || cat.color || DISTINCT_COLORS[idx % DISTINCT_COLORS.length]
+  }));
 
-  // Export Báo cáo Excel
+  // Export Báo cáo Excel theo khoảng thời gian đã lọc
   const handleExportReportExcel = async () => {
     try {
-      addToast({ message: 'Đang khởi tạo tệp báo cáo tài chính Excel...', type: 'info' });
-      const res = await reportApi.exportReportExcel({ month: selectedMonth, year: selectedYear });
+      addToast({
+        message: `Đang khởi tạo tệp báo cáo tài chính T${fromMonth}-T${toMonth}/${selectedYear}...`,
+        type: 'info'
+      });
+      const res = await reportApi.exportReportExcel({
+        year: selectedYear,
+        fromMonth,
+        toMonth
+      });
 
       const blob = new Blob([res], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -81,7 +101,7 @@ export const ReportsPage = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `pocketly-financial-report-T${selectedMonth}-${selectedYear}.xlsx`;
+      a.download = `pocketly-report-T${fromMonth}-T${toMonth}-${selectedYear}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -93,54 +113,157 @@ export const ReportsPage = () => {
     }
   };
 
+  const setQuarter = (start, end) => {
+    setFromMonth(start);
+    setToMonth(end);
+  };
+
   return (
     <div className="space-y-6">
-      {/* 1. Header & Period Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* 1. Header & Bộ lọc thời gian linh hoạt */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
             Báo Cáo & Phân Tích 📈
           </h1>
           <p className="text-xs sm:text-sm text-ink-muted mt-1">
-            Báo cáo trực quan tình hình chi tiêu, so sánh tháng và xuất dữ liệu sang Excel
+            Báo cáo chi tiết theo năm, theo quý hoặc khoảng tháng tuỳ chọn và xuất file Excel
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Button
-            variant="outline"
-            size="sm"
-            icon={FileSpreadsheet}
-            onClick={handleExportReportExcel}
-          >
-            Xuất Báo Cáo Excel
-          </Button>
+        <Button
+          variant="primary"
+          size="sm"
+          icon={FileSpreadsheet}
+          onClick={handleExportReportExcel}
+          className="self-start md:self-auto shrink-0 shadow-soft"
+        >
+          Xuất Báo Cáo Excel
+        </Button>
+      </div>
 
-          {/* Tab Theo Tháng / Theo Năm */}
-          <div className="flex p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark">
+      {/* Filter Bar: Chọn Năm, Từ tháng, Đến tháng & Chọn nhanh theo Quý */}
+      <Card className="p-4 bg-surface-light dark:bg-surface-dark border-border-light dark:border-border-dark">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+            {/* Lọc Năm */}
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary dark:text-lime" />
+              <span className="text-xs font-bold text-ink-muted">Năm:</span>
+              <Select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))}
+                containerClassName="w-24"
+                className="py-1.5 text-xs font-bold"
+              >
+                {[2024, 2025, 2026, 2027].map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Lọc Khoảng Tháng (Từ tháng ... đến tháng ...) */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-ink-muted">Từ:</span>
+              <Select
+                value={fromMonth}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  setFromMonth(val);
+                  if (val > toMonth) setToMonth(val);
+                }}
+                containerClassName="w-28"
+                className="py-1.5 text-xs"
+              >
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    Tháng {i + 1}
+                  </option>
+                ))}
+              </Select>
+
+              <span className="text-xs font-bold text-ink-muted">đến:</span>
+              <Select
+                value={toMonth}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  setToMonth(val);
+                  if (val < fromMonth) setFromMonth(val);
+                }}
+                containerClassName="w-28"
+                className="py-1.5 text-xs"
+              >
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    Tháng {i + 1}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          {/* Chọn nhanh theo Quý (3 tháng) và Cả năm */}
+          <div className="flex items-center gap-1 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark overflow-x-auto">
             <button
-              onClick={() => setPeriodTab('monthly')}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                periodTab === 'monthly'
+              onClick={() => setQuarter(1, 3)}
+              className={cn(
+                'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
+                fromMonth === 1 && toMonth === 3
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted'
-              }`}
+                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+              )}
             >
-              6 Tháng
+              Quý 1 (T1-3)
             </button>
             <button
-              onClick={() => setPeriodTab('yearly')}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
-                periodTab === 'yearly'
+              onClick={() => setQuarter(4, 6)}
+              className={cn(
+                'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
+                fromMonth === 4 && toMonth === 6
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted'
-              }`}
+                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+              )}
             >
-              12 Tháng
+              Quý 2 (T4-6)
+            </button>
+            <button
+              onClick={() => setQuarter(7, 9)}
+              className={cn(
+                'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
+                fromMonth === 7 && toMonth === 9
+                  ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
+                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+              )}
+            >
+              Quý 3 (T7-9)
+            </button>
+            <button
+              onClick={() => setQuarter(10, 12)}
+              className={cn(
+                'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
+                fromMonth === 10 && toMonth === 12
+                  ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
+                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+              )}
+            >
+              Quý 4 (T10-12)
+            </button>
+            <button
+              onClick={() => setQuarter(1, 12)}
+              className={cn(
+                'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
+                fromMonth === 1 && toMonth === 12
+                  ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
+                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+              )}
+            >
+              Cả năm
             </button>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* 2. Month-over-Month Comparison Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -195,7 +318,11 @@ export const ReportsPage = () => {
         {/* Biểu đồ Cột Xu hướng */}
         <Card className="lg:col-span-8 flex flex-col p-6">
           <CardHeader
-            title={`Biểu Đồ Xu Hướng (${periodTab === 'yearly' ? '12 Tháng' : '6 Tháng'})`}
+            title={
+              fromMonth === toMonth
+                ? `Biểu Đồ Xu Hướng (Tháng ${fromMonth}/${selectedYear})`
+                : `Biểu Đồ Xu Hướng (Tháng ${fromMonth} - ${toMonth}/${selectedYear})`
+            }
             subtitle="Tương quan giữa dòng tiền vào và dòng tiền ra"
           />
           {loadingTrends ? (
@@ -229,7 +356,11 @@ export const ReportsPage = () => {
         <Card className="lg:col-span-4 flex flex-col p-6">
           <CardHeader
             title="Top 5 Chi Phí Lớn Nhất"
-            subtitle={`Chiếm tỷ trọng cao nhất trong tháng ${selectedMonth}`}
+            subtitle={
+              fromMonth === toMonth
+                ? `Chiếm tỷ trọng cao nhất trong Tháng ${fromMonth}/${selectedYear}`
+                : `Chiếm tỷ trọng cao nhất từ Tháng ${fromMonth} - ${toMonth}/${selectedYear}`
+            }
           />
           {loadingTop ? (
             <div className="space-y-3 my-auto">

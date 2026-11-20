@@ -14,19 +14,17 @@ export const FloatingChatWidget = () => {
         </div>
       )}
 
-      {/* Floating Trigger Pill/Button */}
+      {/* Floating Trigger Button (Icon tròn thu nhỏ) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 px-4 py-3 rounded-full bg-primary hover:bg-primary-hover text-white dark:bg-lime dark:text-ink-light dark:hover:bg-lime-hover shadow-modal hover:scale-105 active:scale-95 transition-all"
-        title="Trò chuyện cùng Pocket Assistant AI"
+        className="flex items-center justify-center w-12 h-12 rounded-full bg-primary hover:bg-primary-hover text-white dark:bg-lime dark:text-ink-light dark:hover:bg-lime-hover shadow-modal hover:scale-105 active:scale-95 transition-all"
+        title="Hỏi Pocket Assistant"
+        aria-label="Hỏi Pocket Assistant"
       >
         {isOpen ? (
           <X className="w-5 h-5" />
         ) : (
-          <>
-            <Bot className="w-5 h-5 text-lime dark:text-ink-light" />
-            <span className="text-xs font-bold font-heading hidden sm:inline">Hỏi Pocket Assistant</span>
-          </>
+          <Bot className="w-6 h-6 text-lime dark:text-ink-light" />
         )}
       </button>
     </div>

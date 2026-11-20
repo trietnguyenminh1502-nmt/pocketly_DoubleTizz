@@ -1,15 +1,17 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { ThemeToggle, Avatar } from '@/components/ui';
+import { ThemeToggle, Avatar, Dropdown } from '@/components/ui';
 import {
   LayoutDashboard,
   Users,
   Tags,
   Bot,
   FileSpreadsheet,
+  MessageSquare,
   ArrowLeft,
-  LogOut
+  LogOut,
+  User
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
@@ -17,11 +19,18 @@ export const AdminLayout = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
 
+  const adminUserMenuItems = [
+    { label: 'Hồ sơ cá nhân', icon: User, onClick: () => window.location.href = '/profile' },
+    { label: 'Quay lại Ứng dụng', icon: ArrowLeft, onClick: () => window.location.href = '/dashboard' },
+    { label: 'Đăng xuất Admin', icon: LogOut, danger: true, onClick: logout }
+  ];
+
   const adminNav = [
     { name: 'Thống kê Tổng quan', href: '/admin', icon: LayoutDashboard },
     { name: 'Quản lý Người dùng', href: '/admin/users', icon: Users },
     { name: 'Danh mục Hệ thống', href: '/admin/categories', icon: Tags },
     { name: 'Nhật ký Chatbot AI', href: '/admin/chatbot', icon: Bot },
+    { name: 'Hộp thư Hỗ trợ', href: '/admin/support', icon: MessageSquare },
     { name: 'Audit Logs', href: '/admin/audit-logs', icon: FileSpreadsheet }
   ];
 
@@ -77,8 +86,19 @@ export const AdminLayout = () => {
           <h2 className="text-sm font-bold text-ink-muted">Cổng thông tin Quản trị viên Hệ thống</h2>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Avatar fallback="A" size="sm" className="bg-tangerine text-white" />
-            <span className="text-xs font-bold text-ink-light dark:text-ink-dark">{user?.fullName}</span>
+            <Dropdown
+              trigger={
+                <button
+                  type="button"
+                  className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer"
+                  title="Menu tài khoản Quản trị viên"
+                >
+                  <Avatar fallback="A" size="sm" className="bg-tangerine text-white" />
+                  <span className="text-xs font-bold text-ink-light dark:text-ink-dark hidden sm:inline">Admin</span>
+                </button>
+              }
+              items={adminUserMenuItems}
+            />
           </div>
         </header>
 

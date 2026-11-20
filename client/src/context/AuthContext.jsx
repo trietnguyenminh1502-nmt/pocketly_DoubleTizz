@@ -40,9 +40,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     const res = await authApi.login(credentials);
-    const { user: userData, accessToken } = res.data;
+    const { user: userData, accessToken, refreshToken } = res.data;
 
     localStorage.setItem('pocketly_access_token', accessToken);
+    if (refreshToken) {
+      localStorage.setItem('pocketly_refresh_token', refreshToken);
+    }
     localStorage.setItem('pocketly_user', JSON.stringify(userData));
     setUser(userData);
     return userData;
@@ -59,6 +62,7 @@ export const AuthProvider = ({ children }) => {
       console.warn('Logout API error:', err);
     } finally {
       localStorage.removeItem('pocketly_access_token');
+      localStorage.removeItem('pocketly_refresh_token');
       localStorage.removeItem('pocketly_user');
       setUser(null);
       window.location.href = '/login';

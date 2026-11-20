@@ -7,14 +7,14 @@ const prisma = new PrismaClient();
 // Primary Forest Green: #123D2F, Accent Tangerine: #FF6A2B, Accent Lime: #D4F05A
 // Coral (Expense): #FF8A7A, Mint: #BFE8D6, Sand: #EBDFC7
 const DEFAULT_CATEGORIES = [
-  // Expense categories (coral / tangerine / sand tones)
-  { name: 'Ăn uống', icon: 'Utensils', color: '#FF6A2B', type: TransactionType.EXPENSE, isDefault: true },
-  { name: 'Di chuyển', icon: 'Bus', color: '#FF8A7A', type: TransactionType.EXPENSE, isDefault: true },
-  { name: 'Tiền thuê trọ', icon: 'Home', color: '#E57373', type: TransactionType.EXPENSE, isDefault: true },
-  { name: 'Học tập & Giáo trình', icon: 'GraduationCap', color: '#D4A373', type: TransactionType.EXPENSE, isDefault: true },
-  { name: 'Giải trí & Phim ảnh', icon: 'Gamepad2', color: '#FF9F1C', type: TransactionType.EXPENSE, isDefault: true },
-  { name: 'Mua sắm cá nhân', icon: 'ShoppingBag', color: '#E07A5F', type: TransactionType.EXPENSE, isDefault: true },
-  { name: 'Sức khỏe & Y tế', icon: 'HeartPulse', color: '#F28482', type: TransactionType.EXPENSE, isDefault: true },
+  // Expense categories: Bảng màu đa dạng, tương phản cao, dễ phân biệt
+  { name: 'Ăn uống', icon: 'Utensils', color: '#FF6A2B', type: TransactionType.EXPENSE, isDefault: true },             // Cam tươi
+  { name: 'Tiền thuê trọ', icon: 'Home', color: '#3B82F6', type: TransactionType.EXPENSE, isDefault: true },          // Xanh dương
+  { name: 'Mua sắm cá nhân', icon: 'ShoppingBag', color: '#8B5CF6', type: TransactionType.EXPENSE, isDefault: true }, // Tím
+  { name: 'Di chuyển', icon: 'Bus', color: '#06B6D4', type: TransactionType.EXPENSE, isDefault: true },               // Xanh lơ (Cyan)
+  { name: 'Học tập & Giáo trình', icon: 'GraduationCap', color: '#10B981', type: TransactionType.EXPENSE, isDefault: true }, // Xanh ngọc lục bảo
+  { name: 'Giải trí & Phim ảnh', icon: 'Gamepad2', color: '#F59E0B', type: TransactionType.EXPENSE, isDefault: true }, // Vàng nghệ (Amber)
+  { name: 'Sức khỏe & Y tế', icon: 'HeartPulse', color: '#EC4899', type: TransactionType.EXPENSE, isDefault: true },   // Hồng cánh sen
 
   // Income categories (green / mint / lime tones)
   { name: 'Lương đi làm', icon: 'Briefcase', color: '#123D2F', type: TransactionType.INCOME, isDefault: true },
@@ -76,7 +76,7 @@ async function main() {
   // 3. Tạo Admin User
   const admin = await prisma.user.create({
     data: {
-      fullName: 'Quản Trị Viên Pocketly',
+      fullName: 'Admin',
       email: 'admin@pocketly.com',
       passwordHash: adminPasswordHash,
       role: Role.ADMIN,
@@ -253,52 +253,60 @@ async function main() {
     });
     console.info(`💳 Đã tạo ${transactionsData.length} giao dịch chân thực trong 6 tháng qua.`);
 
-    // 8. Tạo Ngân sách mẫu (Budgets) cho tháng hiện tại
+    // 8. Tạo Ngân sách mẫu (Budgets) cho tháng hiện tại và 5 tháng trước đó
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
 
-    // Ngân sách tổng tháng
-    await prisma.budget.create({
-      data: {
-        userId: user.id,
-        categoryId: null, // Ngân sách tổng
-        amount: 4500000,
-        month: currentMonth,
-        year: currentYear,
-        alertThreshold: 80
-      }
-    });
-
-    // Ngân sách ăn uống
     const foodCat = categoryMap.get('Ăn uống');
-    if (foodCat) {
-      await prisma.budget.create({
-        data: {
-          userId: user.id,
-          categoryId: foodCat.id,
-          amount: 2000000,
-          month: currentMonth,
-          year: currentYear,
-          alertThreshold: 85
-        }
-      });
-    }
-
-    // Ngân sách giải trí
     const entCat = categoryMap.get('Giải trí & Phim ảnh');
-    if (entCat) {
+
+    // Tạo ngân sách cho 6 tháng (tháng 6 -> tháng 11)
+    for (let mOffset = 5; mOffset >= 0; mOffset--) {
+      const targetDate = new Date(now.getFullYear(), now.getMonth() - mOffset, 1);
+      const bMonth = targetDate.getMonth() + 1;
+      const bYear = targetDate.getFullYear();
+
+      // Ngân sách tổng tháng
       await prisma.budget.create({
         data: {
           userId: user.id,
-          categoryId: entCat.id,
-          amount: 500000,
-          month: currentMonth,
-          year: currentYear,
-          alertThreshold: 75
+          categoryId: null, // Ngân sách tổng
+          amount: 4500000,
+          month: bMonth,
+          year: bYear,
+          alertThreshold: 80
         }
       });
+
+      // Ngân sách ăn uống
+      if (foodCat) {
+        await prisma.budget.create({
+          data: {
+            userId: user.id,
+            categoryId: foodCat.id,
+            amount: 2000000,
+            month: bMonth,
+            year: bYear,
+            alertThreshold: 85
+          }
+        });
+      }
+
+      // Ngân sách giải trí
+      if (entCat) {
+        await prisma.budget.create({
+          data: {
+            userId: user.id,
+            categoryId: entCat.id,
+            amount: 500000,
+            month: bMonth,
+            year: bYear,
+            alertThreshold: 75
+          }
+        });
+      }
     }
-    console.info(`📊 Đã tạo ngân sách mẫu cho tháng ${currentMonth}/${currentYear}.`);
+    console.info(`📊 Đã tạo ngân sách mẫu xuyên suốt 6 tháng qua (Tháng 6 - Tháng 11/${currentYear}).`);
 
     // 9. Tạo Mục tiêu tiết kiệm (Saving Goals)
     const laptopDeadline = new Date(now.getFullYear(), now.getMonth() + 4, 30);

@@ -67,24 +67,31 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Gọi endpoint refresh-token (cookie httpOnly tự động gửi kèm)
+        // Gửi refreshToken từ localStorage dự phòng kèm cookie httpOnly
+        const storedRefreshToken = localStorage.getItem('pocketly_refresh_token');
         const res = await axios.post(
           `${baseURL}/auth/refresh-token`,
-          {},
+          { refreshToken: storedRefreshToken },
           { withCredentials: true }
         );
 
         const newAccessToken = res.data.data?.accessToken;
-        localStorage.setItem('pocketly_access_token', newAccessToken);
-
-        api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        const newRefreshToken = res.data.data?.refreshToken;
+        if (newAccessToken) {
+          localStorage.setItem('pocketly_access_token', newAccessToken);
+          api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        }
+        if (newRefreshToken) {
+          localStorage.setItem('pocketly_refresh_token', newRefreshToken);
+        }
 
         processQueue(null, newAccessToken);
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
         localStorage.removeItem('pocketly_access_token');
+        localStorage.removeItem('pocketly_refresh_token');
         localStorage.removeItem('pocketly_user');
         window.location.href = '/login?expired=true';
         return Promise.reject(refreshError);

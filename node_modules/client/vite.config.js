@@ -13,6 +13,10 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src')
     }
   },
+  server: {
+    host: '0.0.0.0',  // cho phép truy cập từ điện thoại cùng WiFi
+    port: 5173
+  },
   test: {
     globals: true,
     environment: 'jsdom',

@@ -7,7 +7,6 @@ import {
   Button,
   Input,
   Select,
-  Money,
   Modal,
   ConfirmDialog,
   Skeleton,
@@ -18,13 +17,11 @@ import {
   Wallet,
   Plus,
   ArrowRightLeft,
-  Edit2,
-  Trash2,
   CreditCard,
   Banknote,
-  Smartphone,
-  ShieldCheck
+  Smartphone
 } from 'lucide-react';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 
 const WALLET_ICONS = [
   { name: 'Banknote', icon: Banknote, label: 'Tiền mặt' },
@@ -32,6 +29,66 @@ const WALLET_ICONS = [
   { name: 'Smartphone', icon: Smartphone, label: 'Ví điện tử' },
   { name: 'Wallet', icon: Wallet, label: 'Ví chung' }
 ];
+
+const getWalletBadgeInfo = (name, index) => {
+  const lower = name.toLowerCase();
+  if (lower.includes('mb') || lower.includes('ngân hàng') || lower.includes('bank')) {
+    return {
+      color: '#38BDF8',
+      textColor: '#FFFFFF',
+      abbr: 'MB'
+    };
+  }
+  if (lower.includes('momo')) {
+    return {
+      color: '#F43F5E',
+      textColor: '#FFFFFF',
+      abbr: 'Mo'
+    };
+  }
+  if (lower.includes('tiền mặt') || lower.includes('cash')) {
+    return {
+      color: '#A3E635',
+      textColor: '#16211C',
+      abbr: 'TM'
+    };
+  }
+  const fallbackList = [
+    { color: '#8B5CF6', textColor: '#FFFFFF' },
+    { color: '#FB923C', textColor: '#FFFFFF' },
+    { color: '#06B6D4', textColor: '#FFFFFF' },
+    { color: '#EC4899', textColor: '#FFFFFF' }
+  ];
+  const item = fallbackList[index % fallbackList.length];
+  const words = name.trim().split(/\s+/);
+  const abbr = words.length >= 2
+    ? (words[0][0] + words[1][0]).toUpperCase()
+    : name.slice(0, 2).toUpperCase();
+
+  return {
+    color: item.color,
+    textColor: item.textColor,
+    abbr
+  };
+};
+
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0];
+    return (
+      <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-3 rounded-16 shadow-modal text-xs">
+        <p className="font-semibold text-ink-light dark:text-ink-dark flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: data.payload.color }} />
+          {data.name}:
+        </p>
+        <p className="font-bold text-ink-light dark:text-ink-dark tabular-nums mt-0.5">
+          {Number(data.value).toLocaleString('vi-VN')} đ ({data.payload.percentage}%)
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 export const WalletsPage = () => {
   const queryClient = useQueryClient();
@@ -64,6 +121,23 @@ export const WalletsPage = () => {
 
   const wallets = res?.data?.wallets || [];
   const totalBalance = res?.data?.totalBalance || 0;
+
+  // Dữ liệu cho biểu đồ Donut tỷ trọng các ví
+  const walletChartData = wallets.map((w, idx) => {
+    const badge = getWalletBadgeInfo(w.name, idx);
+    const val = Math.max(0, Number(w.balance));
+    const percentage = totalBalance > 0
+      ? ((val / totalBalance) * 100).toFixed(1).replace('.', ',')
+      : '0';
+
+    return {
+      name: w.name,
+      value: val,
+      color: badge.color,
+      percentage,
+      abbr: badge.abbr
+    };
+  });
 
   const saveMutation = useMutation({
     mutationFn: (data) => {
@@ -141,107 +215,165 @@ export const WalletsPage = () => {
     setIsTransferOpen(true);
   };
 
-  const getWalletIconComponent = (iconName) => {
-    const item = WALLET_ICONS.find((i) => i.name === iconName);
-    return item ? item.icon : Wallet;
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* 1. Header & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
-            Ví Tài Khoản 💳
+            Ví tài khoản
           </h1>
           <p className="text-xs sm:text-sm text-ink-muted mt-1">
-            Quản lý số dư tiền mặt, tài khoản ngân hàng và ví điện tử của bạn
+            Quản lý số dư tiền mặt, tài khoản ngân hàng và ví điện tử của bạn.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Button variant="outline" size="sm" icon={ArrowRightLeft} onClick={openTransferModal}>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={openTransferModal}
+            className="px-4 py-2.5 rounded-20 bg-[#F59E0B] hover:bg-[#D97706] text-ink-light font-bold text-xs sm:text-sm transition-all shadow-sm"
+          >
             Chuyển tiền giữa các ví
-          </Button>
-          <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal}>
-            Thêm ví mới
-          </Button>
+          </button>
+          <button
+            onClick={openCreateModal}
+            className="px-4 py-2.5 rounded-20 bg-primary hover:bg-primary-hover text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" /> Thêm ví mới
+          </button>
         </div>
       </div>
 
-      {/* 2. Total Balance Banner */}
-      <Card className="bg-sand/30 dark:bg-surface-dark border-border-light dark:border-border-dark flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
-            Tổng tài sản trên tất cả các ví
-          </span>
-          <div className="mt-1">
-            <Money amount={totalBalance} type="neutral" className="text-3xl sm:text-4xl font-extrabold font-heading" />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs font-semibold text-primary dark:text-lime bg-surface-light dark:bg-white/5 border border-border-light/60 dark:border-border-dark px-3.5 py-2 rounded-full w-fit">
-          <ShieldCheck className="w-4 h-4" />
-          <span>Bảo mật và cập nhật theo thời gian thực</span>
-        </div>
-      </Card>
-
-      {/* 3. Wallet Cards Grid */}
+      {/* 2. Main Content: 2 Cột (Donut Chart & Danh sách ví) */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <Skeleton className="h-44" />
-          <Skeleton className="h-44" />
-          <Skeleton className="h-44" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <Skeleton className="lg:col-span-5 h-80 rounded-3xl" />
+          <Skeleton className="lg:col-span-7 h-80 rounded-3xl" />
         </div>
       ) : wallets.length === 0 ? (
         <EmptyState title="Chưa có ví nào" description="Tạo ví để bắt đầu quản lý dòng tiền" className="py-16" />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {wallets.map((w) => {
-            const IconComp = getWalletIconComponent(w.icon);
-            return (
-              <Card key={w.id} className="flex flex-col justify-between p-6 space-y-4" hover>
-                <div className="flex items-start justify-between">
-                  <div className="p-3 rounded-20 bg-primary/10 dark:bg-lime/10 text-primary dark:text-lime">
-                    <IconComp className="w-6 h-6" />
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => openEditModal(w)}
-                      className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light transition-colors"
-                      title="Sửa ví"
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Cột trái: Card Biểu đồ Donut Cơ cấu tài sản ví */}
+          <Card className="lg:col-span-5 flex flex-col p-6 sm:p-7 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-3xl shadow-sm">
+            <CardHeader
+              title="Cơ Cấu Ví Tài Khoản"
+              subtitle={`Phân bổ dòng tiền theo các ví (Tổng: ${Number(totalBalance).toLocaleString('vi-VN')} đ)`}
+            />
+
+            <div className="flex flex-col flex-1 justify-between space-y-6">
+              <div className="h-60 sm:h-64 w-full flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={walletChartData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={68}
+                      outerRadius={98}
+                      paddingAngle={4}
+                      stroke="none"
                     >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    {wallets.length > 1 && (
-                      <button
-                        onClick={() => {
-                          setDeletingId(w.id);
-                          setIsDeleteDialogOpen(true);
-                        }}
-                        className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
-                        title="Xóa ví"
+                      {walletChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Chú thích (Legend) dạng lưới 2 cột giống Cơ cấu chi tiêu tháng này */}
+              <div className="pt-4 border-t border-border-light/60 dark:border-border-dark/60">
+                <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm">
+                  {walletChartData.map((w, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                        style={{ backgroundColor: w.color }}
+                      />
+                      <span className="truncate text-ink-muted text-xs sm:text-sm">{w.name}:</span>
+                      <strong className="text-ink-light dark:text-ink-dark text-xs sm:text-sm font-bold shrink-0">
+                        {w.percentage}%
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Cột phải: Danh sách các ví theo hàng */}
+          <Card className="lg:col-span-7 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-3xl p-6 sm:p-8 shadow-sm">
+            <div className="divide-y divide-border-light/60 dark:divide-border-dark/60">
+              {wallets.map((w, idx) => {
+                const badge = getWalletBadgeInfo(w.name, idx);
+                const val = Number(w.balance);
+                const percentage = totalBalance > 0
+                  ? ((Math.max(0, val) / totalBalance) * 100).toFixed(1).replace('.', ',')
+                  : '0';
+
+                return (
+                  <div
+                    key={w.id}
+                    className="py-5 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
+                  >
+                    {/* Badge & Tên ví */}
+                    <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                      <div
+                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center font-black text-sm sm:text-base shrink-0 shadow-sm"
+                        style={{ backgroundColor: badge.color, color: badge.textColor }}
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
+                        {badge.abbr}
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-sm sm:text-base text-ink-light dark:text-ink-dark truncate">
+                          {w.name}
+                        </h3>
+                        <p className="text-xs text-ink-muted mt-0.5">
+                          {percentage}% tổng tài sản
+                        </p>
+                      </div>
+                    </div>
 
-                <div>
-                  <h3 className="text-base font-bold text-ink-light dark:text-ink-dark">{w.name}</h3>
-                  <div className="mt-2">
-                    <Money amount={Number(w.balance)} type="neutral" className="text-2xl font-extrabold font-heading" />
-                  </div>
-                </div>
+                    {/* Số dư & Nút Thao tác */}
+                    <div className="flex items-center gap-3 sm:gap-5 shrink-0">
+                      <div className="text-right">
+                        <p className="text-base sm:text-lg font-black font-heading text-ink-light dark:text-ink-dark">
+                          {Number(w.balance).toLocaleString('vi-VN')} đ
+                        </p>
+                        <p className="text-xs text-ink-muted mt-0.5">
+                          {w._count?.transactions || 0} giao dịch liên kết
+                        </p>
+                      </div>
 
-                <div className="pt-3 border-t border-border-light/60 dark:border-border-dark/60 text-xs text-ink-muted flex justify-between">
-                  <span>Số giao dịch liên kết:</span>
-                  <strong className="text-ink-light dark:text-ink-dark">{w._count?.transactions || 0}</strong>
-                </div>
-              </Card>
-            );
-          })}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => openEditModal(w)}
+                          className="px-3 py-1.5 text-xs font-semibold border border-border-light dark:border-border-dark rounded-12 hover:bg-sand/40 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light transition-colors"
+                        >
+                          Sửa
+                        </button>
+                        {wallets.length > 1 && (
+                          <button
+                            onClick={() => {
+                              setDeletingId(w.id);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                            className="px-3 py-1.5 text-xs font-semibold border border-border-light dark:border-border-dark rounded-12 hover:bg-coral/10 hover:border-coral/40 hover:text-coral text-ink-muted transition-colors"
+                          >
+                            Xóa
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
         </div>
       )}
 

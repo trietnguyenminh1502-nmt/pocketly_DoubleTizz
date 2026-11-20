@@ -25,6 +25,7 @@ router.delete('/categories/:id', AdminController.deleteDefaultCategory);
 
 // 4. Nhật ký Chatbot & Thống kê
 router.get('/chatbot/stats', AdminController.getChatbotStats);
+router.delete('/chatbot/sessions/:id', AdminController.deleteChatSession);
 
 // 5. Nhật ký kiểm tra (Audit Log)
 router.get('/audit-logs', AdminController.listAuditLogs);
