@@ -1,7 +1,11 @@
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { prisma } from '../config/prisma.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export class UserService {
   /**
@@ -77,9 +81,14 @@ export class UserService {
 
     // Xóa file ảnh cũ nếu có
     if (user?.avatarUrl && user.avatarUrl.startsWith('/uploads/avatars/')) {
-      const oldPath = path.resolve(`.${user.avatarUrl}`);
+      const oldFilename = path.basename(user.avatarUrl);
+      const oldPath = path.resolve(__dirname, '../../uploads/avatars', oldFilename);
       if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
+        try {
+          fs.unlinkSync(oldPath);
+        } catch {
+          // Bỏ qua lỗi nếu file không tồn tại
+        }
       }
     }
 

@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import swaggerUi from 'swagger-ui-express';
 import { config } from './config/index.js';
 import { swaggerDocument } from './config/swagger.js';
@@ -24,12 +25,17 @@ import reportRoutes from './routes/report.routes.js';
 import chatbotRoutes from './routes/chatbot.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.resolve(__dirname, '../uploads');
+
 const app = express();
 
-// Security middlewares (cho phép nạp tài nguyên swagger UI an toàn)
+// Security middlewares (cho phép nạp tài nguyên swagger UI và ảnh đại diện tĩnh đa nguồn an toàn)
 app.use(
   helmet({
-    contentSecurityPolicy: false
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
   })
 );
 app.use(
@@ -59,8 +65,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 app.use('/api', apiLimiter);
 
-// Serve static upload files (avatars)
-app.use('/uploads', express.static(path.resolve('uploads')));
+// Serve static upload files (avatars) với header CORS/CORP cross-origin
+app.use(
+  '/uploads',
+  (req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+  },
+  express.static(uploadsDir)
+);
 
 // Swagger API Documentation (Tài liệu OpenAPI 3.0)
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

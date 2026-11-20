@@ -145,7 +145,7 @@ export const ProfilePage = () => {
         <Card className="md:col-span-5 flex flex-col items-center text-center p-6 space-y-4">
           <div className="relative group">
             <Avatar
-              src={user?.avatarUrl ? `http://localhost:5000${user.avatarUrl}` : null}
+              src={user?.avatarUrl}
               fallback={user?.fullName?.charAt(0) || 'U'}
               size="lg"
               className="w-24 h-24 text-2xl border-2 border-primary/20 dark:border-lime/30"
