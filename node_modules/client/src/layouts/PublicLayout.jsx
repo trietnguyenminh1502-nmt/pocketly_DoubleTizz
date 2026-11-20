@@ -51,7 +51,7 @@ export const PublicLayout = () => {
           <div className="flex items-center gap-6 text-xs text-ink-muted">
             <Link to="/terms" className="hover:underline">Điều khoản sử dụng</Link>
             <Link to="/privacy" className="hover:underline">Chính sách bảo mật</Link>
-            <a href="mailto:support@pocketly.com" className="hover:underline">Liên hệ hỗ trợ</a>
+            <Link to="/contact" className="hover:underline">Liên hệ hỗ trợ</Link>
           </div>
         </div>
       </footer>

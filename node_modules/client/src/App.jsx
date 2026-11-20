@@ -20,7 +20,7 @@ import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
 import { VerifyEmailPage } from '@/pages/auth/VerifyEmailPage';
-import { NotFoundPage, ForbiddenPage, LegalPage } from '@/pages/StaticPages';
+import { NotFoundPage, ForbiddenPage, LegalPage, ContactSupportPage } from '@/pages/StaticPages';
 import { DesignPreviewPage } from '@/pages/DesignPreviewPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { TransactionsPage } from '@/pages/TransactionsPage';
@@ -62,6 +62,8 @@ export default function App() {
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/terms" element={<LegalPage type="terms" />} />
                   <Route path="/privacy" element={<LegalPage type="privacy" />} />
+                  <Route path="/contact" element={<ContactSupportPage />} />
+                  <Route path="/support" element={<ContactSupportPage />} />
                   <Route path="/design-preview" element={<DesignPreviewPage />} />
                 </Route>
 

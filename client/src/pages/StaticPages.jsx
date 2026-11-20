@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui';
-import { Home, ArrowLeft } from 'lucide-react';
+import { Button, Card, Input, Textarea, Select, useToast } from '@/components/ui';
+import { Home, ArrowLeft, Mail, Phone, MapPin, MessageSquare, Send, HelpCircle, CheckCircle2 } from 'lucide-react';
 
 export const NotFoundPage = () => {
   return (
@@ -152,6 +152,229 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
         </div>
       )}
+    </div>
+  );
+};
+
+export const ContactSupportPage = () => {
+  const { addToast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    topic: 'general',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.message.trim()) {
+      addToast({ message: 'Vui lòng điền đầy đủ các thông tin bắt buộc!', type: 'error' });
+      return;
+    }
+
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+      addToast({
+        message: 'Gửi yêu cầu hỗ trợ thành công! Đội ngũ Pocketly sẽ liên hệ qua email trong vòng 24h.',
+        type: 'success'
+      });
+      setFormData({ fullName: '', email: '', topic: 'general', message: '' });
+    }, 600);
+  };
+
+  const faqs = [
+    {
+      q: 'Pocketly có hoàn toàn miễn phí cho sinh viên không?',
+      a: 'Có, Pocketly là dự án ứng dụng tài chính cá nhân dành riêng cho sinh viên với 100% tính năng hoàn toàn miễn phí, bao gồm ghi chép thu chi, báo cáo trực quan, quản lý ngân sách và trợ lý AI.'
+    },
+    {
+      q: 'Làm thế nào để tôi xuất dữ liệu chi tiêu ra file Excel?',
+      a: 'Bạn chỉ cần truy cập vào mục "Sổ Giao Dịch" hoặc "Báo Cáo & Phân Tích", ở góc trên bên phải sẽ có nút "Xuất Excel" và "Xuất CSV" để tải về máy tính tức thì.'
+    },
+    {
+      q: 'Trợ lý Pocket Assistant AI có bảo mật thông tin ví của tôi không?',
+      a: 'Hoàn toàn bảo mật. Dữ liệu tài chính chỉ được trích xuất tạm thời làm ngữ cảnh cục bộ trong phiên hỏi đáp của bạn. Pocketly cam kết không bán và không chia sẻ dữ liệu ví/chi tiêu cho bất kỳ bên thứ ba nào.'
+    },
+    {
+      q: 'Tôi quên mật khẩu thì phải làm sao?',
+      a: 'Tại màn hình Đăng nhập, hãy bấm vào nút "Quên mật khẩu", sau đó nhập địa chỉ email đã đăng ký. Hệ thống sẽ gửi mã xác thực để bạn tạo mật khẩu mới an toàn.'
+    }
+  ];
+
+  return (
+    <div className="max-w-5xl mx-auto py-12 px-4 space-y-12">
+      {/* 1. Header */}
+      <div className="text-center space-y-3 max-w-2xl mx-auto">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 dark:bg-lime/10 text-primary dark:text-lime text-xs font-bold uppercase tracking-wider">
+          <MessageSquare className="w-3.5 h-3.5" /> Trung Tâm Trợ Giúp
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-ink-light dark:text-ink-dark tracking-tight">
+          Liên Hệ & Hỗ Trợ Kỹ Thuật
+        </h1>
+        <p className="text-sm text-ink-muted">
+          Bạn gặp khó khăn trong quá trình sử dụng, cần giải đáp thắc mắc hoặc có ý tưởng đóng góp cho Pocketly? Đội ngũ chúng mình luôn sẵn sàng lắng nghe bạn!
+        </p>
+      </div>
+
+      {/* 2. Grid thông tin liên hệ & Form */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        {/* Cột trái: Kênh liên hệ trực tiếp */}
+        <div className="md:col-span-5 space-y-4">
+          <Card className="p-6 space-y-6">
+            <h2 className="text-lg font-bold font-heading text-ink-light dark:text-ink-dark border-b border-border-light dark:border-border-dark pb-3">
+              Thông Tin Liên Hệ
+            </h2>
+
+            <div className="space-y-4 text-sm">
+              <div className="flex items-start gap-3.5">
+                <div className="p-2.5 rounded-16 bg-primary/10 dark:bg-lime/10 text-primary dark:text-lime shrink-0">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-ink-light dark:text-ink-dark">Email hỗ trợ</h3>
+                  <p className="text-xs text-ink-muted mt-0.5">Phản hồi nhanh trong vòng 24 giờ</p>
+                  <a href="mailto:support@pocketly.com" className="text-xs font-bold text-primary dark:text-lime hover:underline mt-1 inline-block">
+                    support@pocketly.com
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3.5">
+                <div className="p-2.5 rounded-16 bg-tangerine/10 text-tangerine shrink-0">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-ink-light dark:text-ink-dark">Đường dây nóng</h3>
+                  <p className="text-xs text-ink-muted mt-0.5">Thứ 2 - Thứ 7 (8:00 - 18:00)</p>
+                  <a href="tel:02812345678" className="text-xs font-bold text-ink-light dark:text-ink-dark hover:underline mt-1 inline-block">
+                    (+84) 028 1234 5678
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3.5">
+                <div className="p-2.5 rounded-16 bg-sand dark:bg-surface-dark text-ink-muted shrink-0">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-ink-light dark:text-ink-dark">Địa chỉ nghiên cứu & phát triển</h3>
+                  <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">
+                    Khu Công Nghệ Phần Mềm (ITP) - Đại học Quốc gia TP.HCM, Phường Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-16 bg-sand/60 dark:bg-surface-dark text-xs text-ink-muted space-y-1">
+              <span className="font-bold text-ink-light dark:text-ink-dark block">⚡ Hỗ trợ trực tuyến:</span>
+              Bạn cũng có thể mở thanh <strong>"Hỏi Pocket Assistant"</strong> ở góc dưới bên phải màn hình để được trợ lý AI giải đáp tức thì về các thao tác sử dụng ví, ngân sách hay tra cứu giao dịch.
+            </div>
+          </Card>
+        </div>
+
+        {/* Cột phải: Form gửi tin nhắn hỗ trợ */}
+        <div className="md:col-span-7">
+          <Card className="p-6 sm:p-8 space-y-6">
+            <h2 className="text-lg font-bold font-heading text-ink-light dark:text-ink-dark border-b border-border-light dark:border-border-dark pb-3">
+              Gửi Yêu Cầu Hỗ Trợ
+            </h2>
+
+            {submitted ? (
+              <div className="text-center py-8 space-y-3">
+                <CheckCircle2 className="w-12 h-12 text-primary dark:text-lime mx-auto" />
+                <h3 className="text-lg font-bold text-ink-light dark:text-ink-dark">Cảm ơn bạn đã liên hệ!</h3>
+                <p className="text-xs text-ink-muted max-w-md mx-auto">
+                  Chúng mình đã tiếp nhận tin nhắn và sẽ phản hồi đến địa chỉ email của bạn sớm nhất. Chúc bạn có một ngày học tập và quản lý chi tiêu hiệu quả!
+                </p>
+                <Button variant="secondary" size="sm" onClick={() => setSubmitted(false)}>
+                  Gửi yêu cầu khác
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    label="Họ và tên của bạn (*)"
+                    placeholder="Nguyễn Văn A"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    required
+                  />
+                  <Input
+                    label="Địa chỉ Email (*)"
+                    type="email"
+                    placeholder="student@university.edu.vn"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <Select
+                  label="Vấn đề bạn cần hỗ trợ"
+                  value={formData.topic}
+                  onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+                  options={[
+                    { value: 'general', label: 'Hỏi đáp chung về ứng dụng Pocketly' },
+                    { value: 'account', label: 'Sự cố tài khoản & Đăng nhập' },
+                    { value: 'transaction', label: 'Giao dịch, Ví tiền & Báo cáo' },
+                    { value: 'ai', label: 'Trợ lý AI & Lời khuyên chi tiêu' },
+                    { value: 'feedback', label: 'Đóng góp ý kiến cải tiến ứng dụng' },
+                    { value: 'other', label: 'Vấn đề khác' }
+                  ]}
+                />
+
+                <Textarea
+                  label="Nội dung chi tiết (*)"
+                  placeholder="Mô tả cụ thể vấn đề bạn gặp phải hoặc nội dung cần giải đáp..."
+                  rows={4}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  required
+                />
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  icon={Send}
+                  isLoading={loading}
+                  className="w-full"
+                >
+                  Gửi yêu cầu hỗ trợ
+                </Button>
+              </form>
+            )}
+          </Card>
+        </div>
+      </div>
+
+      {/* 3. FAQ Section */}
+      <div className="space-y-6 pt-6 border-t border-border-light dark:border-border-dark">
+        <div className="text-center space-y-1">
+          <h2 className="text-xl font-bold font-heading text-ink-light dark:text-ink-dark flex items-center justify-center gap-2">
+            <HelpCircle className="w-5 h-5 text-primary dark:text-lime" /> Câu Hỏi Thường Gặp (FAQ)
+          </h2>
+          <p className="text-xs text-ink-muted">Giải đáp nhanh các thắc mắc phổ biến nhất của sinh viên</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {faqs.map((faq, idx) => (
+            <Card key={idx} className="p-5 space-y-2">
+              <h3 className="text-sm font-bold text-ink-light dark:text-ink-dark flex items-start gap-2">
+                <span className="text-primary dark:text-lime font-mono">Q:</span>
+                {faq.q}
+              </h3>
+              <p className="text-xs text-ink-muted leading-relaxed pl-5">
+                {faq.a}
+              </p>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
