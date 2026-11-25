@@ -2,26 +2,20 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { walletApi } from '@/api/finance';
 import {
-  Card,
-  CardHeader,
   Button,
   Input,
   Select,
   Modal,
   ConfirmDialog,
-  Skeleton,
-  EmptyState,
   useToast
 } from '@/components/ui';
 import {
   Wallet,
-  Plus,
   ArrowRightLeft,
   CreditCard,
   Banknote,
   Smartphone
 } from 'lucide-react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 
 const WALLET_ICONS = [
   { name: 'Banknote', icon: Banknote, label: 'Tiền mặt' },
@@ -30,64 +24,44 @@ const WALLET_ICONS = [
   { name: 'Wallet', icon: Wallet, label: 'Ví chung' }
 ];
 
-const getWalletBadgeInfo = (name, index) => {
-  const lower = name.toLowerCase();
-  if (lower.includes('mb') || lower.includes('ngân hàng') || lower.includes('bank')) {
-    return {
-      color: '#38BDF8',
-      textColor: '#FFFFFF',
-      abbr: 'MB'
-    };
-  }
-  if (lower.includes('momo')) {
-    return {
-      color: '#F43F5E',
-      textColor: '#FFFFFF',
-      abbr: 'Mo'
-    };
-  }
+// Hàm xác định màu thẻ ví theo chuẩn thiết kế
+const getWalletColor = (name = '', index = 0) => {
+  const lower = name.toLowerCase().trim();
   if (lower.includes('tiền mặt') || lower.includes('cash')) {
-    return {
-      color: '#A3E635',
-      textColor: '#16211C',
-      abbr: 'TM'
-    };
+    return '#4A7410';
   }
-  const fallbackList = [
-    { color: '#8B5CF6', textColor: '#FFFFFF' },
-    { color: '#FB923C', textColor: '#FFFFFF' },
-    { color: '#06B6D4', textColor: '#FFFFFF' },
-    { color: '#EC4899', textColor: '#FFFFFF' }
-  ];
-  const item = fallbackList[index % fallbackList.length];
-  const words = name.trim().split(/\s+/);
-  const abbr = words.length >= 2
-    ? (words[0][0] + words[1][0]).toUpperCase()
-    : name.slice(0, 2).toUpperCase();
-
-  return {
-    color: item.color,
-    textColor: item.textColor,
-    abbr
-  };
+  if (
+    lower.includes('ngân hàng') ||
+    lower.includes('bank') ||
+    lower.includes('tài khoản') ||
+    lower.includes('atm') ||
+    lower.includes('mb') ||
+    lower.includes('vcb') ||
+    lower.includes('bidv') ||
+    lower.includes('techcombank')
+  ) {
+    return '#1F4E9C';
+  }
+  if (
+    lower.includes('ví điện tử') ||
+    lower.includes('momo') ||
+    lower.includes('zalopay') ||
+    lower.includes('shopeepay') ||
+    lower.includes('viettel') ||
+    lower.includes('vnpay')
+  ) {
+    return '#C2185B';
+  }
+  const fallbackList = ['#B45309', '#0F766E', '#7C2D12', '#334155'];
+  return fallbackList[index % fallbackList.length];
 };
 
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    const data = payload[0];
-    return (
-      <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-3 rounded-16 shadow-modal text-xs">
-        <p className="font-semibold text-ink-light dark:text-ink-dark flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: data.payload.color }} />
-          {data.name}:
-        </p>
-        <p className="font-bold text-ink-light dark:text-ink-dark tabular-nums mt-0.5">
-          {Number(data.value).toLocaleString('vi-VN')} đ ({data.payload.percentage}%)
-        </p>
-      </div>
-    );
-  }
-  return null;
+// Định dạng tiền tệ kiểu tiếng Việt với Fraunces + tabular-nums
+const formatMoney = (amount) => {
+  const val = Number(amount || 0);
+  const isNegative = val < 0;
+  const formatted = new Intl.NumberFormat('vi-VN').format(Math.abs(val));
+  return `${isNegative ? '−' : ''}${formatted} ₫`;
 };
 
 export const WalletsPage = () => {
@@ -114,28 +88,32 @@ export const WalletsPage = () => {
     note: ''
   });
 
-  const { data: res, isLoading } = useQuery({
+  const { data: res, isLoading, isError, refetch } = useQuery({
     queryKey: ['wallets'],
     queryFn: () => walletApi.list()
   });
 
   const wallets = res?.data?.wallets || [];
-  const totalBalance = res?.data?.totalBalance || 0;
+  const rawTotal = res?.data?.totalBalance;
+  const totalBalance = typeof rawTotal === 'number'
+    ? rawTotal
+    : wallets.reduce((sum, w) => sum + Number(w.balance || 0), 0);
 
-  // Dữ liệu cho biểu đồ Donut tỷ trọng các ví
-  const walletChartData = wallets.map((w, idx) => {
-    const badge = getWalletBadgeInfo(w.name, idx);
-    const val = Math.max(0, Number(w.balance));
-    const percentage = totalBalance > 0
-      ? ((val / totalBalance) * 100).toFixed(1).replace('.', ',')
-      : '0';
+  // Sắp xếp ví theo số dư giảm dần
+  const sortedWallets = [...wallets].sort((a, b) => Number(b.balance || 0) - Number(a.balance || 0));
 
+  // Tính tỷ trọng phân bổ cho từng ví
+  const allocatedWallets = sortedWallets.map((w, index) => {
+    const balance = Number(w.balance || 0);
+    const color = getWalletColor(w.name, index);
+    const pct = totalBalance > 0 ? (Math.max(0, balance) / totalBalance) * 100 : 0;
+    const pctFormatted = pct.toFixed(1).replace('.', ',');
     return {
-      name: w.name,
-      value: val,
-      color: badge.color,
-      percentage,
-      abbr: badge.abbr
+      ...w,
+      balance,
+      color,
+      pct,
+      pctFormatted
     };
   });
 
@@ -150,14 +128,14 @@ export const WalletsPage = () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['reportSummary'] });
       addToast({
-        message: `${editingWallet ? 'Cập nhật' : 'Thêm'} ví thành công! 🌿`,
+        message: `${editingWallet ? 'Cập nhật' : 'Thêm'} ví thành công.`,
         type: 'success'
       });
       setIsModalOpen(false);
       setEditingWallet(null);
     },
     onError: (err) => {
-      addToast({ message: err.message || 'Lỗi khi lưu ví', type: 'error' });
+      addToast({ message: err.message || 'Lỗi khi lưu ví tài khoản', type: 'error' });
     }
   });
 
@@ -166,7 +144,7 @@ export const WalletsPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['reportSummary'] });
-      addToast({ message: 'Chuyển tiền giữa các ví thành công!', type: 'success' });
+      addToast({ message: 'Chuyển tiền giữa các ví thành công.', type: 'success' });
       setIsTransferOpen(false);
       setTransferData({ fromWalletId: '', toWalletId: '', amount: '', note: '' });
     },
@@ -180,7 +158,7 @@ export const WalletsPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['reportSummary'] });
-      addToast({ message: 'Đã xóa ví thành công!', type: 'success' });
+      addToast({ message: 'Đã xóa ví thành công.', type: 'success' });
       setIsDeleteDialogOpen(false);
       setDeletingId(null);
     },
@@ -203,7 +181,7 @@ export const WalletsPage = () => {
 
   const openTransferModal = () => {
     if (wallets.length < 2) {
-      addToast({ message: 'Bạn cần có ít nhất 2 ví để thực hiện chuyển tiền!', type: 'error' });
+      addToast({ message: 'Bạn cần có ít nhất 2 ví để thực hiện chuyển tiền.', type: 'error' });
       return;
     }
     setTransferData({
@@ -216,185 +194,235 @@ export const WalletsPage = () => {
   };
 
   return (
-    <div className="space-y-8">
-      {/* 1. Header & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8 text-[#16201B]">
+      {/* 1. Header */}
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="font-fraunces font-bold text-[36px] sm:text-[46px] tracking-[-1px] text-[#16201B] leading-tight">
             Ví tài khoản
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-[15px] text-[#56635C] mt-1">
             Quản lý số dư tiền mặt, tài khoản ngân hàng và ví điện tử của bạn.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        {/* Nút thao tác góc phải */}
+        <div className="flex flex-wrap items-center gap-[8px] justify-end sm:self-auto shrink-0">
           <button
+            type="button"
             onClick={openTransferModal}
-            className="px-5 py-2.5 rounded-full bg-[#F59E0B] hover:bg-[#D97706] text-ink-light font-semibold text-sm transition-all shadow-soft"
+            className="rounded-[12px] px-[18px] py-[12px] bg-[#F2B84B] text-[#14201A] text-[14px] font-medium hover:bg-[#e4ad44] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#14201A] focus-visible:ring-offset-2"
           >
             Chuyển tiền giữa các ví
           </button>
-          <Button
-            variant="primary"
-            size="md"
-            icon={Plus}
-            className="font-semibold text-sm"
+          <button
+            type="button"
             onClick={openCreateModal}
+            className="rounded-[12px] px-[18px] py-[12px] bg-[#0F3D2E] text-white text-[14px] font-medium hover:bg-[#0c2f23] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E] focus-visible:ring-offset-2"
           >
-            Thêm ví mới
-          </Button>
+            + Thêm ví mới
+          </button>
         </div>
       </div>
 
-      {/* 2. Main Content: 2 Cột (Donut Chart & Danh sách ví) */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <Skeleton className="lg:col-span-5 h-80 rounded-3xl" />
-          <Skeleton className="lg:col-span-7 h-80 rounded-3xl" />
+      {/* 2. Loading State */}
+      {isLoading && (
+        <div className="space-y-8 animate-pulse">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center pb-[36px]">
+            <div className="space-y-3">
+              <div className="h-4 w-48 bg-[#E2DDD3] rounded" />
+              <div className="h-16 w-72 bg-[#E2DDD3] rounded-xl" />
+            </div>
+            <div className="space-y-3">
+              <div className="h-[14px] w-full bg-[#E2DDD3] rounded-full" />
+              <div className="h-4 w-60 bg-[#E2DDD3] rounded" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="h-[240px] rounded-[24px] bg-[#E2DDD3] p-[24px]" />
+            ))}
+          </div>
         </div>
-      ) : wallets.length === 0 ? (
-        <EmptyState title="Chưa có ví nào" description="Tạo ví để bắt đầu quản lý dòng tiền" className="py-16" />
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Cột trái: Card Biểu đồ Donut Cơ cấu tài sản ví */}
-          <Card className="lg:col-span-5 flex flex-col p-6 sm:p-7 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-3xl shadow-sm">
-            <CardHeader
-              title="Cơ Cấu Ví Tài Khoản"
-              subtitle={`Phân bổ dòng tiền theo các ví (Tổng: ${Number(totalBalance).toLocaleString('vi-VN')} đ)`}
-            />
+      )}
 
-            <div className="flex flex-col flex-1 justify-between space-y-6">
-              <div className="h-56 sm:h-60 w-full flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={walletChartData}
-                      dataKey="value"
-                      nameKey="name"
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={68}
-                      outerRadius={98}
-                      paddingAngle={4}
-                      stroke="none"
-                    >
-                      {walletChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+      {/* 3. Error State */}
+      {!isLoading && isError && (
+        <div className="p-8 text-center bg-white rounded-[24px] border border-[#E8E2D6] space-y-3 my-6">
+          <p className="text-[15px] text-[#16201B]">Không thể tải danh sách ví tài khoản. Vui lòng thử lại.</p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="px-4 py-2 rounded-[12px] bg-[#0F3D2E] text-white text-[14px] font-medium hover:bg-[#0c2f23] transition-colors"
+          >
+            Thử lại
+          </button>
+        </div>
+      )}
 
-              {/* Số tiền tổng bự bự dưới biểu đồ */}
-              <div className="text-center py-2 -mt-2">
-                <span className="text-xs uppercase font-bold text-ink-muted tracking-wider block">
-                  Tổng tài sản tích lũy
-                </span>
-                <span className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading text-ink-light dark:text-ink-dark block mt-1">
-                  {Number(totalBalance).toLocaleString('vi-VN')} đ
-                </span>
-              </div>
-
-              {/* Chú thích (Legend) dạng lưới 2 cột giống Cơ cấu chi tiêu tháng này */}
-              <div className="pt-4 border-t border-border-light/60 dark:border-border-dark/60">
-                <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm">
-                  {walletChartData.map((w, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: w.color }}
-                      />
-                      <span className="truncate text-ink-muted text-xs sm:text-sm">{w.name}:</span>
-                      <strong className="text-ink-light dark:text-ink-dark text-xs sm:text-sm font-bold shrink-0">
-                        {w.percentage}%
-                      </strong>
-                    </div>
-                  ))}
-                </div>
+      {/* 4. Main Content */}
+      {!isLoading && !isError && (
+        <>
+          {/* Khối tổng tài sản (Hero) - Nằm thẳng trên nền trang */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center pb-[36px]">
+            {/* Cột trái: Số tổng thật lớn */}
+            <div>
+              <span className="text-[14px] font-medium text-[#56635C] block">
+                Tổng tài sản trên tất cả các ví
+              </span>
+              <div className="font-fraunces font-bold text-[44px] sm:text-[60px] lg:text-[72px] tracking-[-2px] text-[#16201B] tabular-nums leading-none mt-2">
+                {formatMoney(totalBalance)}
               </div>
             </div>
-          </Card>
 
-          {/* Cột phải: Danh sách các ví theo hàng */}
-          <Card className="lg:col-span-7 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-3xl p-6 sm:p-8 shadow-sm">
-            <div className="divide-y divide-border-light/60 dark:divide-border-dark/60">
-              {wallets.map((w, idx) => {
-                const badge = getWalletBadgeInfo(w.name, idx);
-                const val = Number(w.balance);
-                const percentage = totalBalance > 0
-                  ? ((Math.max(0, val) / totalBalance) * 100).toFixed(1).replace('.', ',')
-                  : '0';
+            {/* Cột phải: Thanh phân bổ & Chú thích */}
+            <div>
+              {totalBalance <= 0 || allocatedWallets.length === 0 ? (
+                <div>
+                  <div className="h-[14px] w-full rounded-full bg-[#E2DDD3]" />
+                  <p className="text-[14px] text-[#56635C] mt-2.5">Chưa có số dư</p>
+                </div>
+              ) : (
+                <div>
+                  {/* Thanh phân bổ cao 14px, bo tròn, các đoạn cách nhau 3px */}
+                  <div className="h-[14px] w-full rounded-full overflow-hidden flex gap-[3px] bg-[#E2DDD3]">
+                    {allocatedWallets.map((w) => {
+                      if (w.pct <= 0) return null;
+                      return (
+                        <div
+                          key={w.id}
+                          className="h-full transition-all duration-300"
+                          style={{ width: `${w.pct}%`, backgroundColor: w.color }}
+                          title={`${w.name}: ${w.pctFormatted}%`}
+                        />
+                      );
+                    })}
+                  </div>
 
-                return (
-                  <div
-                    key={w.id}
-                    className="py-5 first:pt-0 last:pb-0 flex items-center justify-between gap-4"
-                  >
-                    {/* Badge & Tên ví */}
-                    <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
-                      <div
-                        className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center font-black text-sm sm:text-base shrink-0 shadow-sm"
-                        style={{ backgroundColor: badge.color, color: badge.textColor }}
-                      >
-                        {badge.abbr}
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="font-bold text-sm sm:text-base text-ink-light dark:text-ink-dark truncate">
+                  {/* Chú thích dạng hàng */}
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-[14px] text-[#56635C]">
+                    {allocatedWallets.map((w) => (
+                      <div key={w.id} className="flex items-center gap-2">
+                        <span
+                          className="w-[10px] h-[10px] rounded-[2px] shrink-0"
+                          style={{ backgroundColor: w.color }}
+                        />
+                        <span className="truncate max-w-[160px]" title={w.name}>
                           {w.name}
-                        </h3>
-                        <p className="text-xs text-ink-muted mt-0.5">
-                          {percentage}% tổng tài sản
-                        </p>
+                        </span>
+                        <span className="tabular-nums font-medium text-[#16201B]">
+                          {w.pctFormatted}%
+                        </span>
                       </div>
-                    </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
-                    {/* Số dư & Nút Thao tác */}
-                    <div className="flex items-center gap-3 sm:gap-5 shrink-0">
-                      <div className="text-right">
-                        <p className="text-base sm:text-lg font-black font-heading text-ink-light dark:text-ink-dark">
-                          {Number(w.balance).toLocaleString('vi-VN')} đ
-                        </p>
-                        <p className="text-xs text-ink-muted mt-0.5">
-                          {w._count?.transactions || 0} giao dịch liên kết
-                        </p>
-                      </div>
+          {/* Lưới thẻ ví (Grid 4 cột) */}
+          {wallets.length === 0 ? (
+            <div className="border-2 border-dashed border-[#BDB7A8] rounded-[24px] p-12 text-center flex flex-col items-center justify-center gap-4 bg-transparent my-4">
+              <p className="text-[16px] font-medium text-[#56635C]">Chưa có ví nào</p>
+              <button
+                type="button"
+                onClick={openCreateModal}
+                className="px-5 py-2.5 rounded-[12px] bg-[#0F3D2E] text-white text-[14px] font-medium hover:bg-[#0c2f23] transition-colors"
+              >
+                + Thêm ví đầu tiên
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+              {allocatedWallets.map((w) => (
+                <div
+                  key={w.id}
+                  className="rounded-[24px] p-[24px] min-h-[240px] text-white flex flex-col justify-between transition-all duration-[180ms] hover:-translate-y-[3px] hover:shadow-[0_12px_28px_rgba(22,32,27,0.18)] motion-reduce:hover:translate-y-0 relative"
+                  style={{ backgroundColor: w.color }}
+                >
+                  {/* Hàng trên: Tên ví & Chip trang trí */}
+                  <div className="flex items-start justify-between gap-3">
+                    <h3
+                      className="text-[17px] font-semibold text-white truncate max-w-[calc(100%-48px)] leading-snug"
+                      title={w.name}
+                    >
+                      {w.name}
+                    </h3>
 
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => openEditModal(w)}
-                          className="px-3 py-1.5 text-xs font-semibold border border-border-light dark:border-border-dark rounded-12 hover:bg-sand/40 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light transition-colors"
-                        >
-                          Sửa
-                        </button>
-                        {wallets.length > 1 && (
-                          <button
-                            onClick={() => {
-                              setDeletingId(w.id);
-                              setIsDeleteDialogOpen(true);
-                            }}
-                            className="px-3 py-1.5 text-xs font-semibold border border-border-light dark:border-border-dark rounded-12 hover:bg-coral/10 hover:border-coral/40 hover:text-coral text-ink-muted transition-colors"
-                          >
-                            Xóa
-                          </button>
-                        )}
+                    {/* Chip trang trí 40x30px, bo 7px, nền rgba(255,255,255,.28) */}
+                    <div
+                      className="w-[40px] h-[30px] rounded-[7px] bg-white/[0.28] border border-white/20 relative flex items-center justify-center shrink-0"
+                      aria-hidden="true"
+                    >
+                      <div className="w-[18px] h-[20px] border border-white/40 rounded-[3px] flex items-center justify-center">
+                        <div className="w-[10px] h-[12px] border-t border-b border-white/40" />
                       </div>
                     </div>
                   </div>
-                );
-              })}
+
+                  {/* Phần dưới: Số dư, số giao dịch liên kết và nút Sửa/Xóa */}
+                  <div className="mt-6">
+                    <div className="font-fraunces font-bold text-[28px] sm:text-[32px] tracking-[-0.5px] tabular-nums text-white leading-tight">
+                      {formatMoney(w.balance)}
+                    </div>
+
+                    <p className="text-[13px] text-white/90 mt-1">
+                      {w._count?.transactions || 0} giao dịch liên kết
+                    </p>
+
+                    <div className="flex items-center gap-[14px] mt-4 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(w)}
+                        aria-label={`Sửa ví ${w.name}`}
+                        className="underline underline-offset-[3px] text-white hover:text-white/80 transition-colors bg-transparent border-0 py-[6px] px-0 text-[13px] font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+                      >
+                        Sửa
+                      </button>
+
+                      {wallets.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeletingId(w.id);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          aria-label={`Xóa ví ${w.name}`}
+                          className="underline underline-offset-[3px] text-white hover:text-white/80 transition-colors bg-transparent border-0 py-[6px] px-0 text-[13px] font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+                        >
+                          Xóa
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Thẻ cuối cùng - "Thêm ví mới" nét đứt */}
+              <button
+                type="button"
+                onClick={openCreateModal}
+                aria-label="Thêm ví mới"
+                className="border-2 border-dashed border-[#BDB7A8] bg-transparent rounded-[24px] min-h-[240px] p-[24px] flex flex-col items-center justify-center gap-2 group hover:border-[#0F3D2E] hover:bg-[#0F3D2E]/[0.05] transition-all duration-[180ms] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E] focus-visible:ring-offset-2"
+              >
+                <span className="text-[32px] font-bold leading-none text-[#56635C] group-hover:text-[#0F3D2E] transition-colors">
+                  +
+                </span>
+                <span className="text-[15px] font-medium text-[#56635C] group-hover:text-[#0F3D2E] transition-colors">
+                  Thêm ví mới
+                </span>
+              </button>
             </div>
-          </Card>
-        </div>
+          )}
+        </>
       )}
 
       {/* Modal Thêm / Sửa Ví */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingWallet ? 'Chỉnh Sửa Ví' : 'Thêm Ví Mới'}
+        title={editingWallet ? 'Chỉnh sửa ví' : 'Thêm ví mới'}
         maxWidth="max-w-md"
       >
         <form
@@ -406,7 +434,7 @@ export const WalletsPage = () => {
         >
           <Input
             label="Tên ví (*)"
-            placeholder="VD: MB Bank, Tiền mặt, Ví MoMo..."
+            placeholder="Ví dụ: MB Bank, Tiền mặt, Ví MoMo..."
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
@@ -464,7 +492,7 @@ export const WalletsPage = () => {
       <Modal
         isOpen={isTransferOpen}
         onClose={() => setIsTransferOpen(false)}
-        title="Chuyển Tiền Giữa Các Ví"
+        title="Chuyển tiền giữa các ví"
         maxWidth="max-w-md"
       >
         <form
@@ -485,7 +513,7 @@ export const WalletsPage = () => {
           >
             {wallets.map((w) => (
               <option key={w.id} value={w.id}>
-                {w.name} (Khả dụng: {Number(w.balance).toLocaleString('vi-VN')}₫)
+                {w.name} (Khả dụng: {Number(w.balance).toLocaleString('vi-VN')} ₫)
               </option>
             ))}
           </Select>
@@ -500,7 +528,7 @@ export const WalletsPage = () => {
               .filter((w) => w.id !== transferData.fromWalletId)
               .map((w) => (
                 <option key={w.id} value={w.id}>
-                  {w.name} (Số dư: {Number(w.balance).toLocaleString('vi-VN')}₫)
+                  {w.name} (Số dư: {Number(w.balance).toLocaleString('vi-VN')} ₫)
                 </option>
               ))}
           </Select>
@@ -509,7 +537,7 @@ export const WalletsPage = () => {
             label="Số tiền chuyển (VND) (*)"
             type="number"
             step="1000"
-            placeholder="VD: 200.000"
+            placeholder="Ví dụ: 200.000"
             value={transferData.amount}
             onChange={(e) => setTransferData({ ...transferData, amount: e.target.value })}
             required
@@ -517,7 +545,7 @@ export const WalletsPage = () => {
 
           <Input
             label="Ghi chú chuyển khoản"
-            placeholder="VD: Rút tiền ATM nạp ví tiền mặt"
+            placeholder="Ví dụ: Rút tiền ATM nạp ví tiền mặt"
             value={transferData.note}
             onChange={(e) => setTransferData({ ...transferData, note: e.target.value })}
           />
@@ -538,7 +566,7 @@ export const WalletsPage = () => {
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={() => deleteMutation.mutate(deletingId)}
-        title="Xóa ví tiền"
+        title="Xóa ví tài khoản"
         message="Hành động này sẽ xóa vĩnh viễn ví. Các giao dịch trước đó vẫn được lưu lại nhưng sẽ không còn ví liên kết. Bạn có muốn xóa không?"
         confirmText="Xóa ví này"
         isDanger
@@ -547,3 +575,4 @@ export const WalletsPage = () => {
     </div>
   );
 };
+

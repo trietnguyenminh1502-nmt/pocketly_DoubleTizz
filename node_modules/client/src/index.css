@@ -5,6 +5,7 @@
 @import '@fontsource/dm-sans/400.css';
 @import '@fontsource/dm-sans/500.css';
 @import '@fontsource/dm-sans/700.css';
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -83,5 +84,9 @@
   }
   .chat-md strong {
     font-weight: 600;
+  }
+
+  .font-fraunces {
+    font-family: 'Fraunces', Georgia, serif;
   }
 }
