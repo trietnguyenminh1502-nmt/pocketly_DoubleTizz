@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import ReactMarkdown from 'react-markdown';
+import BotMessage from '@/components/chat/BotMessage';
 import { adminApi } from '@/api/admin';
 import {
   Card,
@@ -434,16 +434,17 @@ export const AdminChatbotPage = () => {
                         </div>
 
                         <div
-                          className={`rounded-20 px-4 py-3 text-xs leading-relaxed ${
+                          className={`max-w-[85%] sm:max-w-[85%] rounded-20 px-4 py-3 text-xs sm:text-sm leading-relaxed ${
                             isUser
-                              ? 'bg-primary text-white dark:bg-lime dark:text-ink-light rounded-tr-none shadow-sm text-left'
-                              : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark rounded-tl-none shadow-sm prose prose-xs dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-sand/30 dark:prose-pre:bg-white/5'
+                              ? 'bg-primary text-white dark:bg-lime dark:text-ink-light rounded-tr-none shadow-sm text-left whitespace-pre-wrap'
+                              : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark rounded-tl-none shadow-sm'
                           }`}
+                          style={{ overflowWrap: 'anywhere' }}
                         >
                           {isUser ? (
                             <p className="whitespace-pre-wrap">{m.content}</p>
                           ) : (
-                            <ReactMarkdown>{m.content}</ReactMarkdown>
+                            <BotMessage content={m.content} />
                           )}
                         </div>
                       </div>

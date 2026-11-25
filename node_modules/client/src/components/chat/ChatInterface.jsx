@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import ReactMarkdown from 'react-markdown';
 import { chatApi } from '@/api/chatNotificationUser';
+import BotMessage from './BotMessage';
 import { Button, Input, Skeleton, useToast } from '@/components/ui';
 import {
   Bot,
@@ -279,16 +279,17 @@ export const ChatInterface = ({
                   )}
 
                   <div
-                    className={`max-w-[85%] sm:max-w-[75%] rounded-20 px-4 py-2.5 text-xs leading-relaxed ${
+                    className={`max-w-[85%] rounded-20 px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
                       isUser
-                        ? 'bg-primary text-white dark:bg-lime dark:text-ink-light rounded-br-none shadow-soft'
-                        : 'bg-sand/30 dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark rounded-bl-none prose prose-xs dark:prose-invert max-w-none'
+                        ? 'bg-primary text-white dark:bg-lime dark:text-ink-light rounded-br-none shadow-soft whitespace-pre-wrap'
+                        : 'bg-sand/30 dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark rounded-bl-none shadow-sm'
                     }`}
+                    style={{ overflowWrap: 'anywhere' }}
                   >
                     {isUser ? (
                       m.content
                     ) : (
-                      <ReactMarkdown>{m.content}</ReactMarkdown>
+                      <BotMessage content={m.content} />
                     )}
                   </div>
                 </div>

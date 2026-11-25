@@ -29,8 +29,9 @@ export class ChatContextBuilder {
       select: { fullName: true, currency: true }
     });
 
-    const currency = user?.currency || 'VND';
+    const currency = '₫';
     const fullName = user?.fullName || 'Người dùng';
+    const fmt = (n) => Number(n || 0).toLocaleString('vi-VN') + ' ₫';
 
     // 2. Tổng số dư và chi tiết các ví
     const wallets = await prisma.wallet.findMany({
@@ -39,7 +40,7 @@ export class ChatContextBuilder {
     });
     const totalBalance = wallets.reduce((sum, w) => sum + Number(w.balance), 0);
     const walletDetails = wallets
-      .map((w) => `- ${w.name}: ${Number(w.balance).toLocaleString('vi-VN')} ${currency}`)
+      .map((w) => `- ${w.name}: ${fmt(w.balance)}`)
       .join('\n');
 
     // 3. Tổng thu & chi tháng này
@@ -88,7 +89,7 @@ export class ChatContextBuilder {
 
     const sortedCats = sortedCatsList
       .slice(0, 5)
-      .map((c) => `- ${c.name}: ${c.amount.toLocaleString('vi-VN')} ${currency} (${c.pct}%)`)
+      .map((c) => `- ${c.name}: ${fmt(c.amount)} (${c.pct}%)`)
       .join('\n');
 
     // 5. Tình hình ngân sách tháng này (Budget Status)
@@ -103,7 +104,7 @@ export class ChatContextBuilder {
       const remaining = Math.max(0, limit - spent);
       const pct = limit > 0 ? Math.round((spent / limit) * 100) : 0;
       const targetName = b.category ? `mục "${b.category.name}"` : 'toàn tháng';
-      const statusText = pct >= 100 ? 'ĐÃ VƯỢT HẠN MỨC ⚠️' : pct >= b.alertThreshold ? 'SẮP CHẠM HẠN MỨC 🔔' : 'Bình thường ✅';
+      const statusText = pct >= 100 ? 'ĐÃ VƯỢT HẠN MỨC' : pct >= b.alertThreshold ? 'SẮP CHẠM HẠN MỨC' : 'Trong hạn mức';
 
       return {
         targetName,
@@ -112,7 +113,7 @@ export class ChatContextBuilder {
         remaining,
         pct,
         statusText,
-        line: `- Ngân sách ${targetName}: Hạn mức ${limit.toLocaleString('vi-VN')} ${currency}, đã tiêu ${spent.toLocaleString('vi-VN')} ${currency} (${pct}%) -> [${statusText}]`
+        line: `- Ngân sách ${targetName}: Hạn mức ${fmt(limit)}, đã tiêu ${fmt(spent)} (${pct}%) -> [${statusText}]`
       };
     });
 
@@ -134,7 +135,7 @@ export class ChatContextBuilder {
       const sign = tx.type === 'INCOME' ? '+' : '-';
       const cat = tx.category?.name || 'Khác';
       const note = tx.note ? ` ("${tx.note}")` : '';
-      return `- ${d}: [${tx.type === 'INCOME' ? 'Thu' : 'Chi'}] ${sign}${Number(tx.amount).toLocaleString('vi-VN')} ${currency} | ${cat} qua ${tx.wallet?.name}${note}`;
+      return `- ${d}: [${tx.type === 'INCOME' ? 'Thu' : 'Chi'}] ${sign}${fmt(tx.amount)} | ${cat} qua ${tx.wallet?.name}${note}`;
     });
 
     // 7. Các mục tiêu tiết kiệm hiện có
@@ -154,7 +155,7 @@ export class ChatContextBuilder {
         target: tgt,
         pct,
         deadline,
-        line: `- "${g.title}": ${cur.toLocaleString('vi-VN')} / ${tgt.toLocaleString('vi-VN')} ${currency} (${pct}%)${deadline}`
+        line: `- "${g.title}": ${fmt(cur)} / ${fmt(tgt)} (${pct}%)${deadline}`
       };
     });
 
@@ -197,22 +198,73 @@ export class ChatContextBuilder {
 
   /**
    * Tóm tắt toàn bộ bức tranh tài chính THỰC TẾ của người dùng hiện tại
-   * để đưa vào System Context cho AI (Giữ nguyên định dạng ban đầu)
+   * để đưa vào System Context cho AI.
+   * Tự tính toán số liệu và đính kèm mục [SỐ ĐÃ TÍNH SẴN] để AI không tự làm toán.
    */
   static async buildFinancialContext(userId) {
     const data = await this.getFinancialSummary(userId);
+    const fmt = (n) => Number(n || 0).toLocaleString('vi-VN') + ' ₫';
+
+    // 1. Số liệu thực tế từ database
+    const income = data.currentIncome;
+    const actualSpend = data.currentExpense;
+    const netSavings = data.netSavings;
+    const totalBalance = data.totalBalance;
+
+    // 2. Tính toán ngân sách từ dữ liệu thật
+    const categoryBudgets = (data.budgets || []).filter((b) => b.targetName !== 'toàn tháng');
+    const overallBudget = (data.budgets || []).find((b) => b.targetName === 'toàn tháng');
+    const totalBudgetLimit = categoryBudgets.length > 0
+      ? categoryBudgets.reduce((s, b) => s + b.limit, 0)
+      : (overallBudget?.limit || 0);
+
+    const plannedSaving = income - totalBudgetLimit;
+    const budgetStatus = totalBudgetLimit > 0
+      ? (actualSpend <= totalBudgetLimit ? `TRONG HẠN MỨC (còn ${fmt(totalBudgetLimit - actualSpend)})` : `VƯỢT HẠN MỨC ${fmt(actualSpend - totalBudgetLimit)}`)
+      : 'Chưa đặt hạn mức';
+
+    // 3. Tính toán mục tiêu tiết kiệm từ dữ liệu thật
+    const activeGoals = data.savingGoals || [];
+    const primaryGoal = activeGoals.find((g) => g.current < g.target) || activeGoals[0];
+    const goalTarget = primaryGoal ? primaryGoal.target : 0;
+    const goalCurrent = primaryGoal ? primaryGoal.current : 0;
+    const goalRemaining = Math.max(0, goalTarget - goalCurrent);
+
+    // Đánh giá đạt/chưa đạt mục tiêu tiết kiệm
+    let goalAssessment = 'Chưa thiết lập';
+    if (primaryGoal) {
+      if (netSavings >= goalRemaining) {
+        goalAssessment = 'ĐẠT (tiền tiết kiệm tháng này đủ hoàn thành mục tiêu)';
+      } else {
+        const shortage = goalRemaining - netSavings;
+        goalAssessment = `CHƯA ĐẠT, thiếu ${fmt(shortage)}`;
+      }
+    }
+
+    // 4. Khối SỐ ĐÃ TÍNH SẴN (Server tự tính số, AI không tự cộng trừ)
+    const computedSection = `
+SỐ ĐÃ TÍNH SẴN:
+- Tổng thu nhập: ${fmt(income)}
+- Tổng chi: ${fmt(actualSpend)}
+- Còn lại để tiết kiệm: ${fmt(netSavings)}
+${totalBudgetLimit > 0 ? `- Tổng hạn mức ngân sách: ${fmt(totalBudgetLimit)} (${budgetStatus})
+- Tiết kiệm dự kiến nếu chi đúng ngân sách: ${fmt(plannedSaving)}` : ''}
+${primaryGoal ? `- Mục tiêu tiết kiệm ("${primaryGoal.title}"): ${fmt(goalTarget)} (${goalAssessment})
+- Đã tích lũy trong mục tiêu: ${fmt(goalCurrent)}
+- Còn thiếu để hoàn thành mục tiêu: ${fmt(goalRemaining)}` : '- Mục tiêu tiết kiệm: Chưa thiết lập'}
+`.trim();
 
     return `
 === HỒ SƠ TÀI CHÍNH THỰC TẾ CỦA NGƯỜI DÙNG (${data.user.fullName}) ===
-* Đơn vị tiền tệ: ${data.user.currency}
-* Tổng số dư tài sản hiện có: ${data.totalBalance.toLocaleString('vi-VN')} ${data.user.currency}
+* Đơn vị tiền tệ: ₫
+* Tổng số dư tài sản hiện có: ${fmt(data.totalBalance)}
 Chi tiết các ví:
 ${data.walletDetails || 'Chưa có ví nào'}
 
 * Tình hình tài chính Tháng ${data.currentMonth}/${data.currentYear}:
-- Tổng thu nhập tháng: ${data.currentIncome.toLocaleString('vi-VN')} ${data.user.currency}
-- Tổng chi tiêu tháng: ${data.currentExpense.toLocaleString('vi-VN')} ${data.user.currency}
-- Tiết kiệm ròng tháng: ${data.netSavings.toLocaleString('vi-VN')} ${data.user.currency}
+- Tổng thu nhập tháng: ${fmt(data.currentIncome)}
+- Tổng chi tiêu tháng: ${fmt(data.currentExpense)}
+- Tiết kiệm ròng tháng: ${fmt(data.netSavings)}
 
 * Top danh mục chi tiêu nhiều nhất tháng này:
 ${data.sortedCats || 'Chưa có chi tiêu trong tháng'}
@@ -229,6 +281,9 @@ ${data.goalLines.length > 0 ? data.goalLines.join('\n') : 'Chưa có mục tiêu
 
 * 10 giao dịch gần đây nhất của người dùng:
 ${data.txLines.length > 0 ? data.txLines.join('\n') : 'Chưa có giao dịch'}
+
+----------------------------------------
+${computedSection}
 ===============================================================
 `.trim();
   }
@@ -237,10 +292,11 @@ ${data.txLines.length > 0 ? data.txLines.join('\n') : 'Chưa có giao dịch'}
    * Phản hồi dạng Rule-based khi cả hai Provider AI đều gặp sự cố.
    * Nhận diện intent từ từ khóa (total spending this month, top category, budget status, savings goals, balance, all categories)
    * và chỉ trả lời đúng intent đó với số liệu thực tế từ database.
-   * Nếu câu hỏi không liên quan đến tài chính cá nhân, trả về thông báo từ chối thân thiện.
+   * Không dùng emoji, không dùng bảng Markdown, xuống dòng hợp lý và số tiền định dạng chuẩn.
    */
   static async generateRuleBasedFallback(userId, question) {
     const query = normalizeText(question);
+    const fmt = (n) => Number(n || 0).toLocaleString('vi-VN') + ' ₫';
 
     // 0. Nhận diện intent: Liệt kê tất cả danh mục tài chính trong hệ thống (all categories)
     const isAllCategories =
@@ -325,14 +381,13 @@ ${data.txLines.length > 0 ? data.txLines.join('\n') : 'Chưa có giao dịch'}
     // Truy xuất số liệu tài chính thực tế từ database
     const data = await this.getFinancialSummary(userId);
     const { user, currentMonth, currentYear, totalBalance, wallets, currentIncome, currentExpense, netSavings, sortedCatsList, budgets, savingGoals, expenseCategories, incomeCategories } = data;
-    const currency = user.currency;
 
     // Trả lời CHỈ đúng intent khớp
     if (isAllCategories) {
       const expenseLines = expenseCategories.map((c) => `- ${c.name}`).join('\n');
       const incomeLines = incomeCategories.map((c) => `- ${c.name}`).join('\n');
 
-      return `📋 **Danh sách các danh mục tài chính có trong hệ thống Pocketly:**\n\n💸 **Danh mục Chi tiêu (${expenseCategories.length}):**\n${expenseLines}\n\n💰 **Danh mục Thu nhập (${incomeCategories.length}):**\n${incomeLines}`;
+      return `**Danh sách các danh mục tài chính trong Pocketly:**\n\n**Danh mục Chi tiêu (${expenseCategories.length})**\n${expenseLines}\n\n**Danh mục Thu nhập (${incomeCategories.length})**\n${incomeLines}`;
     }
 
     if (isTopCategory) {
@@ -343,46 +398,46 @@ ${data.txLines.length > 0 ? data.txLines.join('\n') : 'Chưa có giao dịch'}
       const top1 = sortedCatsList[0];
       const categoryLines = sortedCatsList
         .slice(0, 5)
-        .map((c, idx) => `${idx + 1}. **${c.name}**: ${c.amount.toLocaleString('vi-VN')} ${currency} (${c.pct}% tổng chi tiêu)`)
+        .map((c, idx) => `${idx + 1}. **${c.name}**: ${fmt(c.amount)} — chiếm ${c.pct}% tổng chi tiêu.`)
         .join('\n');
 
-      return `🏆 **Top danh mục chi tiêu nhiều nhất Tháng ${currentMonth}/${currentYear}:**\n${categoryLines}\n\n👉 Khoản chi lớn nhất là **"${top1.name}"** với **${top1.amount.toLocaleString('vi-VN')} ${currency}** (${top1.pct}% tổng chi tiêu).`;
+      return `**Top danh mục chi tiêu nhiều nhất Tháng ${currentMonth}/${currentYear}**\n${categoryLines}\n\nKhoản chi lớn nhất là **${top1.name}**: ${fmt(top1.amount)} — chiếm ${top1.pct}% tổng chi tiêu.`;
     }
 
     if (isBudget) {
       if (budgets.length === 0) {
-        return `Bạn chưa thiết lập hạn mức ngân sách nào cho Tháng ${currentMonth}/${currentYear}. Bạn có thể vào mục Ngân sách để thiết lập hạn mức chi tiêu cho các danh mục nhé!`;
+        return `Bạn chưa thiết lập hạn mức ngân sách nào cho Tháng ${currentMonth}/${currentYear}. Bạn có thể vào mục Ngân sách để thiết lập hạn mức chi tiêu cho các danh mục nhé.`;
       }
 
       const budgetLines = budgets
-        .map((b) => `- **${b.targetName}**: Hạn mức ${b.limit.toLocaleString('vi-VN')} ${currency} | Đã tiêu: ${b.spent.toLocaleString('vi-VN')} ${currency} (${b.pct}%) | Còn lại: **${b.remaining.toLocaleString('vi-VN')} ${currency}** [${b.statusText}]`)
+        .map((b) => `- ${b.targetName}: ${fmt(b.limit)} — đã tiêu ${fmt(b.spent)} (${b.pct}%), còn lại ${fmt(b.remaining)} [${b.statusText}].`)
         .join('\n');
 
-      return `🎯 **Tình hình ngân sách Tháng ${currentMonth}/${currentYear}:**\n${budgetLines}`;
+      return `**Tình hình ngân sách Tháng ${currentMonth}/${currentYear}**\n${budgetLines}`;
     }
 
     if (isSavingGoal) {
       if (savingGoals.length === 0) {
-        return `Hiện tại bạn chưa có mục tiêu tiết kiệm nào. Hãy tạo mục tiêu mới trong mục Tiết kiệm để cùng Pocketly tích lũy nhé!`;
+        return `Hiện tại bạn chưa có mục tiêu tiết kiệm nào. Hãy tạo mục tiêu mới trong mục Tiết kiệm để cùng Pocketly tích lũy nhé.`;
       }
 
       const goalLines = savingGoals
-        .map((g) => `- 🎯 **"${g.title}"**: Đã tích lũy ${g.current.toLocaleString('vi-VN')} / ${g.target.toLocaleString('vi-VN')} ${currency} (**${g.pct}%**)${g.deadline}`)
+        .map((g) => `- ${g.title}: ${fmt(g.current)} / ${fmt(g.target)} — đạt ${g.pct}%${g.deadline ? ' — ' + g.deadline : ''}.`)
         .join('\n');
 
-      return `🐷 **Tiến độ các mục tiêu tiết kiệm hiện tại:**\n${goalLines}`;
+      return `**Tiến độ các mục tiêu tiết kiệm hiện tại**\n${goalLines}`;
     }
 
     if (isBalance) {
       const walletList = wallets.length > 0
-        ? wallets.map((w) => `- **${w.name}**: ${Number(w.balance).toLocaleString('vi-VN')} ${currency}`).join('\n')
+        ? wallets.map((w) => `- ${w.name}: ${fmt(w.balance)} — số dư khả dụng.`).join('\n')
         : 'Chưa có ví nào';
 
-      return `💰 **Số dư khả dụng hiện tại:**\n- **Tổng số dư tài sản:** **${totalBalance.toLocaleString('vi-VN')} ${currency}**\n\nChi tiết các ví:\n${walletList}`;
+      return `**Số dư khả dụng hiện tại**\n- Tổng số dư tài sản: ${fmt(totalBalance)}\n\nChi tiết các ví:\n${walletList}`;
     }
 
     if (isTotalSpending) {
-      return `📊 **Tổng chi tiêu Tháng ${currentMonth}/${currentYear}:**\n- **Tổng chi tiêu:** **${currentExpense.toLocaleString('vi-VN')} ${currency}**\n- **Tổng thu nhập:** ${currentIncome.toLocaleString('vi-VN')} ${currency}\n- **Tiết kiệm ròng:** ${netSavings >= 0 ? '+' : ''}${netSavings.toLocaleString('vi-VN')} ${currency}`;
+      return `**Tổng quan thu chi Tháng ${currentMonth}/${currentYear}**\n- Tổng chi: ${fmt(currentExpense)} — toàn bộ chi tiêu trong tháng.\n- Tổng thu nhập: ${fmt(currentIncome)} — toàn bộ thu nhập trong tháng.\n- Còn lại để tiết kiệm: ${fmt(netSavings)} — chênh lệch thu trừ chi.`;
     }
 
     return 'Mình chỉ hỗ trợ các câu hỏi về tài chính cá nhân nhé. Bạn thử hỏi về chi tiêu, ngân sách hoặc mục tiêu tiết kiệm xem!';
