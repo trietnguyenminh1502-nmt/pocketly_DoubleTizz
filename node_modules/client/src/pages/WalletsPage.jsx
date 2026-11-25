@@ -11,6 +11,7 @@ import {
 } from '@/components/ui';
 import {
   Wallet,
+  Plus,
   ArrowRightLeft,
   CreditCard,
   Banknote,
@@ -56,7 +57,7 @@ const getWalletColor = (name = '', index = 0) => {
   return fallbackList[index % fallbackList.length];
 };
 
-// Định dạng tiền tệ kiểu tiếng Việt với Fraunces + tabular-nums
+// Định dạng tiền tệ kiểu tiếng Việt đồng bộ font-heading + tabular-nums
 const formatMoney = (amount) => {
   const val = Number(amount || 0);
   const isNegative = val < 0;
@@ -194,53 +195,55 @@ export const WalletsPage = () => {
   };
 
   return (
-    <div className="space-y-8 text-[#16201B]">
-      {/* 1. Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+    <div className="space-y-6">
+      {/* 1. Header đồng bộ các trang */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-fraunces font-bold text-[36px] sm:text-[46px] tracking-[-1px] text-[#16201B] leading-tight">
-            Ví tài khoản
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+            Ví Tài Khoản
           </h1>
-          <p className="text-[15px] text-[#56635C] mt-1">
-            Quản lý số dư tiền mặt, tài khoản ngân hàng và ví điện tử của bạn.
+          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+            Quản lý số dư tiền mặt, tài khoản ngân hàng và ví điện tử của bạn
           </p>
         </div>
 
         {/* Nút thao tác góc phải */}
-        <div className="flex flex-wrap items-center gap-[8px] justify-end sm:self-auto shrink-0">
+        <div className="flex flex-wrap items-center gap-3 justify-end shrink-0">
           <button
             type="button"
             onClick={openTransferModal}
-            className="rounded-[12px] px-[18px] py-[12px] bg-[#F2B84B] text-[#14201A] text-[14px] font-medium hover:bg-[#e4ad44] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#14201A] focus-visible:ring-offset-2"
+            className="px-5 py-2.5 rounded-full bg-[#F59E0B] hover:bg-[#D97706] text-ink-light font-semibold text-sm transition-all shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-[#14201A] focus-visible:ring-offset-2"
           >
             Chuyển tiền giữa các ví
           </button>
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="md"
+            icon={Plus}
+            className="font-semibold text-sm"
             onClick={openCreateModal}
-            className="rounded-[12px] px-[18px] py-[12px] bg-[#0F3D2E] text-white text-[14px] font-medium hover:bg-[#0c2f23] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E] focus-visible:ring-offset-2"
           >
-            + Thêm ví mới
-          </button>
+            Thêm ví mới
+          </Button>
         </div>
       </div>
 
       {/* 2. Loading State */}
       {isLoading && (
-        <div className="space-y-8 animate-pulse">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center pb-[36px]">
-            <div className="space-y-3">
-              <div className="h-4 w-48 bg-[#E2DDD3] rounded" />
-              <div className="h-16 w-72 bg-[#E2DDD3] rounded-xl" />
+        <div className="space-y-6 animate-pulse">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center pb-6 border-b border-border-light/60 dark:border-border-dark/60">
+            <div className="space-y-2">
+              <div className="h-4 w-44 bg-border-light/60 dark:bg-border-dark/60 rounded" />
+              <div className="h-10 w-64 bg-border-light/60 dark:bg-border-dark/60 rounded-xl" />
             </div>
-            <div className="space-y-3">
-              <div className="h-[14px] w-full bg-[#E2DDD3] rounded-full" />
-              <div className="h-4 w-60 bg-[#E2DDD3] rounded" />
+            <div className="space-y-2.5">
+              <div className="h-3.5 w-full bg-border-light/60 dark:bg-border-dark/60 rounded-full" />
+              <div className="h-4 w-56 bg-border-light/60 dark:bg-border-dark/60 rounded" />
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="h-[240px] rounded-[24px] bg-[#E2DDD3] p-[24px]" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="h-60 rounded-24 bg-border-light/60 dark:bg-border-dark/60 p-6" />
             ))}
           </div>
         </div>
@@ -248,12 +251,14 @@ export const WalletsPage = () => {
 
       {/* 3. Error State */}
       {!isLoading && isError && (
-        <div className="p-8 text-center bg-white rounded-[24px] border border-[#E8E2D6] space-y-3 my-6">
-          <p className="text-[15px] text-[#16201B]">Không thể tải danh sách ví tài khoản. Vui lòng thử lại.</p>
+        <div className="p-8 text-center bg-surface-light dark:bg-surface-dark rounded-24 border border-border-light dark:border-border-dark space-y-3 my-4">
+          <p className="text-sm font-medium text-ink-light dark:text-ink-dark">
+            Không thể tải danh sách ví tài khoản. Vui lòng thử lại.
+          </p>
           <button
             type="button"
             onClick={() => refetch()}
-            className="px-4 py-2 rounded-[12px] bg-[#0F3D2E] text-white text-[14px] font-medium hover:bg-[#0c2f23] transition-colors"
+            className="px-5 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-colors"
           >
             Thử lại
           </button>
@@ -264,13 +269,13 @@ export const WalletsPage = () => {
       {!isLoading && !isError && (
         <>
           {/* Khối tổng tài sản (Hero) - Nằm thẳng trên nền trang */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center pb-[36px]">
-            {/* Cột trái: Số tổng thật lớn */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-center pb-6 border-b border-border-light/60 dark:border-border-dark/60">
+            {/* Cột trái: Số tổng */}
             <div>
-              <span className="text-[14px] font-medium text-[#56635C] block">
+              <span className="text-xs sm:text-sm font-medium text-ink-muted block">
                 Tổng tài sản trên tất cả các ví
               </span>
-              <div className="font-fraunces font-bold text-[44px] sm:text-[60px] lg:text-[72px] tracking-[-2px] text-[#16201B] tabular-nums leading-none mt-2">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-ink-light dark:text-ink-dark tabular-nums leading-tight mt-1.5">
                 {formatMoney(totalBalance)}
               </div>
             </div>
@@ -279,13 +284,13 @@ export const WalletsPage = () => {
             <div>
               {totalBalance <= 0 || allocatedWallets.length === 0 ? (
                 <div>
-                  <div className="h-[14px] w-full rounded-full bg-[#E2DDD3]" />
-                  <p className="text-[14px] text-[#56635C] mt-2.5">Chưa có số dư</p>
+                  <div className="h-3.5 w-full rounded-full bg-border-light dark:bg-border-dark" />
+                  <p className="text-xs sm:text-sm text-ink-muted mt-2">Chưa có số dư</p>
                 </div>
               ) : (
                 <div>
                   {/* Thanh phân bổ cao 14px, bo tròn, các đoạn cách nhau 3px */}
-                  <div className="h-[14px] w-full rounded-full overflow-hidden flex gap-[3px] bg-[#E2DDD3]">
+                  <div className="h-3.5 w-full rounded-full overflow-hidden flex gap-[3px] bg-border-light dark:bg-border-dark">
                     {allocatedWallets.map((w) => {
                       if (w.pct <= 0) return null;
                       return (
@@ -300,17 +305,17 @@ export const WalletsPage = () => {
                   </div>
 
                   {/* Chú thích dạng hàng */}
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-[14px] text-[#56635C]">
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-xs sm:text-sm text-ink-muted">
                     {allocatedWallets.map((w) => (
                       <div key={w.id} className="flex items-center gap-2">
                         <span
-                          className="w-[10px] h-[10px] rounded-[2px] shrink-0"
+                          className="w-2.5 h-2.5 rounded-[2px] shrink-0"
                           style={{ backgroundColor: w.color }}
                         />
                         <span className="truncate max-w-[160px]" title={w.name}>
                           {w.name}
                         </span>
-                        <span className="tabular-nums font-medium text-[#16201B]">
+                        <span className="tabular-nums font-semibold text-ink-light dark:text-ink-dark">
                           {w.pctFormatted}%
                         </span>
                       </div>
@@ -323,60 +328,60 @@ export const WalletsPage = () => {
 
           {/* Lưới thẻ ví (Grid 4 cột) */}
           {wallets.length === 0 ? (
-            <div className="border-2 border-dashed border-[#BDB7A8] rounded-[24px] p-12 text-center flex flex-col items-center justify-center gap-4 bg-transparent my-4">
-              <p className="text-[16px] font-medium text-[#56635C]">Chưa có ví nào</p>
+            <div className="border-2 border-dashed border-border-light dark:border-border-dark rounded-24 p-12 text-center flex flex-col items-center justify-center gap-3.5 bg-transparent my-4">
+              <p className="text-sm sm:text-base font-semibold text-ink-muted">Chưa có ví nào</p>
               <button
                 type="button"
                 onClick={openCreateModal}
-                className="px-5 py-2.5 rounded-[12px] bg-[#0F3D2E] text-white text-[14px] font-medium hover:bg-[#0c2f23] transition-colors"
+                className="px-5 py-2.5 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary-hover transition-colors"
               >
                 + Thêm ví đầu tiên
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[20px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
               {allocatedWallets.map((w) => (
                 <div
                   key={w.id}
-                  className="rounded-[24px] p-[24px] min-h-[240px] text-white flex flex-col justify-between transition-all duration-[180ms] hover:-translate-y-[3px] hover:shadow-[0_12px_28px_rgba(22,32,27,0.18)] motion-reduce:hover:translate-y-0 relative"
+                  className="rounded-24 p-5 sm:p-6 min-h-[220px] sm:min-h-[240px] text-white flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-card motion-reduce:hover:translate-y-0 relative shadow-soft"
                   style={{ backgroundColor: w.color }}
                 >
                   {/* Hàng trên: Tên ví & Chip trang trí */}
                   <div className="flex items-start justify-between gap-3">
                     <h3
-                      className="text-[17px] font-semibold text-white truncate max-w-[calc(100%-48px)] leading-snug"
+                      className="text-base sm:text-lg font-bold font-heading text-white truncate max-w-[calc(100%-48px)] leading-snug"
                       title={w.name}
                     >
                       {w.name}
                     </h3>
 
-                    {/* Chip trang trí 40x30px, bo 7px, nền rgba(255,255,255,.28) */}
+                    {/* Chip trang trí 40x30px */}
                     <div
-                      className="w-[40px] h-[30px] rounded-[7px] bg-white/[0.28] border border-white/20 relative flex items-center justify-center shrink-0"
+                      className="w-10 h-7 rounded-[7px] bg-white/25 border border-white/20 relative flex items-center justify-center shrink-0"
                       aria-hidden="true"
                     >
-                      <div className="w-[18px] h-[20px] border border-white/40 rounded-[3px] flex items-center justify-center">
-                        <div className="w-[10px] h-[12px] border-t border-b border-white/40" />
+                      <div className="w-4 h-5 border border-white/40 rounded-[3px] flex items-center justify-center">
+                        <div className="w-2.5 h-3 border-t border-b border-white/40" />
                       </div>
                     </div>
                   </div>
 
                   {/* Phần dưới: Số dư, số giao dịch liên kết và nút Sửa/Xóa */}
-                  <div className="mt-6">
-                    <div className="font-fraunces font-bold text-[28px] sm:text-[32px] tracking-[-0.5px] tabular-nums text-white leading-tight">
+                  <div className="mt-5">
+                    <div className="text-xl sm:text-2xl font-extrabold font-heading tracking-tight tabular-nums text-white leading-tight">
                       {formatMoney(w.balance)}
                     </div>
 
-                    <p className="text-[13px] text-white/90 mt-1">
+                    <p className="text-xs text-white/85 mt-1">
                       {w._count?.transactions || 0} giao dịch liên kết
                     </p>
 
-                    <div className="flex items-center gap-[14px] mt-4 pt-1">
+                    <div className="flex items-center gap-3.5 mt-3.5 pt-1">
                       <button
                         type="button"
                         onClick={() => openEditModal(w)}
                         aria-label={`Sửa ví ${w.name}`}
-                        className="underline underline-offset-[3px] text-white hover:text-white/80 transition-colors bg-transparent border-0 py-[6px] px-0 text-[13px] font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+                        className="underline underline-offset-4 text-white hover:text-white/80 transition-colors bg-transparent border-0 py-1 px-0 text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
                       >
                         Sửa
                       </button>
@@ -389,7 +394,7 @@ export const WalletsPage = () => {
                             setIsDeleteDialogOpen(true);
                           }}
                           aria-label={`Xóa ví ${w.name}`}
-                          className="underline underline-offset-[3px] text-white hover:text-white/80 transition-colors bg-transparent border-0 py-[6px] px-0 text-[13px] font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+                          className="underline underline-offset-4 text-white hover:text-white/80 transition-colors bg-transparent border-0 py-1 px-0 text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
                         >
                           Xóa
                         </button>
@@ -404,12 +409,12 @@ export const WalletsPage = () => {
                 type="button"
                 onClick={openCreateModal}
                 aria-label="Thêm ví mới"
-                className="border-2 border-dashed border-[#BDB7A8] bg-transparent rounded-[24px] min-h-[240px] p-[24px] flex flex-col items-center justify-center gap-2 group hover:border-[#0F3D2E] hover:bg-[#0F3D2E]/[0.05] transition-all duration-[180ms] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0F3D2E] focus-visible:ring-offset-2"
+                className="border-2 border-dashed border-border-light dark:border-border-dark bg-transparent rounded-24 min-h-[220px] sm:min-h-[240px] p-5 sm:p-6 flex flex-col items-center justify-center gap-2 group hover:border-primary dark:hover:border-lime hover:bg-primary/5 dark:hover:bg-lime/5 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:focus-visible:ring-lime focus-visible:ring-offset-2"
               >
-                <span className="text-[32px] font-bold leading-none text-[#56635C] group-hover:text-[#0F3D2E] transition-colors">
+                <span className="text-3xl font-bold leading-none text-ink-muted group-hover:text-primary dark:group-hover:text-lime transition-colors">
                   +
                 </span>
-                <span className="text-[15px] font-medium text-[#56635C] group-hover:text-[#0F3D2E] transition-colors">
+                <span className="text-sm sm:text-base font-semibold text-ink-muted group-hover:text-primary dark:group-hover:text-lime transition-colors">
                   Thêm ví mới
                 </span>
               </button>

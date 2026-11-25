@@ -64,9 +64,9 @@ export const AdminSupportPage = () => {
     keepPreviousData: true
   });
 
-  const tickets = data?.data?.data?.tickets || [];
-  const pagination = data?.data?.data?.pagination || { page: 1, totalPages: 1, total: 0 };
-  const stats = data?.data?.data?.stats || { total: 0, pending: 0, in_progress: 0, resolved: 0 };
+  const tickets = data?.data?.tickets || data?.tickets || [];
+  const pagination = data?.data?.pagination || data?.pagination || { page: 1, totalPages: 1, total: 0 };
+  const stats = data?.data?.stats || data?.stats || { total: 0, pending: 0, in_progress: 0, resolved: 0 };
 
   // Mutation: Cập nhật trạng thái / ghi chú
   const updateMutation = useMutation({
@@ -75,7 +75,7 @@ export const AdminSupportPage = () => {
       addToast({ message: 'Cập nhật yêu cầu hỗ trợ thành công!', type: 'success' });
       queryClient.invalidateQueries(['admin-support-tickets']);
       if (selectedTicket) {
-        setSelectedTicket(res.data.data.ticket);
+        setSelectedTicket(res?.data?.ticket || res?.ticket || null);
       }
     },
     onError: (err) => {

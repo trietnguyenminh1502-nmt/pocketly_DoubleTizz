@@ -177,10 +177,10 @@ export const ContactSupportPage = () => {
 
     try {
       setLoading(true);
-      await supportApi.sendEmail(formData);
+      await supportApi.createTicket(formData);
       setSubmitted(true);
       addToast({
-        message: 'Gửi email hỗ trợ thành công! Đội ngũ Pocketly sẽ liên hệ qua email trong vòng 24h.',
+        message: 'Gửi yêu cầu hỗ trợ thành công! Đội ngũ Pocketly sẽ liên hệ qua email trong vòng 24h.',
         type: 'success'
       });
       setFormData({ fullName: '', email: '', topic: 'general', message: '' });
