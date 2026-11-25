@@ -81,10 +81,14 @@ export class SavingGoalController {
   static async delete(req, res, next) {
     try {
       const { id } = req.params;
-      await SavingGoalService.deleteGoal(req.user.id, id);
+      const refundWalletId = req.body?.refundWalletId || req.query?.refundWalletId || null;
+      const result = await SavingGoalService.deleteGoal(req.user.id, id, refundWalletId);
 
       return successResponse(res, {
-        message: 'Xóa mục tiêu tiết kiệm thành công'
+        message: result.refundedAmount > 0
+          ? `Đã xóa mục tiêu và hoàn trả ${result.refundedAmount.toLocaleString('vi-VN')}₫ về ví thành công!`
+          : 'Xóa mục tiêu tiết kiệm thành công',
+        data: result
       });
     } catch (error) {
       next(error);

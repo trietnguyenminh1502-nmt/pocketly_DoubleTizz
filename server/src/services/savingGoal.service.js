@@ -166,22 +166,50 @@ export class SavingGoalService {
 
   /**
    * Xóa mục tiêu tiết kiệm
+   * Nếu có tiền tích lũy và người dùng chọn ví hoàn tiền, hoàn trả tiền về ví
    */
-  static async deleteGoal(userId, goalId) {
-    const goal = await prisma.savingGoal.findFirst({
-      where: { id: goalId, userId }
+  static async deleteGoal(userId, goalId, refundWalletId = null) {
+    return await prisma.$transaction(async (tx) => {
+      const goal = await tx.savingGoal.findFirst({
+        where: { id: goalId, userId }
+      });
+
+      if (!goal) {
+        const err = new Error('Mục tiêu tiết kiệm không tồn tại');
+        err.statusCode = 404;
+        throw err;
+      }
+
+      const currentAmount = Number(goal.currentAmount) || 0;
+
+      // Nếu có tiền tích lũy và user chọn ví nhận hoàn tiền
+      if (currentAmount > 0 && refundWalletId) {
+        const wallet = await tx.wallet.findFirst({
+          where: { id: refundWalletId, userId }
+        });
+
+        if (!wallet) {
+          const err = new Error('Ví nhận tiền hoàn trả không tồn tại');
+          err.statusCode = 404;
+          throw err;
+        }
+
+        await tx.wallet.update({
+          where: { id: refundWalletId },
+          data: {
+            balance: { increment: currentAmount }
+          }
+        });
+      }
+
+      await tx.savingGoal.delete({
+        where: { id: goalId }
+      });
+
+      return {
+        refundedAmount: refundWalletId ? currentAmount : 0,
+        refundWalletId
+      };
     });
-
-    if (!goal) {
-      const err = new Error('Mục tiêu tiết kiệm không tồn tại');
-      err.statusCode = 404;
-      throw err;
-    }
-
-    await prisma.savingGoal.delete({
-      where: { id: goalId }
-    });
-
-    return true;
   }
 }

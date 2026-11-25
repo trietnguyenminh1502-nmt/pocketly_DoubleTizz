@@ -52,7 +52,11 @@ export const savingGoalApi = {
   getById: (id) => api.get(`/saving-goals/${id}`),
   create: (data) => api.post('/saving-goals', data),
   update: (id, data) => api.patch(`/saving-goals/${id}`, data),
-  delete: (id) => api.delete(`/saving-goals/${id}`),
+  delete: (id, refundWalletId) =>
+    api.delete(`/saving-goals/${id}`, {
+      params: refundWalletId ? { refundWalletId } : {},
+      data: refundWalletId ? { refundWalletId } : {}
+    }),
   contribute: (id, data) => api.post(`/saving-goals/${id}/contribute`, data)
 };
 

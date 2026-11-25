@@ -77,7 +77,8 @@ export const SavingGoalsPage = () => {
   const [contributeGoal, setContributeGoal] = useState(null);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
+  const [deletingGoal, setDeletingGoal] = useState(null);
+  const [refundWalletId, setRefundWalletId] = useState('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -142,12 +143,17 @@ export const SavingGoalsPage = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => savingGoalApi.delete(id),
-    onSuccess: () => {
+    mutationFn: ({ id, refundWalletId }) => savingGoalApi.delete(id, refundWalletId),
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['savingGoals'] });
-      addToast({ message: 'Đã xóa mục tiêu tiết kiệm thành công!', type: 'success' });
+      queryClient.invalidateQueries({ queryKey: ['wallets'] });
+      queryClient.invalidateQueries({ queryKey: ['reportSummary'] });
+      addToast({
+        message: res?.message || 'Đã xóa mục tiêu tiết kiệm thành công!',
+        type: 'success'
+      });
       setIsDeleteDialogOpen(false);
-      setDeletingId(null);
+      setDeletingGoal(null);
     },
     onError: (err) => {
       addToast({ message: err.message || 'Không thể xóa mục tiêu', type: 'error' });
@@ -291,7 +297,8 @@ export const SavingGoalsPage = () => {
                     </button>
                     <button
                       onClick={() => {
-                        setDeletingId(g.id);
+                        setDeletingGoal(g);
+                        setRefundWalletId(wallets[0]?.id || '');
                         setIsDeleteDialogOpen(true);
                       }}
                       className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
@@ -432,13 +439,90 @@ export const SavingGoalsPage = () => {
         </form>
       </Modal>
 
-      {/* Confirm Dialog Xóa */}
+      {/* Modal Xóa có hoàn tiền (nếu mục tiêu đã có tiền tích lũy) */}
+      <Modal
+        isOpen={isDeleteDialogOpen && Boolean(deletingGoal && Number(deletingGoal.currentAmount) > 0)}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setDeletingGoal(null);
+        }}
+        title="Xóa mục tiêu & Hoàn tiền tích lũy"
+        maxWidth="max-w-md"
+      >
+        <div className="space-y-4">
+          <div className="p-3.5 rounded-20 bg-coral/10 border border-coral/20 text-xs sm:text-sm text-ink-light dark:text-ink-dark space-y-1.5">
+            <p className="font-bold text-coral">
+              Bạn đang chuẩn bị xóa mục tiêu: &ldquo;{deletingGoal?.title}&rdquo;
+            </p>
+            <p className="text-xs text-ink-muted">
+              Mục tiêu này đang có số tiền đã tích lũy là{' '}
+              <strong className="text-ink-light dark:text-ink-dark font-extrabold text-sm">
+                {Number(deletingGoal?.currentAmount || 0).toLocaleString('vi-VN')}₫
+              </strong>
+              . Bạn có muốn hoàn trả số tiền này về lại một trong các ví của bạn không?
+            </p>
+          </div>
+
+          <Select
+            label="Hoàn trả tiền về ví"
+            value={refundWalletId}
+            onChange={(e) => setRefundWalletId(e.target.value)}
+            helperText="Số tiền tích lũy sẽ được cộng trực tiếp vào số dư ví bạn chọn"
+          >
+            {wallets.map((w) => (
+              <option key={w.id} value={w.id}>
+                Hoàn về: {w.name} (Số dư hiện tại: {Number(w.balance).toLocaleString('vi-VN')}₫)
+              </option>
+            ))}
+            <option value="">Không hoàn trả (Hủy bỏ số tiền tích lũy)</option>
+          </Select>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setDeletingGoal(null);
+              }}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              isLoading={deleteMutation.isPending}
+              onClick={() => {
+                if (deletingGoal) {
+                  deleteMutation.mutate({
+                    id: deletingGoal.id,
+                    refundWalletId: refundWalletId || undefined
+                  });
+                }
+              }}
+            >
+              Xác nhận xóa {refundWalletId ? '& Hoàn tiền' : ''}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Confirm Dialog Xóa thông thường (nếu currentAmount === 0) */}
       <ConfirmDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={() => deleteMutation.mutate(deletingId)}
+        isOpen={isDeleteDialogOpen && Boolean(deletingGoal && Number(deletingGoal.currentAmount) <= 0)}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setDeletingGoal(null);
+        }}
+        onConfirm={() => {
+          if (deletingGoal) {
+            deleteMutation.mutate({ id: deletingGoal.id, refundWalletId: undefined });
+          }
+        }}
         title="Xóa mục tiêu tiết kiệm"
-        message="Bạn có chắc chắn muốn xóa mục tiêu này? Số tiền đã tích lũy sẽ không bị trừ khỏi các ví của bạn."
+        message={`Bạn có chắc chắn muốn xóa mục tiêu "${deletingGoal?.title}"? Thao tác này không thể hoàn tác.`}
         confirmText="Xóa mục tiêu"
         isDanger
         isLoading={deleteMutation.isPending}
