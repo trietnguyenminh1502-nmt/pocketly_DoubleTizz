@@ -152,8 +152,9 @@ export const DashboardPage = () => {
           </Link>
           <Button
             variant="primary"
-            size="sm"
+            size="md"
             icon={Plus}
+            className="font-semibold text-sm"
             onClick={() => setIsQuickAddOpen(true)}
           >
             Thêm giao dịch

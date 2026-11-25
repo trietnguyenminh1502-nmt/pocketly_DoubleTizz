@@ -132,11 +132,11 @@ export const ReportsPage = () => {
         </div>
 
         <Button
-          variant="primary"
+          variant="outline"
           size="sm"
           icon={FileSpreadsheet}
           onClick={handleExportReportExcel}
-          className="self-start md:self-auto shrink-0 shadow-soft"
+          className="self-start md:self-auto shrink-0 font-semibold"
         >
           Xuất Báo Cáo Excel
         </Button>

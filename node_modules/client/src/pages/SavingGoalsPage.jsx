@@ -193,7 +193,7 @@ export const SavingGoalsPage = () => {
           </p>
         </div>
 
-        <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal}>
+        <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="font-semibold text-sm">
           Tạo mục tiêu mới
         </Button>
       </div>
@@ -210,7 +210,7 @@ export const SavingGoalsPage = () => {
           title="Chưa có mục tiêu tiết kiệm nào"
           description="Bắt đầu đặt mục tiêu mua Laptop, học thêm chứng chỉ hoặc du lịch hè cùng bạn bè!"
           action={
-            <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal}>
+            <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="font-semibold text-sm">
               Tạo mục tiêu đầu tiên
             </Button>
           }

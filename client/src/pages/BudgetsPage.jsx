@@ -150,7 +150,7 @@ export const BudgetsPage = () => {
             ))}
           </Select>
 
-          <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal} className="whitespace-nowrap">
+          <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="whitespace-nowrap font-semibold text-sm">
             Thiết lập ngân sách
           </Button>
         </div>
@@ -168,7 +168,7 @@ export const BudgetsPage = () => {
           title={`Chưa có ngân sách cho Tháng ${selectedMonth}/${selectedYear}`}
           description="Bắt đầu thiết lập ngân sách tổng hoặc cho từng mục như Ăn uống, Giải trí..."
           action={
-            <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal}>
+            <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="font-semibold text-sm">
               Tạo ngân sách đầu tiên
             </Button>
           }

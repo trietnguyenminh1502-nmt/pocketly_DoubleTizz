@@ -213,8 +213,9 @@ export const TransactionsPage = () => {
           </Button>
           <Button
             variant="primary"
-            size="sm"
+            size="md"
             icon={Plus}
+            className="font-semibold text-sm"
             onClick={() => {
               setEditingTransaction(null);
               setIsFormModalOpen(true);

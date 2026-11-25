@@ -232,8 +232,9 @@ export const AdminCategoriesPage = () => {
         <Button
           onClick={handleOpenCreate}
           variant="primary"
-          leftIcon={<Plus className="w-4 h-4" />}
-          className="shadow-soft self-start sm:self-auto"
+          size="md"
+          icon={Plus}
+          className="shadow-soft self-start sm:self-auto font-semibold text-sm"
         >
           Thêm danh mục mới
         </Button>
@@ -286,7 +287,7 @@ export const AdminCategoriesPage = () => {
           title="Chưa có danh mục hệ thống nào"
           description="Hãy tạo các danh mục mặc định mẫu cho học sinh, sinh viên như Ăn uống, Tiền trọ, Học phí..."
           action={
-            <Button onClick={handleOpenCreate} variant="primary" leftIcon={<Plus className="w-4 h-4" />}>
+            <Button onClick={handleOpenCreate} variant="primary" size="md" icon={Plus} className="font-semibold text-sm">
               Tạo danh mục đầu tiên
             </Button>
           }

@@ -231,16 +231,19 @@ export const WalletsPage = () => {
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={openTransferModal}
-            className="px-4 py-2.5 rounded-20 bg-[#F59E0B] hover:bg-[#D97706] text-ink-light font-bold text-xs sm:text-sm transition-all shadow-sm"
+            className="px-5 py-2.5 rounded-full bg-[#F59E0B] hover:bg-[#D97706] text-ink-light font-semibold text-sm transition-all shadow-soft"
           >
             Chuyển tiền giữa các ví
           </button>
-          <button
+          <Button
+            variant="primary"
+            size="md"
+            icon={Plus}
+            className="font-semibold text-sm"
             onClick={openCreateModal}
-            className="px-4 py-2.5 rounded-20 bg-primary hover:bg-primary-hover text-white font-bold text-xs sm:text-sm transition-all shadow-sm flex items-center gap-1.5"
           >
-            <Plus className="w-4 h-4" /> Thêm ví mới
-          </button>
+            Thêm ví mới
+          </Button>
         </div>
       </div>
 
@@ -262,7 +265,7 @@ export const WalletsPage = () => {
             />
 
             <div className="flex flex-col flex-1 justify-between space-y-6">
-              <div className="h-60 sm:h-64 w-full flex items-center justify-center">
+              <div className="h-56 sm:h-60 w-full flex items-center justify-center">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -283,6 +286,16 @@ export const WalletsPage = () => {
                     <Tooltip content={<CustomTooltip />} />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+
+              {/* Số tiền tổng bự bự dưới biểu đồ */}
+              <div className="text-center py-2 -mt-2">
+                <span className="text-xs uppercase font-bold text-ink-muted tracking-wider block">
+                  Tổng tài sản tích lũy
+                </span>
+                <span className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading text-ink-light dark:text-ink-dark block mt-1">
+                  {Number(totalBalance).toLocaleString('vi-VN')} đ
+                </span>
               </div>
 
               {/* Chú thích (Legend) dạng lưới 2 cột giống Cơ cấu chi tiêu tháng này */}

@@ -35,6 +35,7 @@ export const ChatInterface = ({
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [pendingUserMessage, setPendingUserMessage] = useState(null);
 
   // 1. Fetch danh sách các phiên chat
   const { data: sessionsRes, isLoading: loadingSessions } = useQuery({
@@ -59,11 +60,15 @@ export const ChatInterface = ({
   });
 
   const messages = messagesRes?.data?.messages || [];
+  const displayedMessages = [
+    ...messages,
+    ...(pendingUserMessage ? [pendingUserMessage] : [])
+  ];
 
-  // Tự động scroll xuống cuối khi có tin nhắn mới
+  // Tự động scroll xuống cuối khi có tin nhắn mới hoặc đang suy nghĩ
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+  }, [displayedMessages, isTyping]);
 
   // 3. Mutation Tạo session mới
   const createSessionMutation = useMutation({
@@ -78,13 +83,9 @@ export const ChatInterface = ({
   // 4. Mutation Gửi tin nhắn
   const sendMessageMutation = useMutation({
     mutationFn: ({ sessionId, content }) => chatApi.sendMessage(sessionId, content),
-    onMutate: () => {
-      setIsTyping(true);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chatMessages', activeSessionId] });
+    onSuccess: (res, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['chatMessages', variables?.sessionId || activeSessionId] });
       queryClient.invalidateQueries({ queryKey: ['chatSessions'] });
-      setInputText('');
     },
     onError: (err) => {
       addToast({
@@ -93,6 +94,7 @@ export const ChatInterface = ({
       });
     },
     onSettled: () => {
+      setPendingUserMessage(null);
       setIsTyping(false);
     }
   });
@@ -106,19 +108,35 @@ export const ChatInterface = ({
     }
   });
 
-  const handleSend = (textToSend = null) => {
-    const text = textToSend || inputText;
-    if (!text.trim() || isTyping) return;
+  const handleSend = async (textToSend = null) => {
+    const text = (textToSend || inputText).trim();
+    if (!text || isTyping) return;
 
-    if (!activeSessionId) {
-      // Tạo session mới rồi gửi
-      chatApi.createSession({ title: text.substring(0, 30) }).then((res) => {
-        const newId = res.data.session.id;
-        setActiveSessionId(newId);
-        sendMessageMutation.mutate({ sessionId: newId, content: text });
-      });
-    } else {
-      sendMessageMutation.mutate({ sessionId: activeSessionId, content: text });
+    // Ngay lập tức xóa ô nhập và đẩy tin nhắn vào khung chat để người dùng thấy đã gửi
+    setInputText('');
+    setPendingUserMessage({
+      id: `temp-${Date.now()}`,
+      role: 'user',
+      content: text,
+      createdAt: new Date().toISOString()
+    });
+    setIsTyping(true);
+
+    try {
+      let targetSessionId = activeSessionId;
+      if (!targetSessionId) {
+        // Tạo session mới rồi gửi
+        const res = await chatApi.createSession({ title: text.substring(0, 30) });
+        targetSessionId = res.data.session.id;
+        setActiveSessionId(targetSessionId);
+        queryClient.invalidateQueries({ queryKey: ['chatSessions'] });
+      }
+
+      await sendMessageMutation.mutateAsync({ sessionId: targetSessionId, content: text });
+    } catch (err) {
+      setPendingUserMessage(null);
+      setIsTyping(false);
+      setInputText(text); // Phục hồi lại câu người dùng vừa nhập nếu gửi thất bại
     }
   };
 
@@ -134,9 +152,9 @@ export const ChatInterface = ({
           <div className="p-3 border-b border-border-light dark:border-border-dark">
             <Button
               variant="primary"
-              size="sm"
+              size="md"
               icon={Plus}
-              className="w-full text-xs"
+              className="w-full font-semibold text-sm"
               onClick={() => createSessionMutation.mutate()}
               isLoading={createSessionMutation.isPending}
             >
@@ -219,7 +237,7 @@ export const ChatInterface = ({
               <Skeleton className="h-16 w-3/4 ml-auto" />
               <Skeleton className="h-12 w-1/2" />
             </div>
-          ) : messages.length === 0 ? (
+          ) : displayedMessages.length === 0 ? (
             <div className="py-8 text-center space-y-4">
               <div className="w-12 h-12 rounded-full bg-mint/50 text-primary mx-auto flex items-center justify-center">
                 <Sparkles className="w-6 h-6" />
@@ -247,7 +265,7 @@ export const ChatInterface = ({
               </div>
             </div>
           ) : (
-            messages.map((m) => {
+            displayedMessages.map((m) => {
               const isUser = m.role === 'user';
               return (
                 <div
@@ -278,13 +296,16 @@ export const ChatInterface = ({
             })
           )}
 
-          {/* Typing Indicator */}
+          {/* Typing Indicator: Hiển thị ngay bên dưới tin nhắn vừa gửi */}
           {isTyping && (
-            <div className="flex items-center gap-2 text-xs text-ink-muted pt-2 animate-pulse">
-              <div className="w-6 h-6 rounded-full bg-lime/20 text-lime-dark flex items-center justify-center">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <div className="flex items-start gap-2.5 justify-start animate-in fade-in duration-200">
+              <div className="w-7 h-7 rounded-full bg-primary/20 text-primary dark:bg-lime/20 dark:text-lime flex items-center justify-center shrink-0 font-bold text-xs mt-0.5">
+                <Bot className="w-3.5 h-3.5" />
               </div>
-              <span>Pocket Assistant đang phân tích dữ liệu tài chính của bạn...</span>
+              <div className="bg-sand/30 dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-muted rounded-20 rounded-bl-none px-4 py-2.5 text-xs flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-primary dark:text-lime" />
+                <span>Pocket Assistant đang suy nghĩ và phân tích dữ liệu...</span>
+              </div>
             </div>
           )}
 

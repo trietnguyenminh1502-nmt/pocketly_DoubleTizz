@@ -161,42 +161,42 @@ export const CategoriesPage = () => {
   return (
     <div className="space-y-6">
       {/* 1. Header */}
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          Danh Mục Tài Chính 🏷️
+        </h1>
+        <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          Quản lý danh mục thu chi mặc định của hệ thống và tạo danh mục riêng của bạn
+        </p>
+      </div>
+
+      {/* 2. Filter Tabs & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
-            Danh Mục Tài Chính 🏷️
-          </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
-            Quản lý danh mục thu chi mặc định của hệ thống và tạo danh mục riêng của bạn
-          </p>
+        <div className="flex gap-2 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark w-fit">
+          {[
+            { id: 'ALL', label: 'Tất cả' },
+            { id: 'EXPENSE', label: 'Chi tiêu (Expense)' },
+            { id: 'INCOME', label: 'Thu nhập (Income)' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
+                activeTab === tab.id
+                  ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
+                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="primary" size="sm" icon={Plus} onClick={openCreateModal}>
+          <Button variant="primary" size="md" icon={Plus} className="font-semibold text-sm" onClick={openCreateModal}>
             Thêm danh mục mới
           </Button>
         </div>
-      </div>
-
-      {/* 2. Filter Tabs */}
-      <div className="flex gap-2 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark w-fit">
-        {[
-          { id: 'ALL', label: 'Tất cả' },
-          { id: 'EXPENSE', label: 'Chi tiêu (Expense)' },
-          { id: 'INCOME', label: 'Thu nhập (Income)' }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
-              activeTab === tab.id
-                ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
       </div>
 
       {/* 3. Category Grid */}

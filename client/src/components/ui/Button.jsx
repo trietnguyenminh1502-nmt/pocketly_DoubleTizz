@@ -12,6 +12,7 @@ export const Button = ({
   disabled = false,
   isLoading = false,
   icon: Icon,
+  leftIcon,
   ...props
 }) => {
   const baseStyles =
@@ -42,6 +43,8 @@ export const Button = ({
         <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
       ) : Icon ? (
         <Icon className="w-4 h-4 shrink-0" />
+      ) : leftIcon ? (
+        leftIcon
       ) : null}
       {children}
     </button>

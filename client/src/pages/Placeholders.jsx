@@ -21,7 +21,7 @@ export const DashboardPlaceholder = () => {
 
         <div className="flex gap-2.5">
           <Link to="/transactions">
-            <Button variant="primary" size="sm" icon={Plus}>Thêm giao dịch</Button>
+            <Button variant="primary" size="md" icon={Plus} className="font-semibold text-sm">Thêm giao dịch</Button>
           </Link>
           <Link to="/chat">
             <Button variant="lime" size="sm" icon={Bot}>Hỏi AI Chatbot</Button>
