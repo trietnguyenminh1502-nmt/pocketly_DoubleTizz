@@ -24,6 +24,8 @@ router.post('/logout', AuthController.logout);
 router.post('/forgot-password', authLimiter, AuthController.forgotPassword);
 router.post('/reset-password', authLimiter, AuthController.resetPassword);
 router.post('/verify-email', AuthController.verifyEmail);
+router.post('/verify-otp', authLimiter, AuthController.verifyOtp);
+router.post('/resend-otp', authLimiter, AuthController.resendOtp);
 
 // Magic link confirmation
 router.get('/confirm-reset', AuthController.confirmReset);

@@ -214,4 +214,59 @@ export class AuthController {
       next(error);
     }
   }
+
+  /**
+   * [POST /api/v1/auth/verify-otp]
+   * Xác thực mã OTP 6 số và đăng nhập
+   */
+  static async verifyOtp(req, res, next) {
+    try {
+      const { email, otp } = req.body;
+      if (!email || !otp) {
+        return res.status(400).json({
+          success: false,
+          message: 'Vui lòng cung cấp email và mã OTP 6 số'
+        });
+      }
+
+      const { user, accessToken, refreshToken } = await AuthService.verifyOtp({ email, otp });
+
+      setRefreshTokenCookie(res, refreshToken);
+
+      return successResponse(res, {
+        message: 'Xác thực tài khoản thành công! Chào mừng bạn đến với Pocketly.',
+        data: {
+          user,
+          accessToken,
+          refreshToken
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * [POST /api/v1/auth/resend-otp]
+   * Gửi lại mã OTP 6 số qua email
+   */
+  static async resendOtp(req, res, next) {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email là bắt buộc'
+        });
+      }
+
+      const result = await AuthService.resendOtp({ email });
+
+      return successResponse(res, {
+        message: result.message
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

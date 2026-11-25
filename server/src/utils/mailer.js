@@ -1,5 +1,11 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 dotenv.config();
 
 // Tạo transporter dùng SMTP thật (Gmail) từ biến môi trường
@@ -87,5 +93,43 @@ export const sendPasswordResetEmail = async ({ to, fullName, token }) => {
     return { messageId: info.messageId };
   } catch (error) {
     console.error('❌ Lỗi khi gửi email reset password:', error.message);
+  }
+};
+
+export const sendOtpEmail = async ({ to, fullName, otp }) => {
+  try {
+    const info = await transporter.sendMail({
+      from: `"Pocketly 🌿" <${process.env.SMTP_USER}>`,
+      to,
+      subject: `[Pocketly] Mã xác thực tài khoản của bạn: ${otp}`,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px; border: 1px solid #E8E2D6; border-radius: 20px; background-color: #F6F2EA;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <span style="font-size: 28px; font-weight: 800; color: #123D2F; letter-spacing: -0.5px;">🌿 Pocketly</span>
+          </div>
+          <h2 style="color: #123D2F; font-size: 20px; margin-bottom: 12px;">Chào ${fullName || 'bạn'}!</h2>
+          <p style="color: #16211C; font-size: 15px; line-height: 1.6;">
+            Cảm ơn bạn đã đăng ký tài khoản tại <strong>Pocketly</strong>. Để hoàn tất đăng ký, vui lòng nhập mã xác thực 6 số bên dưới:
+          </p>
+          <div style="text-align: center; margin: 28px 0;">
+            <span style="display: inline-block; font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #123D2F; background: #FFFFFF; padding: 14px 28px; border-radius: 14px; border: 2px dashed #D4F05A; font-family: monospace;">
+              ${otp}
+            </span>
+          </div>
+          <p style="color: #5C6B64; font-size: 13px; line-height: 1.5; margin-bottom: 8px;">
+            ⏱ Mã xác thực này có hiệu lực trong vòng <strong>10 phút</strong>.
+          </p>
+          <p style="color: #888; font-size: 12px; margin-top: 24px; border-top: 1px solid #E0D9CC; padding-top: 16px;">
+            Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email hoặc liên hệ với chúng tôi để được trợ giúp.
+          </p>
+        </div>
+      `
+    });
+
+    console.info(`\n📧 [OTP EMAIL SENT] To: ${to} | Code: ${otp} | MessageId: ${info.messageId}\n`);
+    return { messageId: info.messageId };
+  } catch (error) {
+    console.error('❌ Lỗi khi gửi email OTP:', error.message);
+    throw error;
   }
 };

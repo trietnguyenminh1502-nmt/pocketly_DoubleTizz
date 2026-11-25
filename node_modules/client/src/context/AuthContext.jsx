@@ -77,6 +77,21 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const handleAuthSuccess = (authData) => {
+    const { user: userData, accessToken, refreshToken } = authData;
+    if (accessToken) {
+      localStorage.setItem('pocketly_access_token', accessToken);
+    }
+    if (refreshToken) {
+      localStorage.setItem('pocketly_refresh_token', refreshToken);
+    }
+    if (userData) {
+      localStorage.setItem('pocketly_user', JSON.stringify(userData));
+      setUser(userData);
+    }
+    return userData;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -87,7 +102,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        updateUserState
+        updateUserState,
+        handleAuthSuccess
       }}
     >
       {children}

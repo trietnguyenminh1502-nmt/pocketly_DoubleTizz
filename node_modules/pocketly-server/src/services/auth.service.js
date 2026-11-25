@@ -7,7 +7,13 @@ import {
   hashToken,
   generateRandomToken
 } from '../utils/token.js';
-import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer.js';
+import { sendVerificationEmail, sendPasswordResetEmail, sendOtpEmail } from '../utils/mailer.js';
+
+// ─── In-memory store: lưu mã OTP xác thực email (10 phút) ────────────────────
+// Map: email -> { otp, expiresAt, attempts }
+const emailOtpStore = new Map();
+
+const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 // ─── In-memory store: lưu token đã được xác nhận qua email ───────────────────
 // Map: rawToken → { email, confirmedAt }
@@ -39,54 +45,87 @@ export class AuthService {
    * Đăng ký tài khoản người dùng mới
    */
   static async register({ fullName, email, password, currency = 'VND' }) {
-    const existing = await prisma.user.findUnique({
-      where: { email }
-    });
+    const cleanEmail = (email || '').trim().toLowerCase();
 
-    if (existing) {
-      const err = new Error('Email này đã được sử dụng');
-      err.statusCode = 409;
-      throw err;
-    }
+    const existing = await prisma.user.findUnique({
+      where: { email: cleanEmail }
+    });
 
     const passwordHash = await bcrypt.hash(password, 10);
+    let user;
 
-    const user = await prisma.user.create({
-      data: {
-        fullName,
-        email,
-        passwordHash,
-        currency,
-        emailVerified: false
-      },
-      select: {
-        id: true,
-        fullName: true,
-        email: true,
-        role: true,
-        currency: true,
-        emailVerified: true,
-        createdAt: true
+    if (existing) {
+      // Nếu email đã được xác minh hoàn tất -> Chặn đăng ký trùng
+      if (existing.emailVerified) {
+        const err = new Error('Email này đã được đăng ký');
+        err.statusCode = 409;
+        throw err;
       }
-    });
 
-    // Tự động tạo 1 ví mặc định cho người dùng mới
-    await prisma.wallet.create({
-      data: {
-        userId: user.id,
-        name: 'Tiền mặt',
-        balance: 0,
-        icon: 'Wallet'
-      }
-    });
+      // Nếu tài khoản trước đó CHƯA xác minh email -> Cập nhật thông tin và cấp mã OTP mới
+      user = await prisma.user.update({
+        where: { id: existing.id },
+        data: {
+          fullName: fullName.trim(),
+          passwordHash,
+          currency
+        },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          role: true,
+          currency: true,
+          emailVerified: true,
+          createdAt: true
+        }
+      });
+    } else {
+      // Tạo người dùng mới
+      user = await prisma.user.create({
+        data: {
+          fullName: fullName.trim(),
+          email: cleanEmail,
+          passwordHash,
+          currency,
+          emailVerified: false
+        },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          role: true,
+          currency: true,
+          emailVerified: true,
+          createdAt: true
+        }
+      });
 
-    // Sinh token xác thực email (lưu dạng token ngẫu nhiên hoặc gửi qua mailer)
-    const verificationToken = generateRandomToken();
-    sendVerificationEmail({
-      to: user.email,
-      fullName: user.fullName,
-      token: verificationToken
-    });
+      // Tự động tạo 1 ví mặc định cho người dùng mới
+      await prisma.wallet.create({
+        data: {
+          userId: user.id,
+          name: 'Tiền mặt',
+          balance: 0,
+          icon: 'Wallet'
+        }
+      });
+    }
+
+    // Tạo mã OTP 6 số và gửi trực tiếp tới email của người dùng
+    const otp = generateOtp();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 phút
+    emailOtpStore.set(cleanEmail, { otp, expiresAt, attempts: 0 });
+
+    try {
+      await sendOtpEmail({
+        to: user.email,
+        fullName: user.fullName,
+        otp
+      });
+    } catch (mailErr) {
+      console.warn('⚠️ Lỗi gửi OTP qua email khi đăng ký:', mailErr.message);
+    }
 
     return user;
   }
@@ -302,5 +341,105 @@ export class AuthService {
     // Với mock Ethereal, ta cập nhật trạng thái emailVerified cho user
     // Khi nhận token hợp lệ, tìm user và update
     return true;
+  }
+
+  /**
+   * Xác minh mã OTP 6 số và kích hoạt tài khoản, đồng thời cấp JWT đăng nhập
+   */
+  static async verifyOtp({ email, otp }) {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanOtp = (otp || '').trim();
+
+    const record = emailOtpStore.get(cleanEmail);
+    if (!record) {
+      const err = new Error('Mã xác nhận không tồn tại hoặc đã hết hạn. Vui lòng yêu cầu gửi lại mã.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    if (Date.now() > record.expiresAt) {
+      emailOtpStore.delete(cleanEmail);
+      const err = new Error('Mã xác nhận đã hết hạn. Vui lòng yêu cầu mã mới.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    if (record.otp !== cleanOtp) {
+      record.attempts = (record.attempts || 0) + 1;
+      if (record.attempts >= 5) {
+        emailOtpStore.delete(cleanEmail);
+        const err = new Error('Bạn đã nhập sai quá 5 lần. Vui lòng yêu cầu gửi lại mã mới.');
+        err.statusCode = 400;
+        throw err;
+      }
+      const err = new Error('Mã xác nhận không chính xác. Vui lòng kiểm tra lại email.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    // OTP hợp lệ! Xóa khỏi store
+    emailOtpStore.delete(cleanEmail);
+
+    // Cập nhật emailVerified = true cho user
+    const user = await prisma.user.update({
+      where: { email: cleanEmail },
+      data: { emailVerified: true },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        avatarUrl: true,
+        role: true,
+        status: true,
+        currency: true,
+        emailVerified: true
+      }
+    });
+
+    // Tự động đăng nhập: tạo Access Token & Refresh Token
+    const payload = { userId: user.id, role: user.role };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+
+    const tokenHash = hashToken(refreshToken);
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await prisma.refreshToken.create({
+      data: {
+        userId: user.id,
+        tokenHash,
+        expiresAt
+      }
+    });
+
+    return { user, accessToken, refreshToken };
+  }
+
+  /**
+   * Gửi lại mã OTP qua email
+   */
+  static async resendOtp({ email }) {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const user = await prisma.user.findUnique({
+      where: { email: cleanEmail }
+    });
+
+    if (!user) {
+      const err = new Error('Không tìm thấy tài khoản với email này.');
+      err.statusCode = 404;
+      throw err;
+    }
+
+    const otp = generateOtp();
+    const expiresAt = Date.now() + 10 * 60 * 1000;
+    emailOtpStore.set(cleanEmail, { otp, expiresAt, attempts: 0 });
+
+    await sendOtpEmail({
+      to: user.email,
+      fullName: user.fullName,
+      otp
+    });
+
+    return { message: 'Đã gửi lại mã xác thực thành công' };
   }
 }
