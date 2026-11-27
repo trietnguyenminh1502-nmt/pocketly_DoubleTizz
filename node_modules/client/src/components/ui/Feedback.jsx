@@ -43,22 +43,61 @@ export const Pagination = ({ currentPage = 1, totalPages = 1, onPageChange, clas
   );
 };
 
-export const ProgressBar = ({ progress = 0, color = 'primary', className = '' }) => {
-  const clamped = Math.min(100, Math.max(0, progress));
+export const ProgressBar = ({
+  progress = 0,
+  color = 'auto',
+  threshold = 80,
+  showThreshold,
+  label = 'Tiến độ',
+  className = ''
+}) => {
+  const numericProgress = Number(progress);
+  const safeProgress = Number.isFinite(numericProgress) ? numericProgress : 0;
+  const clamped = Math.min(100, Math.max(0, safeProgress));
+  const numericThreshold = Number(threshold);
+  const thresholdPosition = Number.isFinite(numericThreshold)
+    ? Math.min(100, Math.max(0, numericThreshold))
+    : 80;
+  const automaticColor = safeProgress > 100
+    ? 'danger'
+    : safeProgress >= thresholdPosition
+      ? 'warning'
+      : 'safe';
+  const selectedColor = color === 'auto' ? automaticColor : color;
 
   const colors = {
+    safe: 'bg-success',
+    warning: 'bg-warning',
+    danger: 'bg-danger',
     primary: 'bg-primary dark:bg-lime',
     tangerine: 'bg-tangerine',
     coral: 'bg-coral',
     lime: 'bg-lime'
   };
+  const markerIsVisible = showThreshold ?? color === 'auto';
 
   return (
-    <div className={cn('w-full bg-border/60 rounded-full h-2.5 overflow-hidden', className)}>
-      <div
-        className={cn('h-full transition-all duration-300 rounded-full', colors[color] || colors.primary)}
-        style={{ width: `${clamped}%` }}
-      />
+    <div
+      className={cn('relative w-full', className)}
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={clamped}
+    >
+      <div className="w-full bg-border/60 rounded-full h-2.5 overflow-hidden">
+        <div
+          className={cn('h-full transition-all duration-300 rounded-full', colors[selectedColor] || colors[automaticColor])}
+          style={{ width: `${clamped}%` }}
+        />
+      </div>
+      {markerIsVisible && (
+        <span
+          aria-hidden="true"
+          className="absolute top-[-2px] bottom-[-2px] z-10 w-0.5 -translate-x-1/2 rounded-full bg-white shadow-sm dark:bg-ink-light"
+          style={{ left: `${thresholdPosition}%` }}
+        />
+      )}
     </div>
   );
 };

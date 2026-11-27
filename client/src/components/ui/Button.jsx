@@ -6,8 +6,8 @@ import { cn } from '@/utils/cn';
  */
 export const Button = ({
   children,
-  variant = 'primary', // primary, secondary, outline, ghost, danger, lime
-  size = 'md', // sm, md, lg
+  variant = 'primary',
+  size = 'md',
   className = '',
   disabled = false,
   isLoading = false,
@@ -20,11 +20,12 @@ export const Button = ({
 
   const variants = {
     primary: 'bg-primary hover:bg-primary-hover text-white shadow-soft dark:bg-lime dark:text-ink-light dark:hover:bg-lime-hover',
-    secondary: 'bg-sand hover:bg-sand-light text-ink-light border border-border-light dark:bg-surface-dark dark:text-ink-dark dark:border-border-dark',
-    outline: 'border border-border text-primary hover:bg-black/5 dark:hover:bg-white/5',
+    secondary: 'border border-border bg-transparent text-primary hover:bg-primary/5 dark:border-border-dark dark:text-ink-dark dark:hover:bg-white/5',
+    outline: 'border border-border bg-transparent text-primary hover:bg-primary/5 dark:border-border-dark dark:text-ink-dark dark:hover:bg-white/5',
     ghost: 'text-primary hover:bg-black/5 dark:hover:bg-white/5',
     danger: 'bg-coral text-white hover:bg-coral-dark shadow-soft',
-    lime: 'bg-lime text-ink-light hover:bg-lime-hover shadow-soft'
+    lime: 'bg-lime text-ink-light hover:bg-lime-hover shadow-soft',
+    auth: 'bg-auth-accent text-auth-ink hover:brightness-105 shadow-auth-button hover:shadow-auth-button-hover'
   };
 
   const sizes = {

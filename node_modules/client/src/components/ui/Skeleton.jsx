@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/utils/cn';
+import { Button } from './Button';
 
 export const Skeleton = ({ className = '', ...props }) => {
   return (
@@ -14,11 +15,20 @@ export const Skeleton = ({ className = '', ...props }) => {
 };
 
 export const EmptyState = ({
+  icon: Icon,
   title = 'Chưa có dữ liệu nào',
   description = 'Bắt đầu thêm các giao dịch hoặc mục tiêu mới để theo dõi tài chính nhé!',
   action,
+  actionLabel,
+  onAction,
   className = ''
 }) => {
+  const generatedAction = actionLabel && onAction ? (
+    <Button variant="primary" size="sm" onClick={onAction}>
+      {actionLabel}
+    </Button>
+  ) : null;
+
   return (
     <div
       className={cn(
@@ -26,29 +36,33 @@ export const EmptyState = ({
         className
       )}
     >
-      {/* Inline SVG Friendly Illustration (Cây mầm tài chính) */}
       <div className="w-20 h-20 mb-4 p-4 rounded-full bg-sand/50 dark:bg-surface-dark flex items-center justify-center text-brand dark:text-lime">
-        <svg
-          viewBox="0 0 64 64"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-12 h-12"
-        >
-          <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="2.5" strokeDasharray="4 4" />
-          <path
-            d="M32 44V24M32 24C32 24 24 16 18 20C12 24 20 32 32 24ZM32 28C32 28 40 20 46 24C52 28 44 36 32 28Z"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="32" cy="48" r="3" fill="rgb(var(--color-tangerine))" />
-        </svg>
+        {Icon ? (
+          <Icon className="w-12 h-12" aria-hidden="true" />
+        ) : (
+          <svg
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-12 h-12"
+            aria-hidden="true"
+          >
+            <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="2.5" strokeDasharray="4 4" />
+            <path
+              d="M32 44V24M32 24C32 24 24 16 18 20C12 24 20 32 32 24ZM32 28C32 28 40 20 46 24C52 28 44 36 32 28Z"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="32" cy="48" r="3" fill="rgb(var(--color-tangerine))" />
+          </svg>
+        )}
       </div>
 
       <h4 className="text-base font-bold text-primary mb-1">{title}</h4>
       <p className="text-xs text-secondary max-w-sm mb-5">{description}</p>
-      {action && <div>{action}</div>}
+      {(action || generatedAction) && <div>{action || generatedAction}</div>}
     </div>
   );
 };

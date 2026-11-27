@@ -10,3 +10,8 @@ export * from './Feedback';
 export * from './Dropdown';
 export * from './Money';
 export * from './ThemeToggle';
+export * from './PageHeader';
+export * from './StatusPill';
+export * from './IconButton';
+export * from './StatCard';
+export * from './ChartCard';
