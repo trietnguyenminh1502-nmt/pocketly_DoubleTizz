@@ -15,4 +15,5 @@ export * from './StatusPill';
 export * from './IconButton';
 export * from './StatCard';
 export * from './ChartCard';
+export * from './ChartTooltip';
 export * from './FormModal';

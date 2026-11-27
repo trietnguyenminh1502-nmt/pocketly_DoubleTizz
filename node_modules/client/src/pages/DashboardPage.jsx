@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { reportApi, budgetApi, savingGoalApi, transactionApi, categoryApi, walletApi } from '@/api/finance';
-import { Card, CardHeader, Money, Button, ProgressBar, Badge, Skeleton, EmptyState } from '@/components/ui';
+import {
+  Card,
+  CardHeader,
+  Money,
+  Button,
+  ProgressBar,
+  Badge,
+  Skeleton,
+  EmptyState,
+  StatCard,
+  ChartCard,
+  ChartTooltip
+} from '@/components/ui';
 import { TransactionFormModal } from '@/components/finance/TransactionFormModal';
-import { formatCompactVND, formatDate, formatPercent, formatVND } from '../../../shared/formatters.js';
+import { formatCompactVND, formatDate, formatPercent } from '../../../shared/formatters.js';
+import { chartTheme, getCategoryColorInfo } from '@/utils/chartTheme';
 import {
   ResponsiveContainer,
   PieChart,
@@ -30,49 +43,6 @@ import {
   Bot
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-// Custom Tooltip cho Biểu đồ Tròn & Cột (Sử dụng bảng màu dự án)
-const CATEGORY_COLOR_MAP = {
-  'Tiền thuê trọ': '#3B82F6',        // Xanh dương
-  'Mua sắm cá nhân': '#8B5CF6',     // Tím
-  'Ăn uống': '#F97316',             // Cam tươi
-  'Di chuyển': '#06B6D4',           // Xanh lơ cyan
-  'Học tập & Giáo trình': '#10B981',// Xanh ngọc
-  'Giải trí & Phim ảnh': '#F59E0B', // Vàng nghệ
-  'Sức khỏe & Y tế': '#EC4899',     // Hồng cánh sen
-  'Du Lịch': '#14B8A6'              // Xanh teal
-};
-
-const DISTINCT_COLORS = [
-  '#3B82F6', // Blue
-  '#8B5CF6', // Purple
-  '#F97316', // Orange
-  '#06B6D4', // Cyan
-  '#10B981', // Emerald
-  '#F59E0B', // Amber
-  '#EC4899', // Pink
-  '#14B8A6', // Teal
-  '#6366F1'  // Indigo
-];
-
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-surface border border-border p-3 rounded-16 shadow-modal text-xs">
-        {label && <p className="font-bold text-primary mb-1">{label}</p>}
-        {payload.map((entry, index) => (
-          <p key={`item-${index}`} className="flex items-center gap-2" style={{ color: entry.color || entry.fill }}>
-            <span className="font-semibold">{entry.name}:</span>
-            <span className="font-bold tabular-nums">
-              {formatVND(entry.value)}
-            </span>
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
 
 export const DashboardPage = () => {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
@@ -120,9 +90,9 @@ export const DashboardPage = () => {
 
   const summary = summaryRes?.data;
   const rawCategories = categorySpendingRes?.data?.categories || [];
-  const categoryData = rawCategories.map((cat, idx) => ({
+  const categoryData = rawCategories.map((cat, index) => ({
     ...cat,
-    color: CATEGORY_COLOR_MAP[cat.name] || cat.color || DISTINCT_COLORS[idx % DISTINCT_COLORS.length]
+    colorInfo: getCategoryColorInfo(cat, index)
   }));
   const trendsData = trendsRes?.data?.trends || [];
   const budgets = budgetsRes?.data?.budgets || [];
@@ -173,78 +143,85 @@ export const DashboardPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Tổng số dư ví */}
-          <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Tổng số dư khả dụng</span>
-              <div className="p-2 rounded-full bg-sand/40 text-brand dark:text-lime">
-                <Wallet className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2">
-              <Money amount={summary?.totalBalance || 0} type="neutral" className="text-2xl font-extrabold font-heading" />
-            </div>
-            <p className="text-[11px] text-secondary mt-2">Tổng từ tất cả ví cá nhân</p>
-          </Card>
-
-          {/* Card 2: Thu nhập tháng này */}
-          <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Thu nhập tháng</span>
-              <div className="p-2 rounded-full bg-mint/50 text-brand">
-                <ArrowDownLeft className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2">
-              <Money amount={summary?.currentMonth?.income || 0} type="income" showSign className="text-2xl font-extrabold font-heading" />
-            </div>
-            <p className="text-[11px] text-secondary mt-2">
-              Tăng trưởng: <strong className="text-brand dark:text-lime">{formatPercent(summary?.momComparison?.incomeGrowthPercentage ?? 0)}</strong> so với tháng trước
-            </p>
-          </Card>
-
-          {/* Card 3: Chi tiêu tháng này */}
-          <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Chi tiêu tháng</span>
-              <div className="p-2 rounded-full bg-tangerine/15 text-tangerine">
-                <ArrowUpRight className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2">
-              <Money amount={summary?.currentMonth?.expense || 0} type="expense" showSign className="text-2xl font-extrabold font-heading" />
-            </div>
-            <p className="text-[11px] text-secondary mt-2">
-              Biến động: <strong className="text-tangerine">{formatPercent(summary?.momComparison?.expenseGrowthPercentage ?? 0)}</strong> so với tháng trước
-            </p>
-          </Card>
-
-          {/* Card 4: Tiết kiệm ròng & Tỷ lệ */}
-          <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Tiết kiệm ròng</span>
-              <div className="p-2 rounded-full bg-lime/20 text-lime-dark">
-                <TrendingUp className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2">
-              <Money amount={summary?.currentMonth?.netSavings || 0} type={summary?.currentMonth?.netSavings >= 0 ? 'income' : 'expense'} showSign className="text-2xl font-extrabold font-heading" />
-            </div>
-            <p className="text-[11px] text-secondary mt-2">
-              Tỷ lệ tiết kiệm: <strong className="text-brand dark:text-lime">{formatPercent(summary?.currentMonth?.savingsRate ?? 0)}</strong>
-            </p>
-          </Card>
+          <StatCard
+            label="Tổng số dư khả dụng"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={summary?.totalBalance || 0}
+            icon={Wallet}
+            iconClassName="bg-sand/40 text-brand dark:text-lime"
+            valueClassName="font-extrabold font-heading"
+            comparison="Tổng từ tất cả ví cá nhân"
+          />
+          <StatCard
+            label="Thu nhập tháng"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={summary?.currentMonth?.income || 0}
+            valueType="income"
+            showSign
+            icon={ArrowDownLeft}
+            iconClassName="bg-mint/50 text-brand"
+            valueClassName="font-extrabold font-heading"
+            trend={(summary?.momComparison?.incomeGrowthPercentage ?? 0) >= 0 ? 'up' : 'down'}
+            comparison={(
+              <>
+                Tăng trưởng:{' '}
+                <strong className="text-brand dark:text-lime">
+                  {formatPercent(summary?.momComparison?.incomeGrowthPercentage ?? 0)}
+                </strong>{' '}
+                so với tháng trước
+              </>
+            )}
+          />
+          <StatCard
+            label="Chi tiêu tháng"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={summary?.currentMonth?.expense || 0}
+            valueType="expense"
+            showSign
+            icon={ArrowUpRight}
+            iconClassName="bg-tangerine/15 text-tangerine"
+            valueClassName="font-extrabold font-heading"
+            trend={(summary?.momComparison?.expenseGrowthPercentage ?? 0) >= 0 ? 'down' : 'up'}
+            comparison={(
+              <>
+                Biến động:{' '}
+                <strong className="text-tangerine">
+                  {formatPercent(summary?.momComparison?.expenseGrowthPercentage ?? 0)}
+                </strong>{' '}
+                so với tháng trước
+              </>
+            )}
+          />
+          <StatCard
+            label="Tiết kiệm ròng"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={summary?.currentMonth?.netSavings || 0}
+            valueType={summary?.currentMonth?.netSavings >= 0 ? 'income' : 'expense'}
+            showSign
+            icon={TrendingUp}
+            iconClassName="bg-lime/20 text-lime-dark"
+            valueClassName="font-extrabold font-heading"
+            comparison={(
+              <>
+                Tỷ lệ tiết kiệm:{' '}
+                <strong className="text-brand dark:text-lime">
+                  {formatPercent(summary?.currentMonth?.savingsRate ?? 0)}
+                </strong>
+              </>
+            )}
+          />
         </div>
       )}
 
       {/* 3. Charts Row: Donut Chart & Trends Bar Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Donut Chart: Cơ cấu chi tiêu theo danh mục */}
-        <Card className="lg:col-span-5 flex flex-col p-6 sm:p-7">
-          <CardHeader
-            title="Cơ Cấu Chi Tiêu Tháng Này"
-            subtitle="Phân bổ tiền theo các danh mục ăn uống, học tập..."
-          />
+        <ChartCard
+          className="lg:col-span-5 flex flex-col p-6 sm:p-7"
+          chartClassName="flex flex-col flex-1"
+          title="Cơ Cấu Chi Tiêu Tháng Này"
+          description="Phân bổ tiền theo các danh mục ăn uống, học tập..."
+        >
           {loadingCategory ? (
             <Skeleton className="h-64 my-auto" />
           ) : categoryData.length === 0 ? (
@@ -266,10 +243,10 @@ export const DashboardPage = () => {
                       stroke="none"
                     >
                       {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
+                        <Cell key={`cell-${index}`} fill={entry.colorInfo.color} />
                       ))}
                     </Pie>
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip content={<ChartTooltip />} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -277,30 +254,34 @@ export const DashboardPage = () => {
               {/* Legend List */}
               <div className="pt-4 border-t border-border/60">
                 <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm">
-                  {categoryData.slice(0, 4).map((cat, idx) => (
-                    <div key={cat.categoryId || idx} className="flex items-center gap-2">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: cat.color }}
-                      />
-                      <span className="truncate text-secondary text-xs sm:text-sm">{cat.name}:</span>
-                      <strong className="text-primary text-xs sm:text-sm font-bold shrink-0">
-                        {formatPercent(cat.percentage ?? 0)}
-                      </strong>
-                    </div>
-                  ))}
+                  {categoryData.slice(0, 4).map((cat, idx) => {
+                    const color = cat.colorInfo || getCategoryColorInfo(cat, idx);
+                    return (
+                      <div key={cat.categoryId || idx} className="flex items-center gap-2">
+                        <span
+                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${color.className}`}
+                          style={color.hasCustomColor ? { backgroundColor: color.color } : undefined}
+                        />
+                        <span className="truncate text-secondary text-xs sm:text-sm">{cat.name}:</span>
+                        <strong className="text-primary text-xs sm:text-sm font-bold shrink-0">
+                          {formatPercent(cat.percentage ?? 0)}
+                        </strong>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
           )}
-        </Card>
+        </ChartCard>
 
         {/* Bar Chart: Thu Nhập vs Chi Tiêu (6 tháng) */}
-        <Card className="lg:col-span-7 flex flex-col">
-          <CardHeader
-            title="Xu Hướng Thu - Chi 6 Tháng"
-            subtitle="So sánh tổng thu nhập và chi phí sinh hoạt qua từng tháng"
-          />
+        <ChartCard
+          className="lg:col-span-7 flex flex-col"
+          chartClassName="flex flex-col flex-1"
+          title="Xu Hướng Thu - Chi 6 Tháng"
+          description="So sánh tổng thu nhập và chi phí sinh hoạt qua từng tháng"
+        >
           {loadingTrends ? (
             <Skeleton className="h-64 my-auto" />
           ) : trendsData.length === 0 ? (
@@ -309,27 +290,32 @@ export const DashboardPage = () => {
             <div className="h-64 w-full my-auto pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={trendsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--color-chart-border))" opacity={0.5} />
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
-                  <YAxis
-                    tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }}
-                    tickFormatter={formatCompactVND}
-                    tickLine={false}
-                    axisLine={false}
+                  <CartesianGrid {...chartTheme.grid} />
+                  <XAxis
+                    dataKey="label"
+                    tick={chartTheme.axis.xTick}
+                    tickLine={chartTheme.axis.tickLine}
+                    axisLine={chartTheme.axis.axisLine}
                   />
-                  <Tooltip content={<CustomTooltip />} />
+                  <YAxis
+                    tick={chartTheme.axis.yTick}
+                    tickFormatter={formatCompactVND}
+                    tickLine={chartTheme.axis.tickLine}
+                    axisLine={chartTheme.axis.axisLine}
+                  />
+                  <Tooltip content={<ChartTooltip />} />
                   <Legend
                     verticalAlign="top"
                     align="right"
-                    wrapperStyle={{ fontSize: 11, paddingBottom: 10 }}
+                    wrapperStyle={chartTheme.legend.wrapperStyle}
                   />
-                  <Bar dataKey="income" name="Thu nhập" fill="rgb(var(--color-chart-primary))" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="expense" name="Chi tiêu" fill="rgb(var(--color-chart-expense))" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="income" name="Thu nhập" fill={chartTheme.colors.primary} radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="expense" name="Chi tiêu" fill={chartTheme.colors.expense} radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
-        </Card>
+        </ChartCard>
       </div>
 
       {/* 4. Bottom Row: Budgets, Goals, Recent Transactions */}
@@ -456,39 +442,41 @@ export const DashboardPage = () => {
               <EmptyState title="Chưa có giao dịch" description="Bấm 'Thêm giao dịch' để bắt đầu ghi chép" className="my-auto py-8" />
             ) : (
               <div className="divide-y divide-border-light/60 dark:divide-border-dark/60 flex-1">
-                {recentTransactions.map((tx) => (
-                  <div key={tx.id} className="py-3 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm shadow-soft"
-                        style={{
-                          backgroundColor: tx.category?.color ? `${tx.category.color}20` : 'rgb(var(--color-tangerine) / 0.125)',
-                          color: tx.category?.color || 'rgb(var(--color-tangerine))'
-                        }}
-                      >
-                        {tx.type === 'INCOME' ? '+' : '-'}
+                {recentTransactions.map((tx) => {
+                  const color = getCategoryColorInfo(tx.category);
+                  return (
+                    <div key={tx.id} className="py-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm shadow-soft ${color.softClassName} ${color.textClassName}`}
+                          style={color.hasCustomColor
+                            ? { backgroundColor: `${color.color}20`, color: color.color }
+                            : undefined}
+                        >
+                          {tx.type === 'INCOME' ? '+' : '-'}
+                        </div>
+                        <div className="overflow-hidden">
+                          <p className="text-sm font-bold text-primary truncate">
+                            {tx.note || tx.category?.name || 'Giao dịch'}
+                          </p>
+                          <p className="text-[11px] text-secondary">
+                            {formatDate(tx.date)} • {tx.wallet?.name}
+                          </p>
+                        </div>
                       </div>
-                      <div className="overflow-hidden">
-                        <p className="text-sm font-bold text-primary truncate">
-                          {tx.note || tx.category?.name || 'Giao dịch'}
-                        </p>
-                        <p className="text-[11px] text-secondary">
-                          {formatDate(tx.date)} • {tx.wallet?.name}
-                        </p>
-                      </div>
-                    </div>
 
-                    <div className="text-right shrink-0">
-                      <Money
-                        amount={Number(tx.amount)}
-                        type={tx.type === 'INCOME' ? 'income' : 'expense'}
-                        showSign
-                        className="text-sm font-bold"
-                      />
-                      <span className="block text-[10px] text-secondary uppercase">{tx.category?.name}</span>
+                      <div className="text-right shrink-0">
+                        <Money
+                          amount={Number(tx.amount)}
+                          type={tx.type === 'INCOME' ? 'income' : 'expense'}
+                          showSign
+                          className="text-sm font-bold"
+                        />
+                        <span className="block text-[10px] text-secondary uppercase">{tx.category?.name}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </Card>

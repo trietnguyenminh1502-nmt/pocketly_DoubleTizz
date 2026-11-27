@@ -14,6 +14,7 @@ import {
   EmptyState,
   useToast
 } from '@/components/ui';
+import { CATEGORY_COLOR_OPTIONS, getCategoryColorInfo } from '@/utils/chartTheme';
 import {
   Plus,
   Edit2,
@@ -70,21 +71,6 @@ const ICON_OPTIONS = [
   { name: 'Sparkles', icon: Sparkles, label: 'Khác' }
 ];
 
-const COLOR_PALETTE = [
-  '#FF6A2B', // Tangerine (Cam tươi)
-  '#3B82F6', // Blue (Xanh dương)
-  '#8B5CF6', // Purple (Tím Violet)
-  '#06B6D4', // Cyan (Xanh lơ)
-  '#10B981', // Emerald (Xanh ngọc lục bảo)
-  '#F59E0B', // Amber (Vàng nghệ)
-  '#EC4899', // Pink (Hồng cánh sen)
-  '#123D2F', // Forest Green (Xanh rừng đậm)
-  '#D4F05A', // Lime (Xanh chuối neon)
-  '#14B8A6', // Teal (Xanh mòng két)
-  '#E57373', // Red Coral (Đỏ san hô)
-  '#64748B'  // Slate (Xám đá)
-];
-
 export const AdminCategoriesPage = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -100,7 +86,7 @@ export const AdminCategoriesPage = () => {
     name: '',
     type: 'EXPENSE',
     icon: 'Utensils',
-    color: '#FF6A2B'
+    color: CATEGORY_COLOR_OPTIONS[0].value
   });
 
   // 1. Fetch danh mục hệ thống
@@ -171,7 +157,7 @@ export const AdminCategoriesPage = () => {
       name: '',
       type: 'EXPENSE',
       icon: 'Utensils',
-      color: '#FF6A2B'
+      color: CATEGORY_COLOR_OPTIONS[0].value
     });
     setEditingCategory(null);
   };
@@ -213,8 +199,15 @@ export const AdminCategoriesPage = () => {
 
   const renderIcon = (iconName, color, className = 'w-5 h-5') => {
     const IconComponent = ICON_MAP[iconName] || Tag;
-    return <IconComponent className={className} style={{ color }} />;
+    const colorInfo = getCategoryColorInfo({ color });
+    return (
+      <IconComponent
+        className={`${className} ${colorInfo.textClassName}`}
+        style={colorInfo.hasCustomColor ? { color: colorInfo.color } : undefined}
+      />
+    );
   };
+  const formColor = getCategoryColorInfo({ color: formData.color });
 
   return (
     <div className="space-y-6">
@@ -294,62 +287,65 @@ export const AdminCategoriesPage = () => {
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredCategories.map((cat) => (
-            <Card
-              key={cat.id}
-              className="p-4 flex flex-col justify-between hover:shadow-hover transition-all duration-200 border-border group"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-20 flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: `${cat.color}20` }}
-                  >
-                    {renderIcon(cat.icon, cat.color, 'w-6 h-6')}
-                  </div>
-                  <div>
-                    <h3 className="font-heading font-bold text-base text-primary line-clamp-1">
-                      {cat.name}
-                    </h3>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <Badge
-                        variant={cat.type === 'EXPENSE' ? 'coral' : 'lime'}
-                        size="sm"
-                      >
-                        {cat.type === 'EXPENSE' ? 'Chi tiêu' : 'Thu nhập'}
-                      </Badge>
-                      <Badge variant="neutral" size="sm" className="flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-tangerine" />
-                        Mặc định
-                      </Badge>
+          {filteredCategories.map((cat) => {
+            const color = getCategoryColorInfo(cat);
+            return (
+              <Card
+                key={cat.id}
+                className="p-4 flex flex-col justify-between hover:shadow-hover transition-all duration-200 border-border group"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-12 h-12 rounded-20 flex items-center justify-center shrink-0 ${color.softClassName}`}
+                      style={color.hasCustomColor ? { backgroundColor: `${color.color}20` } : undefined}
+                    >
+                      {renderIcon(cat.icon, cat.color, 'w-6 h-6')}
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-bold text-base text-primary line-clamp-1">
+                        {cat.name}
+                      </h3>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <Badge
+                          variant={cat.type === 'EXPENSE' ? 'coral' : 'lime'}
+                          size="sm"
+                        >
+                          {cat.type === 'EXPENSE' ? 'Chi tiêu' : 'Thu nhập'}
+                        </Badge>
+                        <Badge variant="neutral" size="sm" className="flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3 text-tangerine" />
+                          Mặc định
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-1.5 pt-3 mt-3 border-t border-border/60">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleOpenEdit(cat)}
-                  leftIcon={<Edit2 className="w-3.5 h-3.5 text-secondary group-hover:text-tangerine" />}
-                  className="text-xs text-secondary hover:text-ink-light dark:hover:text-ink-dark"
-                >
-                  Sửa
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handleDeletePrompt(cat.id)}
-                  leftIcon={<Trash2 className="w-3.5 h-3.5 text-coral" />}
-                  className="text-xs text-coral hover:bg-coral/10"
-                >
-                  Xóa
-                </Button>
-              </div>
-            </Card>
-          ))}
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-1.5 pt-3 mt-3 border-t border-border/60">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleOpenEdit(cat)}
+                    leftIcon={<Edit2 className="w-3.5 h-3.5 text-secondary group-hover:text-tangerine" />}
+                    className="text-xs text-secondary hover:text-ink-light dark:hover:text-ink-dark"
+                  >
+                    Sửa
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDeletePrompt(cat.id)}
+                    leftIcon={<Trash2 className="w-3.5 h-3.5 text-coral" />}
+                    className="text-xs text-coral hover:bg-coral/10"
+                  >
+                    Xóa
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -413,17 +409,16 @@ export const AdminCategoriesPage = () => {
               Mã màu hiển thị
             </label>
             <div className="flex flex-wrap gap-2.5 items-center">
-              {COLOR_PALETTE.map((c) => {
-                const isSelected = formData.color.toLowerCase() === c.toLowerCase();
+              {CATEGORY_COLOR_OPTIONS.map((color) => {
+                const isSelected = formData.color.toLowerCase() === color.value.toLowerCase();
                 return (
                   <button
-                    key={c}
+                    key={color.value}
                     type="button"
-                    onClick={() => setFormData({ ...formData, color: c })}
+                    onClick={() => setFormData({ ...formData, color: color.value })}
                     className={`w-7 h-7 rounded-full transition-transform ${
                       isSelected ? 'ring-2 ring-tangerine ring-offset-2 scale-110' : 'hover:scale-105'
-                    }`}
-                    style={{ backgroundColor: c }}
+                    } ${color.className}`}
                   />
                 );
               })}
@@ -433,8 +428,8 @@ export const AdminCategoriesPage = () => {
           {/* Xem trước */}
           <div className="p-3 bg-sand/30 dark:bg-white/5 rounded-20 border border-border flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-16 flex items-center justify-center shrink-0"
-              style={{ backgroundColor: `${formData.color}20` }}
+              className={`w-10 h-10 rounded-16 flex items-center justify-center shrink-0 ${formColor.softClassName}`}
+              style={formColor.hasCustomColor ? { backgroundColor: `${formColor.color}20` } : undefined}
             >
               {renderIcon(formData.icon, formData.color, 'w-5 h-5')}
             </div>

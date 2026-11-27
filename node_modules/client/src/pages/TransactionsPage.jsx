@@ -23,6 +23,7 @@ import {
 } from '@/components/ui';
 import { TransactionFormModal } from '@/components/finance/TransactionFormModal';
 import { formatDate } from '../../../shared/formatters.js';
+import { getCategoryColorInfo } from '@/utils/chartTheme';
 import {
   Search,
   Plus,
@@ -398,66 +399,69 @@ export const TransactionsPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transactions.map((tx) => (
-                  <TableRow key={tx.id}>
-                    <TableCell className="text-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(tx.id)}
-                        onChange={() => handleSelectOne(tx.id)}
-                        className="rounded accent-primary cursor-pointer"
-                      />
-                    </TableCell>
-                    <TableCell className="tabular-nums text-xs font-semibold text-secondary">
-                      {formatDate(tx.date)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
-                          style={{ backgroundColor: tx.category?.color || 'rgb(var(--color-tangerine))' }}
+                {transactions.map((tx) => {
+                  const color = getCategoryColorInfo(tx.category);
+                  return (
+                    <TableRow key={tx.id}>
+                      <TableCell className="text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(tx.id)}
+                          onChange={() => handleSelectOne(tx.id)}
+                          className="rounded accent-primary cursor-pointer"
                         />
-                        <span className="font-bold text-xs">{tx.category?.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="max-w-[200px] truncate text-xs text-primary">
-                      {tx.note || <span className="text-secondary/50 italic">Không có ghi chú</span>}
-                    </TableCell>
-                    <TableCell className="text-xs text-secondary">{tx.wallet?.name}</TableCell>
-                    <TableCell>
-                      <Money
-                        amount={Number(tx.amount)}
-                        type={tx.type === 'INCOME' ? 'income' : 'expense'}
-                        showSign
-                        className="text-sm font-bold"
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => {
-                            setEditingTransaction(tx);
-                            setIsFormModalOpen(true);
-                          }}
-                          className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
-                          title="Sửa giao dịch"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDeletingId(tx.id);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                          className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
-                          title="Xóa giao dịch"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell className="tabular-nums text-xs font-semibold text-secondary">
+                        {formatDate(tx.date)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-2.5 h-2.5 rounded-full shrink-0 ${color.className}`}
+                            style={color.hasCustomColor ? { backgroundColor: color.color } : undefined}
+                          />
+                          <span className="font-bold text-xs">{tx.category?.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-[200px] truncate text-xs text-primary">
+                        {tx.note || <span className="text-secondary/50 italic">Không có ghi chú</span>}
+                      </TableCell>
+                      <TableCell className="text-xs text-secondary">{tx.wallet?.name}</TableCell>
+                      <TableCell>
+                        <Money
+                          amount={Number(tx.amount)}
+                          type={tx.type === 'INCOME' ? 'income' : 'expense'}
+                          showSign
+                          className="text-sm font-bold"
+                        />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => {
+                              setEditingTransaction(tx);
+                              setIsFormModalOpen(true);
+                            }}
+                            className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
+                            title="Sửa giao dịch"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setDeletingId(tx.id);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                            className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
+                            title="Xóa giao dịch"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
 

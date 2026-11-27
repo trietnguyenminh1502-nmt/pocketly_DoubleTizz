@@ -2,6 +2,11 @@
 export default {
   darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  safelist: [
+    {
+      pattern: /^(bg|text)-chart-category-(tangerine|blue|purple|cyan|emerald|amber|pink|forest|lime|teal|coral|slate|orange|indigo)(\/15)?$/
+    }
+  ],
   theme: {
     extend: {
       colors: {
@@ -23,6 +28,22 @@ export default {
         'chart-primary': 'rgb(var(--color-chart-primary) / <alpha-value>)',
         'chart-expense': 'rgb(var(--color-chart-expense) / <alpha-value>)',
         'chart-secondary': 'rgb(var(--color-chart-secondary) / <alpha-value>)',
+        'chart-category': {
+          tangerine: 'rgb(var(--color-chart-category-tangerine) / <alpha-value>)',
+          blue: 'rgb(var(--color-chart-category-blue) / <alpha-value>)',
+          purple: 'rgb(var(--color-chart-category-purple) / <alpha-value>)',
+          cyan: 'rgb(var(--color-chart-category-cyan) / <alpha-value>)',
+          emerald: 'rgb(var(--color-chart-category-emerald) / <alpha-value>)',
+          amber: 'rgb(var(--color-chart-category-amber) / <alpha-value>)',
+          pink: 'rgb(var(--color-chart-category-pink) / <alpha-value>)',
+          forest: 'rgb(var(--color-chart-category-forest) / <alpha-value>)',
+          lime: 'rgb(var(--color-chart-category-lime) / <alpha-value>)',
+          teal: 'rgb(var(--color-chart-category-teal) / <alpha-value>)',
+          coral: 'rgb(var(--color-chart-category-coral) / <alpha-value>)',
+          slate: 'rgb(var(--color-chart-category-slate) / <alpha-value>)',
+          orange: 'rgb(var(--color-chart-category-orange) / <alpha-value>)',
+          indigo: 'rgb(var(--color-chart-category-indigo) / <alpha-value>)'
+        },
         'focus-ink': 'rgb(var(--color-focus-ink) / <alpha-value>)',
         'status-neutral': 'rgb(var(--color-status-neutral) / <alpha-value>)',
         'status-neutral-bg': 'rgb(var(--color-status-neutral-bg) / <alpha-value>)',

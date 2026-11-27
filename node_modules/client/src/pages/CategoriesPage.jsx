@@ -14,6 +14,7 @@ import {
   EmptyState,
   useToast
 } from '@/components/ui';
+import { CATEGORY_COLOR_OPTIONS, getCategoryColorInfo } from '@/utils/chartTheme';
 import {
   Plus,
   Edit2,
@@ -53,21 +54,6 @@ const ICON_OPTIONS = [
   { name: 'Sparkles', icon: Sparkles, label: 'Khác' }
 ];
 
-const COLOR_PALETTE = [
-  '#FF6A2B', // Tangerine (Cam tươi)
-  '#3B82F6', // Blue (Xanh dương)
-  '#8B5CF6', // Purple (Tím Violet)
-  '#06B6D4', // Cyan (Xanh lơ)
-  '#10B981', // Emerald (Xanh ngọc lục bảo)
-  '#F59E0B', // Amber (Vàng nghệ)
-  '#EC4899', // Pink (Hồng cánh sen)
-  '#123D2F', // Forest Green (Xanh rừng đậm)
-  '#D4F05A', // Lime (Xanh chuối neon)
-  '#14B8A6', // Teal (Xanh mòng két)
-  '#E57373', // Red Coral (Đỏ san hô)
-  '#64748B'  // Slate (Xám đá)
-];
-
 export const CategoriesPage = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -78,7 +64,7 @@ export const CategoriesPage = () => {
       name: '',
       type: 'EXPENSE',
       icon: 'Utensils',
-      color: '#FF6A2B'
+      color: CATEGORY_COLOR_OPTIONS[0].value
     },
     mapRecordToForm: (category) => ({
       name: category.name,
@@ -200,13 +186,16 @@ export const CategoriesPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredCategories.map((cat) => {
             const IconComp = getIconComponent(cat.icon);
+            const color = getCategoryColorInfo(cat);
             return (
               <Card key={cat.id} className="p-4 flex flex-col justify-between" hover>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-11 h-11 rounded-20 flex items-center justify-center shrink-0 shadow-soft"
-                      style={{ backgroundColor: `${cat.color}25`, color: cat.color }}
+                      className={`w-11 h-11 rounded-20 flex items-center justify-center shrink-0 shadow-soft ${color.softClassName} ${color.textClassName}`}
+                      style={color.hasCustomColor
+                        ? { backgroundColor: `${color.color}25`, color: color.color }
+                        : undefined}
                     >
                       <IconComp className="w-5 h-5" />
                     </div>
@@ -313,15 +302,14 @@ export const CategoriesPage = () => {
               Bảng màu thương hiệu Pocketly
             </label>
             <div className="flex flex-wrap gap-2.5 p-3 rounded-20 bg-sand/20 dark:bg-surface-dark border border-border">
-              {COLOR_PALETTE.map((c) => (
+              {CATEGORY_COLOR_OPTIONS.map((color) => (
                 <button
-                  key={c}
+                  key={color.value}
                   type="button"
-                  onClick={() => crudModal.setField('color', c)}
+                  onClick={() => crudModal.setField('color', color.value)}
                   className={`w-7 h-7 rounded-full transition-transform ${
-                    crudModal.formData.color === c ? 'scale-125 ring-2 ring-primary dark:ring-lime' : 'hover:scale-110'
-                  }`}
-                  style={{ backgroundColor: c }}
+                    crudModal.formData.color === color.value ? 'scale-125 ring-2 ring-primary dark:ring-lime' : 'hover:scale-110'
+                  } ${color.className}`}
                 />
               ))}
             </div>

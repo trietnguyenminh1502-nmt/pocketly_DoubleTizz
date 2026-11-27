@@ -10,8 +10,12 @@ import {
   Select,
   Badge,
   Skeleton,
-  useToast
+  useToast,
+  StatCard,
+  ChartCard,
+  ChartTooltip
 } from '@/components/ui';
+import { chartTheme, formatChartCount } from '@/utils/chartTheme';
 import {
   Users,
   ReceiptText,
@@ -30,7 +34,8 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip
+  Tooltip,
+  Cell
 } from 'recharts';
 
 export const AdminDashboardPage = () => {
@@ -68,10 +73,10 @@ export const AdminDashboardPage = () => {
   });
 
   const chartData = [
-    { name: 'Người dùng hoạt động', count: stats?.users?.active || 0, fill: 'rgb(var(--color-chart-primary))' },
-    { name: 'Người dùng bị khóa', count: stats?.users?.locked || 0, fill: 'rgb(var(--color-coral))' },
-    { name: 'Đăng ký tuần qua', count: stats?.users?.newThisWeek || 0, fill: 'rgb(var(--color-tangerine))' },
-    { name: 'Có giao dịch tháng qua', count: stats?.users?.transactingPast30Days || 0, fill: 'rgb(var(--color-accent))' }
+    { name: 'Người dùng hoạt động', count: stats?.users?.active || 0, fill: chartTheme.colors.primary },
+    { name: 'Người dùng bị khóa', count: stats?.users?.locked || 0, fill: chartTheme.colors.danger },
+    { name: 'Đăng ký tuần qua', count: stats?.users?.newThisWeek || 0, fill: chartTheme.colors.warning },
+    { name: 'Có giao dịch tháng qua', count: stats?.users?.transactingPast30Days || 0, fill: chartTheme.colors.accent }
   ];
 
   return (
@@ -96,92 +101,96 @@ export const AdminDashboardPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Tổng người dùng</span>
-              <div className="p-2 rounded-full bg-sand/40 text-brand dark:text-lime">
-                <Users className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2 text-3xl font-extrabold font-heading text-primary">
-              {stats?.users?.total || 0}
-            </div>
-            <p className="text-[11px] text-brand dark:text-lime mt-1 font-semibold">
-              +{stats?.users?.newThisWeek || 0} sinh viên đăng ký tuần qua
-            </p>
-          </Card>
-
-          <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Người dùng Active</span>
-              <div className="p-2 rounded-full bg-mint/50 text-brand">
-                <UserCheck className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2 text-3xl font-extrabold font-heading text-brand dark:text-lime">
-              {stats?.users?.active || 0}
-            </div>
-            <p className="text-[11px] text-secondary mt-1">
-              Đang hoạt động bình thường trên hệ thống
-            </p>
-          </Card>
-
-          <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Tổng giao dịch</span>
-              <div className="p-2 rounded-full bg-tangerine/15 text-tangerine">
-                <ReceiptText className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2 text-3xl font-extrabold font-heading text-tangerine">
-              {stats?.transactions?.total || 0}
-            </div>
-            <p className="text-[11px] text-secondary mt-1">
-              {stats?.users?.transactingPast30Days || 0} user có phát sinh chi tiêu gần đây
-            </p>
-          </Card>
-
-          <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-secondary">
-              <span className="text-xs font-bold uppercase tracking-wider">Lượt hỏi AI Chatbot</span>
-              <div className="p-2 rounded-full bg-lime/20 text-lime-dark">
-                <Bot className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-2 text-3xl font-extrabold font-heading text-primary">
-              {stats?.chatbot?.totalMessages || 0}
-            </div>
-            <p className="text-[11px] text-secondary mt-1">
-              Qua {stats?.chatbot?.totalSessions || 0} phiên tư vấn tài chính
-            </p>
-          </Card>
+          <StatCard
+            label="Tổng người dùng"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={stats?.users?.total || 0}
+            valueFormatter={formatChartCount}
+            valueClassName="text-3xl font-extrabold font-heading text-primary"
+            icon={Users}
+            iconClassName="bg-sand/40 text-brand dark:text-lime"
+            trend={(stats?.users?.newThisWeek || 0) > 0 ? 'up' : 'neutral'}
+            comparison={`+${formatChartCount(stats?.users?.newThisWeek || 0)} sinh viên đăng ký tuần qua`}
+            comparisonClassName="text-[11px] font-semibold"
+            className="p-5"
+          />
+          <StatCard
+            label="Người dùng Active"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={stats?.users?.active || 0}
+            valueFormatter={formatChartCount}
+            valueClassName="text-3xl font-extrabold font-heading text-brand dark:text-lime"
+            icon={UserCheck}
+            iconClassName="bg-mint/50 text-brand"
+            comparison="Đang hoạt động bình thường trên hệ thống"
+            comparisonClassName="text-[11px]"
+            className="p-5"
+          />
+          <StatCard
+            label="Tổng giao dịch"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={stats?.transactions?.total || 0}
+            valueFormatter={formatChartCount}
+            valueClassName="text-3xl font-extrabold font-heading text-tangerine"
+            icon={ReceiptText}
+            iconClassName="bg-tangerine/15 text-tangerine"
+            comparison={`${formatChartCount(stats?.users?.transactingPast30Days || 0)} user có phát sinh chi tiêu gần đây`}
+            comparisonClassName="text-[11px]"
+            className="p-5"
+          />
+          <StatCard
+            label="Lượt hỏi AI Chatbot"
+            labelClassName="text-xs font-bold uppercase tracking-wider"
+            value={stats?.chatbot?.totalMessages || 0}
+            valueFormatter={formatChartCount}
+            valueClassName="text-3xl font-extrabold font-heading text-primary"
+            icon={Bot}
+            iconClassName="bg-lime/20 text-lime-dark"
+            comparison={`Qua ${formatChartCount(stats?.chatbot?.totalSessions || 0)} phiên tư vấn tài chính`}
+            comparisonClassName="text-[11px]"
+            className="p-5"
+          />
         </div>
       )}
 
       {/* 3. Chart & System Announcement Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Biểu đồ phân bổ người dùng */}
-        <Card className="lg:col-span-7 flex flex-col p-6">
-          <CardHeader
-            title="Phân Bổ Người Dùng & Hoạt Động"
-            subtitle="Tỷ lệ người dùng kích hoạt, bị khóa và mức độ tương tác"
-          />
+        <ChartCard
+          className="lg:col-span-7 flex flex-col p-6"
+          chartClassName="flex flex-col flex-1"
+          title="Phân Bổ Người Dùng & Hoạt Động"
+          description="Tỷ lệ người dùng kích hoạt, bị khóa và mức độ tương tác"
+        >
           {isLoading ? (
             <Skeleton className="h-64 my-auto" />
           ) : (
             <div className="h-64 w-full my-auto pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--color-chart-border))" opacity={0.5} />
-                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid rgb(var(--color-chart-border))' }} />
-                  <Bar dataKey="count" name="Số lượng" radius={[8, 8, 0, 0]} />
+                  <CartesianGrid {...chartTheme.grid} />
+                  <XAxis
+                    dataKey="name"
+                    tick={chartTheme.axis.yTick}
+                    tickLine={chartTheme.axis.tickLine}
+                    axisLine={chartTheme.axis.axisLine}
+                  />
+                  <YAxis
+                    tick={chartTheme.axis.yTick}
+                    tickLine={chartTheme.axis.tickLine}
+                    axisLine={chartTheme.axis.axisLine}
+                  />
+                  <Tooltip content={<ChartTooltip valueFormatter={formatChartCount} />} />
+                  <Bar dataKey="count" name="Số lượng" radius={[8, 8, 0, 0]}>
+                    {chartData.map((item) => (
+                      <Cell key={item.name} fill={item.fill} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
-        </Card>
+        </ChartCard>
 
         {/* Form Phát Sóng Thông Báo Hệ Thống */}
         <Card className="lg:col-span-5 p-6 flex flex-col justify-between">

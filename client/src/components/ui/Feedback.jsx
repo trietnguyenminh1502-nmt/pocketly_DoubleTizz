@@ -49,7 +49,10 @@ export const ProgressBar = ({
   threshold = 80,
   showThreshold,
   label = 'Tiến độ',
-  className = ''
+  className = '',
+  trackClassName = '',
+  barClassName = '',
+  barStyle
 }) => {
   const numericProgress = Number(progress);
   const safeProgress = Number.isFinite(numericProgress) ? numericProgress : 0;
@@ -85,10 +88,10 @@ export const ProgressBar = ({
       aria-valuemax={100}
       aria-valuenow={clamped}
     >
-      <div className="w-full bg-border/60 rounded-full h-2.5 overflow-hidden">
+      <div className={cn('w-full bg-border/60 rounded-full h-2.5 overflow-hidden', trackClassName)}>
         <div
-          className={cn('h-full transition-all duration-300 rounded-full', colors[selectedColor] || colors[automaticColor])}
-          style={{ width: `${clamped}%` }}
+          className={cn('h-full transition-all duration-300 rounded-full', colors[selectedColor] || colors[automaticColor], barClassName)}
+          style={{ width: `${clamped}%`, ...barStyle }}
         />
       </div>
       {markerIsVisible && (

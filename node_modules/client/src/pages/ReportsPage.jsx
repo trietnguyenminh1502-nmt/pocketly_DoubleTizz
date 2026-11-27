@@ -4,15 +4,19 @@ import { reportApi } from '@/api/finance';
 import { cn } from '@/utils/cn';
 import {
   Card,
-  CardHeader,
   Button,
   Money,
   Select,
   Skeleton,
   EmptyState,
-  useToast
+  useToast,
+  ProgressBar,
+  StatCard,
+  ChartCard,
+  ChartTooltip
 } from '@/components/ui';
-import { formatCompactVND, formatPercent, formatVND } from '../../../shared/formatters.js';
+import { formatCompactVND, formatPercent } from '../../../shared/formatters.js';
+import { chartTheme, getCategoryColorInfo } from '@/utils/chartTheme';
 import {
   FileSpreadsheet,
   TrendingUp,
@@ -29,21 +33,6 @@ import {
   Tooltip,
   Legend
 } from 'recharts';
-
-const CATEGORY_COLOR_MAP = {
-  'Tiền thuê trọ': '#3B82F6',
-  'Mua sắm cá nhân': '#8B5CF6',
-  'Ăn uống': '#F97316',
-  'Di chuyển': '#06B6D4',
-  'Học tập & Giáo trình': '#10B981',
-  'Giải trí & Phim ảnh': '#F59E0B',
-  'Sức khỏe & Y tế': '#EC4899',
-  'Du Lịch': '#14B8A6'
-};
-
-const DISTINCT_COLORS = [
-  '#3B82F6', '#8B5CF6', '#F97316', '#06B6D4', '#10B981', '#F59E0B', '#EC4899', '#14B8A6', '#6366F1'
-];
 
 export const ReportsPage = () => {
   const { addToast } = useToast();
@@ -78,9 +67,9 @@ export const ReportsPage = () => {
   const summary = summaryRes?.data;
   const trendsData = trendsRes?.data?.trends || [];
   const rawTop = topCategoriesRes?.data?.topCategories || [];
-  const topCategories = rawTop.map((cat, idx) => ({
+  const topCategories = rawTop.map((cat, index) => ({
     ...cat,
-    color: CATEGORY_COLOR_MAP[cat.name] || cat.color || DISTINCT_COLORS[idx % DISTINCT_COLORS.length]
+    colorInfo: getCategoryColorInfo(cat, index)
   }));
 
   // Export Báo cáo Excel theo khoảng thời gian đã lọc
@@ -268,101 +257,126 @@ export const ReportsPage = () => {
 
       {/* 2. Month-over-Month Comparison Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tổng thu nhập tháng</span>
-          <div className="mt-2">
-            <Money amount={summary?.currentMonth?.income || 0} type="income" showSign className="text-2xl font-extrabold" />
-          </div>
-          <p className="text-[11px] text-secondary mt-2">
-            Tháng trước: <Money amount={summary?.momComparison?.lastMonthIncome || 0} type="neutral" className="text-secondary font-normal" />
-          </p>
-        </Card>
-
-        <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tổng chi tiêu tháng</span>
-          <div className="mt-2">
-            <Money amount={summary?.currentMonth?.expense || 0} type="expense" showSign className="text-2xl font-extrabold" />
-          </div>
-          <p className="text-[11px] text-secondary mt-2">
-            Tháng trước: <Money amount={summary?.momComparison?.lastMonthExpense || 0} type="neutral" className="text-secondary font-normal" />
-          </p>
-        </Card>
-
-        <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tiền tiết kiệm ròng</span>
-          <div className="mt-2">
-            <Money
-              amount={summary?.currentMonth?.netSavings || 0}
-              type={summary?.currentMonth?.netSavings >= 0 ? 'income' : 'expense'}
-              showSign
-              className="text-2xl font-extrabold"
-            />
-          </div>
-          <p className="text-[11px] text-secondary mt-2">
-            Dư sau khi trừ chi phí sinh hoạt
-          </p>
-        </Card>
-
-        <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tỷ lệ tiết kiệm (%)</span>
-          <div className="mt-2 text-2xl font-extrabold font-heading text-brand dark:text-lime">
-            {formatPercent(summary?.currentMonth?.savingsRate ?? 0)}
-          </div>
-          <p className="text-[11px] text-secondary mt-2">
-            Mục tiêu khuyến nghị sinh viên: ≥ 20%
-          </p>
-        </Card>
+        <StatCard
+          label="Tổng thu nhập tháng"
+          labelClassName="text-xs uppercase font-bold tracking-wider"
+          value={summary?.currentMonth?.income || 0}
+          valueType="income"
+          showSign
+          valueClassName="font-extrabold"
+          comparisonClassName="text-[11px]"
+          className="p-5"
+          comparison={(
+            <>
+              Tháng trước:{' '}
+              <Money
+                amount={summary?.momComparison?.lastMonthIncome || 0}
+                type="neutral"
+                className="text-secondary font-normal"
+              />
+            </>
+          )}
+        />
+        <StatCard
+          label="Tổng chi tiêu tháng"
+          labelClassName="text-xs uppercase font-bold tracking-wider"
+          value={summary?.currentMonth?.expense || 0}
+          valueType="expense"
+          showSign
+          valueClassName="font-extrabold"
+          comparisonClassName="text-[11px]"
+          className="p-5"
+          comparison={(
+            <>
+              Tháng trước:{' '}
+              <Money
+                amount={summary?.momComparison?.lastMonthExpense || 0}
+                type="neutral"
+                className="text-secondary font-normal"
+              />
+            </>
+          )}
+        />
+        <StatCard
+          label="Tiền tiết kiệm ròng"
+          labelClassName="text-xs uppercase font-bold tracking-wider"
+          value={summary?.currentMonth?.netSavings || 0}
+          valueType={summary?.currentMonth?.netSavings >= 0 ? 'income' : 'expense'}
+          showSign
+          valueClassName="font-extrabold"
+          comparisonClassName="text-[11px]"
+          className="p-5"
+          comparison="Dư sau khi trừ chi phí sinh hoạt"
+        />
+        <StatCard
+          label="Tỷ lệ tiết kiệm (%)"
+          labelClassName="text-xs uppercase font-bold tracking-wider"
+          value={summary?.currentMonth?.savingsRate ?? 0}
+          valueFormatter={formatPercent}
+          valueClassName="font-extrabold font-heading text-brand dark:text-lime"
+          comparisonClassName="text-[11px]"
+          className="p-5"
+          comparison="Mục tiêu khuyến nghị sinh viên: ≥ 20%"
+        />
       </div>
 
       {/* 3. Trends & Top Categories */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Biểu đồ Cột Xu hướng */}
-        <Card className="lg:col-span-8 flex flex-col p-6">
-          <CardHeader
-            title={
-              fromMonth === toMonth
-                ? `Biểu Đồ Xu Hướng (Tháng ${fromMonth}/${selectedYear})`
-                : `Biểu Đồ Xu Hướng (Tháng ${fromMonth} - ${toMonth}/${selectedYear})`
-            }
-            subtitle="Tương quan giữa dòng tiền vào và dòng tiền ra"
-          />
+        <ChartCard
+          className="lg:col-span-8 flex flex-col p-6"
+          chartClassName="flex flex-col flex-1"
+          title={
+            fromMonth === toMonth
+              ? `Biểu Đồ Xu Hướng (Tháng ${fromMonth}/${selectedYear})`
+              : `Biểu Đồ Xu Hướng (Tháng ${fromMonth} - ${toMonth}/${selectedYear})`
+          }
+          description="Tương quan giữa dòng tiền vào và dòng tiền ra"
+        >
           {loadingTrends ? (
             <Skeleton className="h-72 my-auto" />
           ) : (
             <div className="h-72 w-full my-auto pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={trendsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--color-chart-border))" opacity={0.5} />
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
+                  <CartesianGrid {...chartTheme.grid} />
+                  <XAxis
+                    dataKey="label"
+                    tick={chartTheme.axis.xTick}
+                    tickLine={chartTheme.axis.tickLine}
+                    axisLine={chartTheme.axis.axisLine}
+                  />
                   <YAxis
-                    tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }}
+                    tick={chartTheme.axis.yTick}
                     tickFormatter={formatCompactVND}
-                    tickLine={false}
-                    axisLine={false}
+                    tickLine={chartTheme.axis.tickLine}
+                    axisLine={chartTheme.axis.axisLine}
                   />
-                  <Tooltip
-                    formatter={(val) => formatVND(val)}
-                    contentStyle={{ borderRadius: '16px', border: '1px solid rgb(var(--color-chart-border))' }}
+                  <Tooltip content={<ChartTooltip />} />
+                  <Legend
+                    verticalAlign="top"
+                    align="right"
+                    wrapperStyle={chartTheme.legend.wrapperStyle}
                   />
-                  <Legend verticalAlign="top" align="right" wrapperStyle={{ fontSize: 11, paddingBottom: 10 }} />
-                  <Bar dataKey="income" name="Thu nhập" fill="rgb(var(--color-chart-primary))" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="expense" name="Chi tiêu" fill="rgb(var(--color-chart-expense))" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="income" name="Thu nhập" fill={chartTheme.colors.primary} radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="expense" name="Chi tiêu" fill={chartTheme.colors.expense} radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           )}
-        </Card>
+        </ChartCard>
 
         {/* Top 5 Danh Mục Tốn Kém Nhất */}
-        <Card className="lg:col-span-4 flex flex-col p-6">
-          <CardHeader
-            title="Top 5 Chi Phí Lớn Nhất"
-            subtitle={
-              fromMonth === toMonth
-                ? `Chiếm tỷ trọng cao nhất trong Tháng ${fromMonth}/${selectedYear}`
-                : `Chiếm tỷ trọng cao nhất từ Tháng ${fromMonth} - ${toMonth}/${selectedYear}`
-            }
-          />
+        <ChartCard
+          className="lg:col-span-4 flex flex-col p-6"
+          chartClassName="flex flex-col flex-1"
+          title="Top 5 Chi Phí Lớn Nhất"
+          description={
+            fromMonth === toMonth
+              ? `Chiếm tỷ trọng cao nhất trong Tháng ${fromMonth}/${selectedYear}`
+              : `Chiếm tỷ trọng cao nhất từ Tháng ${fromMonth} - ${toMonth}/${selectedYear}`
+          }
+        >
           {loadingTop ? (
             <div className="space-y-3 my-auto">
               <Skeleton className="h-10" />
@@ -373,28 +387,37 @@ export const ReportsPage = () => {
             <EmptyState title="Chưa có dữ liệu" className="my-auto py-8" />
           ) : (
             <div className="space-y-4 my-auto">
-              {topCategories.map((c, index) => (
-                <div key={c.categoryId} className="space-y-1">
+              {topCategories.map((category, index) => (
+                <div key={category.categoryId} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-bold flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c.color }} />
-                      {index + 1}. {c.name}
+                      <span
+                        className={`w-2 h-2 rounded-full ${category.colorInfo.className}`}
+                        style={category.colorInfo.hasCustomColor
+                          ? { backgroundColor: category.colorInfo.color }
+                          : undefined}
+                      />
+                      {index + 1}. {category.name}
                     </span>
                     <strong className="text-tangerine">
-                      <Money amount={c.amount} type="expense" className="text-tangerine font-extrabold" /> ({formatPercent(c.percentage ?? 0)})
+                      <Money amount={category.amount} type="expense" className="text-tangerine font-extrabold" /> ({formatPercent(category.percentage ?? 0)})
                     </strong>
                   </div>
-                  <div className="w-full bg-border/60 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${c.percentage}%`, backgroundColor: c.color }}
-                    />
-                  </div>
+                  <ProgressBar
+                    progress={category.percentage}
+                    color="safe"
+                    trackClassName="h-2"
+                    barClassName={category.colorInfo.className}
+                    barStyle={category.colorInfo.hasCustomColor
+                      ? { backgroundColor: category.colorInfo.color }
+                      : undefined}
+                    label={`Tỷ trọng chi tiêu ${category.name}`}
+                  />
                 </div>
               ))}
             </div>
           )}
-        </Card>
+        </ChartCard>
       </div>
     </div>
   );
