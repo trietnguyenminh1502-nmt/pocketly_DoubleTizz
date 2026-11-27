@@ -8,7 +8,7 @@ import {
   Input,
   Select,
   Badge,
-  Modal,
+  FormModal,
   ConfirmDialog,
   Skeleton,
   EmptyState,
@@ -34,6 +34,7 @@ import {
   BookOpen,
   Sparkles
 } from 'lucide-react';
+import { useCrudModal } from '@/hooks/useCrudModal';
 
 const ICON_OPTIONS = [
   { name: 'Utensils', icon: Utensils, label: 'Ăn uống' },
@@ -72,17 +73,19 @@ export const CategoriesPage = () => {
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState('ALL'); // ALL, EXPENSE, INCOME
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
-
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    type: 'EXPENSE',
-    icon: 'Utensils',
-    color: '#FF6A2B'
+  const crudModal = useCrudModal({
+    initialFormData: {
+      name: '',
+      type: 'EXPENSE',
+      icon: 'Utensils',
+      color: '#FF6A2B'
+    },
+    mapRecordToForm: (category) => ({
+      name: category.name,
+      type: category.type,
+      icon: category.icon,
+      color: category.color
+    })
   });
 
   const { data: res, isLoading } = useQuery({
@@ -98,23 +101,19 @@ export const CategoriesPage = () => {
   });
 
   const saveMutation = useMutation({
-    mutationFn: (data) => {
-      if (editingCategory) {
-        return categoryApi.update(editingCategory.id, data);
+    mutationFn: ({ data, record, mode }) => {
+      if (mode === 'edit') {
+        return categoryApi.update(record.id, data);
       }
       return categoryApi.create(data);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       addToast({
-        message: `${editingCategory ? 'Cập nhật' : 'Tạo mới'} danh mục thành công! 🌿`,
+        message: `${variables.mode === 'edit' ? 'Cập nhật' : 'Tạo mới'} danh mục thành công! 🌿`,
         type: 'success'
       });
-      setIsModalOpen(false);
-      setEditingCategory(null);
-    },
-    onError: (err) => {
-      addToast({ message: err.message || 'Lỗi khi lưu danh mục', type: 'error' });
+      crudModal.close();
     }
   });
 
@@ -123,34 +122,22 @@ export const CategoriesPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       addToast({ message: 'Đã xóa danh mục thành công!', type: 'success' });
-      setIsDeleteDialogOpen(false);
-      setDeletingId(null);
+      crudModal.cancelDelete();
     },
     onError: (err) => {
       addToast({ message: err.message || 'Không thể xóa danh mục này', type: 'error' });
     }
   });
 
-  const openCreateModal = () => {
-    setEditingCategory(null);
-    setFormData({
-      name: '',
-      type: 'EXPENSE',
-      icon: 'Utensils',
-      color: '#FF6A2B'
-    });
-    setIsModalOpen(true);
-  };
-
-  const openEditModal = (cat) => {
-    setEditingCategory(cat);
-    setFormData({
-      name: cat.name,
-      type: cat.type,
-      icon: cat.icon,
-      color: cat.color
-    });
-    setIsModalOpen(true);
+  const handleSave = async (event) => {
+    event.preventDefault();
+    try {
+      await crudModal.submit((data, record, mode) =>
+        saveMutation.mutateAsync({ data, record, mode })
+      );
+    } catch (error) {
+      addToast({ message: error.message || 'Lỗi khi lưu danh mục', type: 'error' });
+    }
   };
 
   const getIconComponent = (iconName) => {
@@ -193,7 +180,7 @@ export const CategoriesPage = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button variant="primary" size="md" icon={Plus} className="font-semibold text-sm" onClick={openCreateModal}>
+          <Button variant="primary" size="md" icon={Plus} className="font-semibold text-sm" onClick={() => crudModal.openCreate()}>
             Thêm danh mục mới
           </Button>
         </div>
@@ -242,7 +229,7 @@ export const CategoriesPage = () => {
                 {!cat.isDefault && (
                   <div className="flex items-center justify-end gap-1 pt-3 mt-3 border-t border-border/60">
                     <button
-                      onClick={() => openEditModal(cat)}
+                      onClick={() => crudModal.openEdit(cat)}
                       className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
                       title="Sửa danh mục"
                     >
@@ -250,8 +237,7 @@ export const CategoriesPage = () => {
                     </button>
                     <button
                       onClick={() => {
-                        setDeletingId(cat.id);
-                        setIsDeleteDialogOpen(true);
+                        crudModal.requestDelete(cat.id);
                       }}
                       className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                       title="Xóa danh mục"
@@ -267,31 +253,27 @@ export const CategoriesPage = () => {
       )}
 
       {/* Modal Tạo / Sửa Danh mục */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingCategory ? 'Chỉnh Sửa Danh Mục' : 'Tạo Danh Mục Mới'}
+      <FormModal
+        isOpen={crudModal.isOpen}
+        onClose={crudModal.close}
+        onSubmit={handleSave}
+        title={crudModal.mode === 'edit' ? 'Chỉnh Sửa Danh Mục' : 'Tạo Danh Mục Mới'}
         maxWidth="max-w-md"
+        isSubmitting={crudModal.isSubmitting}
+        submitText={crudModal.mode === 'edit' ? 'Lưu thay đổi' : 'Tạo ngay'}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            saveMutation.mutate(formData);
-          }}
-          className="space-y-4"
-        >
           <Input
             label="Tên danh mục (*)"
             placeholder="VD: Cà phê sáng, Săn sale Shopee..."
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={crudModal.formData.name}
+            onChange={(e) => crudModal.setField('name', e.target.value)}
             required
           />
 
           <Select
             label="Loại danh mục (*)"
-            value={formData.type}
-            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+            value={crudModal.formData.type}
+            onChange={(e) => crudModal.setField('type', e.target.value)}
           >
             <option value="EXPENSE">Chi tiêu (Expense)</option>
             <option value="INCOME">Thu nhập (Income)</option>
@@ -305,12 +287,12 @@ export const CategoriesPage = () => {
             <div className="grid grid-cols-7 gap-2 p-3 rounded-20 bg-sand/20 dark:bg-surface-dark border border-border max-h-36 overflow-y-auto">
               {ICON_OPTIONS.map((item) => {
                 const Icon = item.icon;
-                const isSelected = formData.icon === item.name;
+                const isSelected = crudModal.formData.icon === item.name;
                 return (
                   <button
                     key={item.name}
                     type="button"
-                    onClick={() => setFormData({ ...formData, icon: item.name })}
+                    onClick={() => crudModal.setField('icon', item.name)}
                     className={`p-2.5 rounded-16 flex items-center justify-center transition-all ${
                       isSelected
                         ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft scale-105'
@@ -335,9 +317,9 @@ export const CategoriesPage = () => {
                 <button
                   key={c}
                   type="button"
-                  onClick={() => setFormData({ ...formData, color: c })}
+                  onClick={() => crudModal.setField('color', c)}
                   className={`w-7 h-7 rounded-full transition-transform ${
-                    formData.color === c ? 'scale-125 ring-2 ring-primary dark:ring-lime' : 'hover:scale-110'
+                    crudModal.formData.color === c ? 'scale-125 ring-2 ring-primary dark:ring-lime' : 'hover:scale-110'
                   }`}
                   style={{ backgroundColor: c }}
                 />
@@ -345,22 +327,13 @@ export const CategoriesPage = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-border">
-            <Button type="button" variant="secondary" size="sm" onClick={() => setIsModalOpen(false)}>
-              Hủy
-            </Button>
-            <Button type="submit" variant="primary" size="sm" isLoading={saveMutation.isPending}>
-              {editingCategory ? 'Lưu thay đổi' : 'Tạo ngay'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      </FormModal>
 
       {/* Confirm Xóa danh mục */}
       <ConfirmDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={() => deleteMutation.mutate(deletingId)}
+        isOpen={crudModal.isDeleteConfirmationOpen}
+        onClose={crudModal.cancelDelete}
+        onConfirm={() => deleteMutation.mutate(crudModal.deleteTarget)}
         title="Xóa danh mục"
         message="Hệ thống chỉ cho phép xóa nếu danh mục này chưa có giao dịch nào liên kết. Bạn có muốn tiếp tục không?"
         confirmText="Xóa danh mục"

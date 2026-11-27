@@ -7,10 +7,12 @@ import {
   Input,
   Select,
   Modal,
+  FormModal,
   Money,
   ConfirmDialog,
   useToast
 } from '@/components/ui';
+import { useCrudModal } from '@/hooks/useCrudModal';
 import {
   Wallet,
   Plus,
@@ -63,18 +65,20 @@ export const WalletsPage = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingWallet, setEditingWallet] = useState(null);
+  const crudModal = useCrudModal({
+    initialFormData: {
+      name: '',
+      balance: 0,
+      icon: 'Wallet'
+    },
+    mapRecordToForm: (wallet) => ({
+      name: wallet.name,
+      balance: Number(wallet.balance),
+      icon: wallet.icon
+    })
+  });
 
   const [isTransferOpen, setIsTransferOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    balance: 0,
-    icon: 'Wallet'
-  });
 
   const [transferData, setTransferData] = useState({
     fromWalletId: '',
@@ -111,24 +115,20 @@ export const WalletsPage = () => {
   });
 
   const saveMutation = useMutation({
-    mutationFn: (data) => {
-      if (editingWallet) {
-        return walletApi.update(editingWallet.id, data);
+    mutationFn: ({ data, record, mode }) => {
+      if (mode === 'edit') {
+        return walletApi.update(record.id, data);
       }
       return walletApi.create(data);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['reportSummary'] });
       addToast({
-        message: `${editingWallet ? 'Cập nhật' : 'Thêm'} ví thành công.`,
+        message: `${variables.mode === 'edit' ? 'Cập nhật' : 'Thêm'} ví thành công.`,
         type: 'success'
       });
-      setIsModalOpen(false);
-      setEditingWallet(null);
-    },
-    onError: (err) => {
-      addToast({ message: err.message || 'Lỗi khi lưu ví tài khoản', type: 'error' });
+      crudModal.close();
     }
   });
 
@@ -152,25 +152,26 @@ export const WalletsPage = () => {
       queryClient.invalidateQueries({ queryKey: ['wallets'] });
       queryClient.invalidateQueries({ queryKey: ['reportSummary'] });
       addToast({ message: 'Đã xóa ví thành công.', type: 'success' });
-      setIsDeleteDialogOpen(false);
-      setDeletingId(null);
+      crudModal.cancelDelete();
     },
     onError: (err) => {
       addToast({ message: err.message || 'Không thể xóa ví này', type: 'error' });
     }
   });
 
-  const openCreateModal = () => {
-    setEditingWallet(null);
-    setFormData({ name: '', balance: 0, icon: 'Wallet' });
-    setIsModalOpen(true);
+  const handleSave = async (event) => {
+    event.preventDefault();
+    try {
+      await crudModal.submit((data, record, mode) =>
+        saveMutation.mutateAsync({ data, record, mode })
+      );
+    } catch (error) {
+      addToast({ message: error.message || 'Lỗi khi lưu ví tài khoản', type: 'error' });
+    }
   };
 
-  const openEditModal = (w) => {
-    setEditingWallet(w);
-    setFormData({ name: w.name, balance: Number(w.balance), icon: w.icon });
-    setIsModalOpen(true);
-  };
+  const openCreateModal = () => crudModal.openCreate();
+  const openEditModal = (wallet) => crudModal.openEdit(wallet);
 
   const openTransferModal = () => {
     if (wallets.length < 2) {
@@ -386,8 +387,7 @@ export const WalletsPage = () => {
                         <button
                           type="button"
                           onClick={() => {
-                            setDeletingId(w.id);
-                            setIsDeleteDialogOpen(true);
+                            crudModal.requestDelete(w);
                           }}
                           aria-label={`Xóa ví ${w.name}`}
                           className="underline underline-offset-4 text-white hover:text-white/80 transition-colors bg-transparent border-0 py-1 px-0 text-xs sm:text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
@@ -420,34 +420,30 @@ export const WalletsPage = () => {
       )}
 
       {/* Modal Thêm / Sửa Ví */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingWallet ? 'Chỉnh sửa ví' : 'Thêm ví mới'}
+      <FormModal
+        isOpen={crudModal.isOpen}
+        onClose={crudModal.close}
+        onSubmit={handleSave}
+        title={crudModal.mode === 'edit' ? 'Chỉnh sửa ví' : 'Thêm ví mới'}
         maxWidth="max-w-md"
+        isSubmitting={crudModal.isSubmitting}
+        submitText={crudModal.mode === 'edit' ? 'Lưu thay đổi' : 'Tạo ví ngay'}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            saveMutation.mutate(formData);
-          }}
-          className="space-y-4"
-        >
           <Input
             label="Tên ví (*)"
             placeholder="Ví dụ: MB Bank, Tiền mặt, Ví MoMo..."
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={crudModal.formData.name}
+            onChange={(e) => crudModal.setField('name', e.target.value)}
             required
           />
 
-          {!editingWallet && (
+          {crudModal.mode === 'create' && (
             <Input
               label="Số dư ban đầu (VND)"
               type="number"
               placeholder="0"
-              value={formData.balance}
-              onChange={(e) => setFormData({ ...formData, balance: parseFloat(e.target.value) || 0 })}
+              value={crudModal.formData.balance}
+              onChange={(e) => crudModal.setField('balance', parseFloat(e.target.value) || 0)}
             />
           )}
 
@@ -458,12 +454,12 @@ export const WalletsPage = () => {
             <div className="grid grid-cols-4 gap-2">
               {WALLET_ICONS.map((item) => {
                 const Icon = item.icon;
-                const isSelected = formData.icon === item.name;
+                const isSelected = crudModal.formData.icon === item.name;
                 return (
                   <button
                     key={item.name}
                     type="button"
-                    onClick={() => setFormData({ ...formData, icon: item.name })}
+                    onClick={() => crudModal.setField('icon', item.name)}
                     className={`p-3 rounded-20 flex flex-col items-center gap-1 transition-all border ${
                       isSelected
                         ? 'border-primary dark:border-lime bg-primary/10 dark:bg-lime/10 text-brand dark:text-lime shadow-soft'
@@ -477,17 +473,7 @@ export const WalletsPage = () => {
               })}
             </div>
           </div>
-
-          <div className="flex justify-end gap-2 pt-3 border-t border-border">
-            <Button type="button" variant="secondary" size="sm" onClick={() => setIsModalOpen(false)}>
-              Hủy
-            </Button>
-            <Button type="submit" variant="primary" size="sm" isLoading={saveMutation.isPending}>
-              {editingWallet ? 'Lưu thay đổi' : 'Tạo ví ngay'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      </FormModal>
 
       {/* Modal Chuyển tiền giữa các ví (Transfer Modal) */}
       <Modal
@@ -564,9 +550,13 @@ export const WalletsPage = () => {
 
       {/* Confirm Dialog Xóa ví */}
       <ConfirmDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={() => deleteMutation.mutate(deletingId)}
+        isOpen={crudModal.isDeleteConfirmationOpen}
+        onClose={crudModal.cancelDelete}
+        onConfirm={() => {
+          if (crudModal.deleteTarget) {
+            deleteMutation.mutate(crudModal.deleteTarget.id);
+          }
+        }}
         title="Xóa ví tài khoản"
         message="Hành động này sẽ xóa vĩnh viễn ví. Các giao dịch trước đó vẫn được lưu lại nhưng sẽ không còn ví liên kết. Bạn có muốn xóa không?"
         confirmText="Xóa ví này"

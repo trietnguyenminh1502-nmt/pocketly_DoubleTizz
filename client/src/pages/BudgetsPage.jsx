@@ -10,7 +10,7 @@ import {
   Money,
   ProgressBar,
   Badge,
-  Modal,
+  FormModal,
   ConfirmDialog,
   Skeleton,
   EmptyState,
@@ -26,6 +26,7 @@ import {
   CheckCircle2,
   BellRing
 } from 'lucide-react';
+import { useCrudModal } from '@/hooks/useCrudModal';
 
 export const BudgetsPage = () => {
   const queryClient = useQueryClient();
@@ -35,17 +36,21 @@ export const BudgetsPage = () => {
   const [selectedMonth, setSelectedMonth] = useState(now.getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBudget, setEditingBudget] = useState(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deletingId, setDeletingId] = useState(null);
-
-  const [formData, setFormData] = useState({
-    categoryId: '',
-    amount: '',
-    alertThreshold: 80,
-    month: now.getMonth() + 1,
-    year: now.getFullYear()
+  const crudModal = useCrudModal({
+    initialFormData: () => ({
+      categoryId: '',
+      amount: '',
+      alertThreshold: 80,
+      month: selectedMonth,
+      year: selectedYear
+    }),
+    mapRecordToForm: (budget) => ({
+      categoryId: budget.categoryId || '',
+      amount: budget.limit,
+      alertThreshold: budget.alertThreshold || 80,
+      month: budget.month,
+      year: budget.year
+    })
   });
 
   // 1. Fetch Danh sách Ngân sách
@@ -64,26 +69,22 @@ export const BudgetsPage = () => {
   const expenseCategories = catRes?.data?.categories || [];
 
   const saveMutation = useMutation({
-    mutationFn: (data) => {
-      if (editingBudget) {
-        return budgetApi.update(editingBudget.id, {
+    mutationFn: ({ data, record, mode }) => {
+      if (mode === 'edit') {
+        return budgetApi.update(record.id, {
           amount: data.amount,
           alertThreshold: data.alertThreshold
         });
       }
       return budgetApi.create(data);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       addToast({
-        message: `${editingBudget ? 'Cập nhật' : 'Thiết lập'} ngân sách thành công! 🌿`,
+        message: `${variables.mode === 'edit' ? 'Cập nhật' : 'Thiết lập'} ngân sách thành công! 🌿`,
         type: 'success'
       });
-      setIsModalOpen(false);
-      setEditingBudget(null);
-    },
-    onError: (err) => {
-      addToast({ message: err.message || 'Lỗi khi lưu ngân sách', type: 'error' });
+      crudModal.close();
     }
   });
 
@@ -92,36 +93,29 @@ export const BudgetsPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       addToast({ message: 'Đã xóa ngân sách thành công!', type: 'success' });
-      setIsDeleteDialogOpen(false);
-      setDeletingId(null);
+      crudModal.cancelDelete();
     },
     onError: (err) => {
       addToast({ message: err.message || 'Không thể xóa ngân sách', type: 'error' });
     }
   });
 
-  const openCreateModal = () => {
-    setEditingBudget(null);
-    setFormData({
-      categoryId: '',
-      amount: '',
-      alertThreshold: 80,
-      month: selectedMonth,
-      year: selectedYear
-    });
-    setIsModalOpen(true);
-  };
+  const handleSave = async (event) => {
+    event.preventDefault();
+    const data = {
+      ...crudModal.formData,
+      amount: parseFloat(crudModal.formData.amount),
+      alertThreshold: parseInt(crudModal.formData.alertThreshold, 10),
+      categoryId: crudModal.formData.categoryId || null
+    };
 
-  const openEditModal = (b) => {
-    setEditingBudget(b);
-    setFormData({
-      categoryId: b.categoryId || '',
-      amount: b.limit,
-      alertThreshold: b.alertThreshold || 80,
-      month: b.month,
-      year: b.year
-    });
-    setIsModalOpen(true);
+    try {
+      await crudModal.submit((_, record, mode) =>
+        saveMutation.mutateAsync({ data, record, mode })
+      );
+    } catch (error) {
+      addToast({ message: error.message || 'Lỗi khi lưu ngân sách', type: 'error' });
+    }
   };
 
   return (
@@ -151,7 +145,7 @@ export const BudgetsPage = () => {
             ))}
           </Select>
 
-          <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="whitespace-nowrap font-semibold text-sm">
+          <Button variant="primary" size="md" icon={Plus} onClick={() => crudModal.openCreate()} className="whitespace-nowrap font-semibold text-sm">
             Thiết lập ngân sách
           </Button>
         </div>
@@ -169,7 +163,7 @@ export const BudgetsPage = () => {
           title={`Chưa có ngân sách cho Tháng ${selectedMonth}/${selectedYear}`}
           description="Bắt đầu thiết lập ngân sách tổng hoặc cho từng mục như Ăn uống, Giải trí..."
           action={
-            <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="font-semibold text-sm">
+            <Button variant="primary" size="md" icon={Plus} onClick={() => crudModal.openCreate()} className="font-semibold text-sm">
               Tạo ngân sách đầu tiên
             </Button>
           }
@@ -237,7 +231,7 @@ export const BudgetsPage = () => {
 
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => openEditModal(b)}
+                      onClick={() => crudModal.openEdit(b)}
                       className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
                       title="Sửa ngân sách"
                     >
@@ -245,8 +239,7 @@ export const BudgetsPage = () => {
                     </button>
                     <button
                       onClick={() => {
-                        setDeletingId(b.id);
-                        setIsDeleteDialogOpen(true);
+                        crudModal.requestDelete(b.id);
                       }}
                       className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                       title="Xóa ngân sách"
@@ -262,29 +255,20 @@ export const BudgetsPage = () => {
       )}
 
       {/* Modal Thiết Lập / Sửa Ngân Sách */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingBudget ? 'Chỉnh Sửa Ngân Sách' : 'Thiết Lập Ngân Sách Mới'}
+      <FormModal
+        isOpen={crudModal.isOpen}
+        onClose={crudModal.close}
+        onSubmit={handleSave}
+        title={crudModal.mode === 'edit' ? 'Chỉnh Sửa Ngân Sách' : 'Thiết Lập Ngân Sách Mới'}
         maxWidth="max-w-md"
+        isSubmitting={crudModal.isSubmitting}
+        submitText={crudModal.mode === 'edit' ? 'Lưu thay đổi' : 'Lưu ngân sách'}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            saveMutation.mutate({
-              ...formData,
-              amount: parseFloat(formData.amount),
-              alertThreshold: parseInt(formData.alertThreshold, 10),
-              categoryId: formData.categoryId || null
-            });
-          }}
-          className="space-y-4"
-        >
-          {!editingBudget && (
+          {crudModal.mode === 'create' && (
             <Select
               label="Hạng mục áp dụng (*)"
-              value={formData.categoryId}
-              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              value={crudModal.formData.categoryId}
+              onChange={(e) => crudModal.setField('categoryId', e.target.value)}
             >
               <option value="">Ngân sách tổng toàn tháng (Tất cả chi tiêu)</option>
               {expenseCategories.map((c) => (
@@ -300,8 +284,8 @@ export const BudgetsPage = () => {
             type="number"
             step="10000"
             placeholder="VD: 2.000.000"
-            value={formData.amount}
-            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+            value={crudModal.formData.amount}
+            onChange={(e) => crudModal.setField('amount', e.target.value)}
             required
           />
 
@@ -310,28 +294,19 @@ export const BudgetsPage = () => {
             type="number"
             min="10"
             max="100"
-            value={formData.alertThreshold}
-            onChange={(e) => setFormData({ ...formData, alertThreshold: e.target.value })}
+            value={crudModal.formData.alertThreshold}
+            onChange={(e) => crudModal.setField('alertThreshold', e.target.value)}
             helperText="Pocketly sẽ tự động gửi thông báo khi chi tiêu chạm ngưỡng này (VD: 80%)"
             required
           />
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-border">
-            <Button type="button" variant="secondary" size="sm" onClick={() => setIsModalOpen(false)}>
-              Hủy
-            </Button>
-            <Button type="submit" variant="primary" size="sm" isLoading={saveMutation.isPending}>
-              {editingBudget ? 'Lưu thay đổi' : 'Lưu ngân sách'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      </FormModal>
 
       {/* Confirm Dialog Xóa Ngân Sách */}
       <ConfirmDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={() => deleteMutation.mutate(deletingId)}
+        isOpen={crudModal.isDeleteConfirmationOpen}
+        onClose={crudModal.cancelDelete}
+        onConfirm={() => deleteMutation.mutate(crudModal.deleteTarget)}
         title="Xóa ngân sách"
         message="Bạn có chắc chắn muốn xóa ngân sách này? Dữ liệu các giao dịch thực tế sẽ không bị ảnh hưởng."
         confirmText="Xóa ngân sách"

@@ -10,6 +10,7 @@ import {
   Money,
   Badge,
   Modal,
+  FormModal,
   ConfirmDialog,
   Skeleton,
   EmptyState,
@@ -27,6 +28,7 @@ import {
   CheckCircle2,
   Sparkles
 } from 'lucide-react';
+import { useCrudModal } from '@/hooks/useCrudModal';
 
 // Component Vòng Tròn Tiến Độ SVG (Progress Ring)
 const ProgressRing = ({ progress = 0, size = 80, strokeWidth = 8, color = 'rgb(var(--color-chart-primary))' }) => {
@@ -70,22 +72,25 @@ export const SavingGoalsPage = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingGoal, setEditingGoal] = useState(null);
+  const crudModal = useCrudModal({
+    initialFormData: {
+      title: '',
+      targetAmount: '',
+      currentAmount: '',
+      deadline: ''
+    },
+    mapRecordToForm: (goal) => ({
+      title: goal.title,
+      targetAmount: goal.targetAmount,
+      currentAmount: goal.currentAmount,
+      deadline: goal.deadline ? new Date(goal.deadline).toISOString().split('T')[0] : ''
+    })
+  });
 
   const [isContributeOpen, setIsContributeOpen] = useState(false);
   const [contributeGoal, setContributeGoal] = useState(null);
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deletingGoal, setDeletingGoal] = useState(null);
   const [refundWalletId, setRefundWalletId] = useState('');
-
-  const [formData, setFormData] = useState({
-    title: '',
-    targetAmount: '',
-    currentAmount: '',
-    deadline: ''
-  });
 
   const [contributeData, setContributeData] = useState({
     amount: '',
@@ -106,23 +111,19 @@ export const SavingGoalsPage = () => {
   const wallets = walletsRes?.data?.wallets || [];
 
   const saveMutation = useMutation({
-    mutationFn: (data) => {
-      if (editingGoal) {
-        return savingGoalApi.update(editingGoal.id, data);
+    mutationFn: ({ data, record, mode }) => {
+      if (mode === 'edit') {
+        return savingGoalApi.update(record.id, data);
       }
       return savingGoalApi.create(data);
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['savingGoals'] });
       addToast({
-        message: `${editingGoal ? 'Cập nhật' : 'Tạo'} mục tiêu tiết kiệm thành công! 🎯`,
+        message: `${variables.mode === 'edit' ? 'Cập nhật' : 'Tạo'} mục tiêu tiết kiệm thành công! 🎯`,
         type: 'success'
       });
-      setIsModalOpen(false);
-      setEditingGoal(null);
-    },
-    onError: (err) => {
-      addToast({ message: err.message || 'Lỗi khi lưu mục tiêu', type: 'error' });
+      crudModal.close();
     }
   });
 
@@ -152,29 +153,29 @@ export const SavingGoalsPage = () => {
         message: res?.message || 'Đã xóa mục tiêu tiết kiệm thành công!',
         type: 'success'
       });
-      setIsDeleteDialogOpen(false);
-      setDeletingGoal(null);
+      crudModal.cancelDelete();
     },
     onError: (err) => {
       addToast({ message: err.message || 'Không thể xóa mục tiêu', type: 'error' });
     }
   });
 
-  const openCreateModal = () => {
-    setEditingGoal(null);
-    setFormData({ title: '', targetAmount: '', currentAmount: '', deadline: '' });
-    setIsModalOpen(true);
-  };
+  const handleSave = async (event) => {
+    event.preventDefault();
+    const data = {
+      ...crudModal.formData,
+      targetAmount: parseFloat(crudModal.formData.targetAmount),
+      currentAmount: parseFloat(crudModal.formData.currentAmount) || 0,
+      deadline: crudModal.formData.deadline || null
+    };
 
-  const openEditModal = (g) => {
-    setEditingGoal(g);
-    setFormData({
-      title: g.title,
-      targetAmount: g.targetAmount,
-      currentAmount: g.currentAmount,
-      deadline: g.deadline ? new Date(g.deadline).toISOString().split('T')[0] : ''
-    });
-    setIsModalOpen(true);
+    try {
+      await crudModal.submit((_, record, mode) =>
+        saveMutation.mutateAsync({ data, record, mode })
+      );
+    } catch (error) {
+      addToast({ message: error.message || 'Lỗi khi lưu mục tiêu', type: 'error' });
+    }
   };
 
   const openContributeModal = (g) => {
@@ -199,7 +200,7 @@ export const SavingGoalsPage = () => {
           </p>
         </div>
 
-        <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="font-semibold text-sm">
+        <Button variant="primary" size="md" icon={Plus} onClick={() => crudModal.openCreate()} className="font-semibold text-sm">
           Tạo mục tiêu mới
         </Button>
       </div>
@@ -216,7 +217,7 @@ export const SavingGoalsPage = () => {
           title="Chưa có mục tiêu tiết kiệm nào"
           description="Bắt đầu đặt mục tiêu mua Laptop, học thêm chứng chỉ hoặc du lịch hè cùng bạn bè!"
           action={
-            <Button variant="primary" size="md" icon={Plus} onClick={openCreateModal} className="font-semibold text-sm">
+            <Button variant="primary" size="md" icon={Plus} onClick={() => crudModal.openCreate()} className="font-semibold text-sm">
               Tạo mục tiêu đầu tiên
             </Button>
           }
@@ -289,7 +290,7 @@ export const SavingGoalsPage = () => {
 
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => openEditModal(g)}
+                      onClick={() => crudModal.openEdit(g)}
                       className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
                       title="Sửa mục tiêu"
                     >
@@ -297,9 +298,8 @@ export const SavingGoalsPage = () => {
                     </button>
                     <button
                       onClick={() => {
-                        setDeletingGoal(g);
+                        crudModal.requestDelete(g);
                         setRefundWalletId(wallets[0]?.id || '');
-                        setIsDeleteDialogOpen(true);
                       }}
                       className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                       title="Xóa mục tiêu"
@@ -315,29 +315,20 @@ export const SavingGoalsPage = () => {
       )}
 
       {/* Modal Tạo / Sửa Mục Tiêu */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingGoal ? 'Chỉnh Sửa Mục Tiêu' : 'Tạo Mục Tiêu Tiết Kiệm Mới'}
+      <FormModal
+        isOpen={crudModal.isOpen}
+        onClose={crudModal.close}
+        onSubmit={handleSave}
+        title={crudModal.mode === 'edit' ? 'Chỉnh Sửa Mục Tiêu' : 'Tạo Mục Tiêu Tiết Kiệm Mới'}
         maxWidth="max-w-md"
+        isSubmitting={crudModal.isSubmitting}
+        submitText={crudModal.mode === 'edit' ? 'Lưu thay đổi' : 'Tạo mục tiêu'}
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            saveMutation.mutate({
-              ...formData,
-              targetAmount: parseFloat(formData.targetAmount),
-              currentAmount: parseFloat(formData.currentAmount) || 0,
-              deadline: formData.deadline || null
-            });
-          }}
-          className="space-y-4"
-        >
           <Input
             label="Tên mục tiêu (*)"
             placeholder="VD: Đổi Laptop làm đồ án, Đi du lịch Đà Lạt..."
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            value={crudModal.formData.title}
+            onChange={(e) => crudModal.setField('title', e.target.value)}
             required
           />
 
@@ -346,18 +337,18 @@ export const SavingGoalsPage = () => {
             type="number"
             step="10000"
             placeholder="VD: 15.000.000"
-            value={formData.targetAmount}
-            onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
+            value={crudModal.formData.targetAmount}
+            onChange={(e) => crudModal.setField('targetAmount', e.target.value)}
             required
           />
 
-          {!editingGoal && (
+          {crudModal.mode === 'create' && (
             <Input
               label="Số tiền đã có sẵn (VND)"
               type="number"
               placeholder="0"
-              value={formData.currentAmount}
-              onChange={(e) => setFormData({ ...formData, currentAmount: e.target.value })}
+              value={crudModal.formData.currentAmount}
+              onChange={(e) => crudModal.setField('currentAmount', e.target.value)}
             />
           )}
 
@@ -368,21 +359,11 @@ export const SavingGoalsPage = () => {
             <input
               type="date"
               className="w-full bg-surface text-primary border border-border rounded-16 px-4 py-2.5 text-sm outline-none focus:border-primary dark:focus:border-lime"
-              value={formData.deadline}
-              onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+              value={crudModal.formData.deadline}
+              onChange={(e) => crudModal.setField('deadline', e.target.value)}
             />
           </div>
-
-          <div className="flex justify-end gap-2 pt-3 border-t border-border">
-            <Button type="button" variant="secondary" size="sm" onClick={() => setIsModalOpen(false)}>
-              Hủy
-            </Button>
-            <Button type="submit" variant="primary" size="sm" isLoading={saveMutation.isPending}>
-              {editingGoal ? 'Lưu thay đổi' : 'Tạo mục tiêu'}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      </FormModal>
 
       {/* Modal Tích Lũy Thêm (Add Contribution) */}
       <Modal
@@ -441,23 +422,20 @@ export const SavingGoalsPage = () => {
 
       {/* Modal Xóa có hoàn tiền (nếu mục tiêu đã có tiền tích lũy) */}
       <Modal
-        isOpen={isDeleteDialogOpen && Boolean(deletingGoal && Number(deletingGoal.currentAmount) > 0)}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setDeletingGoal(null);
-        }}
+        isOpen={crudModal.isDeleteConfirmationOpen && Boolean(crudModal.deleteTarget && Number(crudModal.deleteTarget.currentAmount) > 0)}
+        onClose={crudModal.cancelDelete}
         title="Xóa mục tiêu & Hoàn tiền tích lũy"
         maxWidth="max-w-md"
       >
         <div className="space-y-4">
           <div className="p-3.5 rounded-20 bg-coral/10 border border-coral/20 text-xs sm:text-sm text-primary space-y-1.5">
             <p className="font-bold text-coral">
-              Bạn đang chuẩn bị xóa mục tiêu: &ldquo;{deletingGoal?.title}&rdquo;
+              Bạn đang chuẩn bị xóa mục tiêu: &ldquo;{crudModal.deleteTarget?.title}&rdquo;
             </p>
             <p className="text-xs text-secondary">
               Mục tiêu này đang có số tiền đã tích lũy là{' '}
               <strong className="text-primary font-extrabold text-sm">
-                <Money amount={deletingGoal?.currentAmount || 0} type="neutral" className="text-primary font-extrabold text-sm" />
+                <Money amount={crudModal.deleteTarget?.currentAmount || 0} type="neutral" className="text-primary font-extrabold text-sm" />
               </strong>
               . Bạn có muốn hoàn trả số tiền này về lại một trong các ví của bạn không?
             </p>
@@ -482,10 +460,7 @@ export const SavingGoalsPage = () => {
               type="button"
               variant="secondary"
               size="sm"
-              onClick={() => {
-                setIsDeleteDialogOpen(false);
-                setDeletingGoal(null);
-              }}
+              onClick={crudModal.cancelDelete}
             >
               Hủy
             </Button>
@@ -495,9 +470,9 @@ export const SavingGoalsPage = () => {
               size="sm"
               isLoading={deleteMutation.isPending}
               onClick={() => {
-                if (deletingGoal) {
+                if (crudModal.deleteTarget) {
                   deleteMutation.mutate({
-                    id: deletingGoal.id,
+                    id: crudModal.deleteTarget.id,
                     refundWalletId: refundWalletId || undefined
                   });
                 }
@@ -511,18 +486,15 @@ export const SavingGoalsPage = () => {
 
       {/* Confirm Dialog Xóa thông thường (nếu currentAmount === 0) */}
       <ConfirmDialog
-        isOpen={isDeleteDialogOpen && Boolean(deletingGoal && Number(deletingGoal.currentAmount) <= 0)}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setDeletingGoal(null);
-        }}
+        isOpen={crudModal.isDeleteConfirmationOpen && Boolean(crudModal.deleteTarget && Number(crudModal.deleteTarget.currentAmount) <= 0)}
+        onClose={crudModal.cancelDelete}
         onConfirm={() => {
-          if (deletingGoal) {
-            deleteMutation.mutate({ id: deletingGoal.id, refundWalletId: undefined });
+          if (crudModal.deleteTarget) {
+            deleteMutation.mutate({ id: crudModal.deleteTarget.id, refundWalletId: undefined });
           }
         }}
         title="Xóa mục tiêu tiết kiệm"
-        message={`Bạn có chắc chắn muốn xóa mục tiêu "${deletingGoal?.title}"? Thao tác này không thể hoàn tác.`}
+        message={`Bạn có chắc chắn muốn xóa mục tiêu "${crudModal.deleteTarget?.title}"? Thao tác này không thể hoàn tác.`}
         confirmText="Xóa mục tiêu"
         isDanger
         isLoading={deleteMutation.isPending}
