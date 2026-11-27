@@ -30,16 +30,16 @@ const TOPIC_LABELS = {
 const TOPIC_COLORS = {
   general: 'bg-sand text-ink-light dark:bg-surface-dark dark:text-ink-dark',
   account: 'bg-coral/10 text-coral',
-  transaction: 'bg-primary/10 text-primary dark:bg-lime/10 dark:text-lime',
+  transaction: 'bg-primary/10 text-brand dark:bg-lime/10 dark:text-lime',
   ai: 'bg-tangerine/10 text-tangerine',
-  feedback: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  other: 'bg-slate-500/10 text-slate-600 dark:text-slate-400'
+  feedback: 'bg-success-bg/10 text-success dark:text-success',
+  other: 'bg-status-neutral-bg/10 text-status-neutral dark:text-status-neutral'
 };
 
 const STATUS_LABELS = {
-  PENDING: { label: 'Chờ xử lý', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
-  IN_PROGRESS: { label: 'Đang xử lý', color: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' },
-  RESOLVED: { label: 'Đã giải quyết', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' }
+  PENDING: { label: 'Chờ xử lý', color: 'bg-warning-bg/10 text-warning dark:text-warning border-warning-bg/20' },
+  IN_PROGRESS: { label: 'Đang xử lý', color: 'bg-info-bg/10 text-info dark:text-info border-info-bg/20' },
+  RESOLVED: { label: 'Đã giải quyết', color: 'bg-success-bg/10 text-success dark:text-success border-success-bg/20' }
 };
 
 export const AdminSupportPage = () => {
@@ -122,11 +122,11 @@ export const AdminSupportPage = () => {
       {/* 1. Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark flex items-center gap-2.5">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary flex items-center gap-2.5">
             <span className="p-2 rounded-16 bg-tangerine/10 text-tangerine text-xl">📬</span>
             Hộp Thư Yêu Cầu & Hỗ Trợ
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-xs sm:text-sm text-secondary mt-1">
             Theo dõi, phân loại và phản hồi các yêu cầu trợ giúp từ sinh viên sử dụng Pocketly
           </p>
         </div>
@@ -145,48 +145,48 @@ export const AdminSupportPage = () => {
       {/* 2. Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 sm:p-5 flex items-center gap-4">
-          <div className="p-3 rounded-20 bg-primary/10 dark:bg-lime/10 text-primary dark:text-lime">
+          <div className="p-3 rounded-20 bg-primary/10 dark:bg-lime/10 text-brand dark:text-lime">
             <MessageSquare className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-ink-muted font-medium">Tổng số yêu cầu</p>
-            <p className="text-xl sm:text-2xl font-black font-heading text-ink-light dark:text-ink-dark mt-0.5">
+            <p className="text-xs text-secondary font-medium">Tổng số yêu cầu</p>
+            <p className="text-xl sm:text-2xl font-black font-heading text-primary mt-0.5">
               {stats.total}
             </p>
           </div>
         </Card>
 
-        <Card className="p-4 sm:p-5 flex items-center gap-4 border-amber-500/30">
-          <div className="p-3 rounded-20 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+        <Card className="p-4 sm:p-5 flex items-center gap-4 border-warning-bg/30">
+          <div className="p-3 rounded-20 bg-warning-bg/10 text-warning dark:text-warning">
             <Clock className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-ink-muted font-medium">Chờ xử lý</p>
-            <p className="text-xl sm:text-2xl font-black font-heading text-amber-600 dark:text-amber-400 mt-0.5">
+            <p className="text-xs text-secondary font-medium">Chờ xử lý</p>
+            <p className="text-xl sm:text-2xl font-black font-heading text-warning dark:text-warning mt-0.5">
               {stats.pending}
             </p>
           </div>
         </Card>
 
-        <Card className="p-4 sm:p-5 flex items-center gap-4 border-sky-500/30">
-          <div className="p-3 rounded-20 bg-sky-500/10 text-sky-600 dark:text-sky-400">
+        <Card className="p-4 sm:p-5 flex items-center gap-4 border-info-bg/30">
+          <div className="p-3 rounded-20 bg-info-bg/10 text-info dark:text-info">
             <AlertCircle className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-ink-muted font-medium">Đang xử lý</p>
-            <p className="text-xl sm:text-2xl font-black font-heading text-sky-600 dark:text-sky-400 mt-0.5">
+            <p className="text-xs text-secondary font-medium">Đang xử lý</p>
+            <p className="text-xl sm:text-2xl font-black font-heading text-info dark:text-info mt-0.5">
               {stats.in_progress}
             </p>
           </div>
         </Card>
 
-        <Card className="p-4 sm:p-5 flex items-center gap-4 border-emerald-500/30">
-          <div className="p-3 rounded-20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+        <Card className="p-4 sm:p-5 flex items-center gap-4 border-success-bg/30">
+          <div className="p-3 rounded-20 bg-success-bg/10 text-success dark:text-success">
             <CheckCircle2 className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs text-ink-muted font-medium">Đã giải quyết</p>
-            <p className="text-xl sm:text-2xl font-black font-heading text-emerald-600 dark:text-emerald-400 mt-0.5">
+            <p className="text-xs text-secondary font-medium">Đã giải quyết</p>
+            <p className="text-xl sm:text-2xl font-black font-heading text-success dark:text-success mt-0.5">
               {stats.resolved}
             </p>
           </div>
@@ -246,14 +246,14 @@ export const AdminSupportPage = () => {
       {/* 4. Tickets Table */}
       <Card className="overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center text-ink-muted text-sm animate-pulse">
+          <div className="p-12 text-center text-secondary text-sm animate-pulse">
             Đang tải danh sách yêu cầu hỗ trợ...
           </div>
         ) : tickets.length === 0 ? (
           <div className="p-12 text-center space-y-2">
-            <MessageSquare className="w-10 h-10 text-ink-muted mx-auto opacity-40" />
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark">Không có yêu cầu hỗ trợ nào</h3>
-            <p className="text-xs text-ink-muted">
+            <MessageSquare className="w-10 h-10 text-secondary mx-auto opacity-40" />
+            <h3 className="text-base font-bold text-primary">Không có yêu cầu hỗ trợ nào</h3>
+            <p className="text-xs text-secondary">
               {search || status !== 'ALL' || topic !== 'ALL'
                 ? 'Không tìm thấy kết quả phù hợp với bộ lọc hiện tại.'
                 : 'Chưa có sinh viên nào gửi yêu cầu hỗ trợ.'}
@@ -262,7 +262,7 @@ export const AdminSupportPage = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="bg-sand/40 dark:bg-surface-dark border-b border-border-light dark:border-border-dark text-xs uppercase tracking-wider text-ink-muted">
+              <thead className="bg-sand/40 dark:bg-surface-dark border-b border-border text-xs uppercase tracking-wider text-secondary">
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">Người gửi</th>
                   <th className="py-3.5 px-4 font-semibold">Chủ đề</th>
@@ -285,8 +285,8 @@ export const AdminSupportPage = () => {
                       onClick={() => handleOpenDetail(t)}
                     >
                       <td className="py-3.5 px-4">
-                        <div className="font-bold text-ink-light dark:text-ink-dark">{t.fullName}</div>
-                        <div className="text-xs text-ink-muted">{t.email}</div>
+                        <div className="font-bold text-primary">{t.fullName}</div>
+                        <div className="text-xs text-secondary">{t.email}</div>
                       </td>
 
                       <td className="py-3.5 px-4">
@@ -296,17 +296,17 @@ export const AdminSupportPage = () => {
                       </td>
 
                       <td className="py-3.5 px-4 max-w-xs">
-                        <p className="text-xs text-ink-light dark:text-ink-dark line-clamp-2">
+                        <p className="text-xs text-primary line-clamp-2">
                           {t.message}
                         </p>
                         {t.notes && (
-                          <span className="text-[10px] text-primary dark:text-lime font-mono block mt-0.5">
+                          <span className="text-[10px] text-brand dark:text-lime font-mono block mt-0.5">
                             Ghi chú: {t.notes}
                           </span>
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-xs text-ink-muted whitespace-nowrap">
+                      <td className="py-3.5 px-4 text-xs text-secondary whitespace-nowrap">
                         {new Date(t.createdAt).toLocaleString('vi-VN')}
                       </td>
 
@@ -330,7 +330,7 @@ export const AdminSupportPage = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="p-1.5 hover:text-primary dark:hover:text-lime"
+                            className="p-1.5 hover:text-brand dark:hover:text-lime"
                             title="Xem chi tiết"
                             onClick={() => handleOpenDetail(t)}
                           >
@@ -358,8 +358,8 @@ export const AdminSupportPage = () => {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="p-4 border-t border-border-light dark:border-border-dark flex justify-between items-center">
-            <span className="text-xs text-ink-muted">
+          <div className="p-4 border-t border-border flex justify-between items-center">
+            <span className="text-xs text-secondary">
               Hiển thị {tickets.length} trên tổng số {pagination.total} yêu cầu
             </span>
             <Pagination
@@ -380,13 +380,13 @@ export const AdminSupportPage = () => {
         >
           <div className="space-y-5">
             {/* Người gửi & Thông tin cơ bản */}
-            <div className="p-4 rounded-16 bg-sand/40 dark:bg-surface-dark border border-border-light dark:border-border-dark space-y-2.5">
+            <div className="p-4 rounded-16 bg-sand/40 dark:bg-surface-dark border border-border space-y-2.5">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-bold text-ink-light dark:text-ink-dark text-base">{selectedTicket.fullName}</h3>
+                  <h3 className="font-bold text-primary text-base">{selectedTicket.fullName}</h3>
                   <a
                     href={`mailto:${selectedTicket.email}?subject=[Pocketly Support] Phản hồi yêu cầu của bạn`}
-                    className="text-xs font-semibold text-primary dark:text-lime hover:underline flex items-center gap-1 mt-0.5"
+                    className="text-xs font-semibold text-brand dark:text-lime hover:underline flex items-center gap-1 mt-0.5"
                   >
                     <Mail className="w-3.5 h-3.5" /> {selectedTicket.email} <ExternalLink className="w-3 h-3 ml-0.5" />
                   </a>
@@ -397,23 +397,23 @@ export const AdminSupportPage = () => {
                 </span>
               </div>
 
-              <div className="text-xs text-ink-muted">
+              <div className="text-xs text-secondary">
                 Thời gian gửi: {new Date(selectedTicket.createdAt).toLocaleString('vi-VN')}
               </div>
             </div>
 
             {/* Nội dung tin nhắn người dùng */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-ink-muted uppercase tracking-wider block">
+              <label className="text-xs font-bold text-secondary uppercase tracking-wider block">
                 Nội dung yêu cầu từ sinh viên:
               </label>
-              <div className="p-4 rounded-16 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-sm text-ink-light dark:text-ink-dark whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto font-sans">
+              <div className="p-4 rounded-16 bg-surface border border-border text-sm text-primary whitespace-pre-wrap leading-relaxed max-h-60 overflow-y-auto font-sans">
                 {selectedTicket.message}
               </div>
             </div>
 
             {/* Thao tác xử lý */}
-            <div className="space-y-3 pt-2 border-t border-border-light dark:border-border-dark">
+            <div className="space-y-3 pt-2 border-t border-border">
               <Select
                 label="Trạng thái giải quyết"
                 value={editStatus}

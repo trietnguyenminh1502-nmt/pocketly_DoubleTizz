@@ -132,10 +132,10 @@ export const ProfilePage = () => {
     <div className="space-y-6 max-w-4xl mx-auto">
       {/* 1. Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
           Hồ Sơ & Cài Đặt Cá Nhân ⚙️
         </h1>
-        <p className="text-xs sm:text-sm text-ink-muted mt-1">
+        <p className="text-xs sm:text-sm text-secondary mt-1">
           Quản lý tài khoản, thay đổi ảnh đại diện, mật khẩu và tùy chọn giao diện
         </p>
       </div>
@@ -163,18 +163,18 @@ export const ProfilePage = () => {
           </div>
 
           <div>
-            <h3 className="text-lg font-bold text-ink-light dark:text-ink-dark">{user?.fullName}</h3>
-            <p className="text-xs text-ink-muted mt-0.5">{user?.email}</p>
-            <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sand/60 dark:bg-surface-dark text-xs font-bold text-primary dark:text-lime">
+            <h3 className="text-lg font-bold text-primary">{user?.fullName}</h3>
+            <p className="text-xs text-secondary mt-0.5">{user?.email}</p>
+            <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sand/60 dark:bg-surface-dark text-xs font-bold text-brand dark:text-lime">
               Vai trò: {user?.role === 'ADMIN' ? 'Quản trị viên (ADMIN)' : 'Sinh viên (USER)'}
             </div>
           </div>
 
-          <div className="w-full pt-4 border-t border-border-light/60 dark:border-border-dark/60 text-left space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">Tùy chọn giao diện</span>
-            <div className="flex items-center justify-between p-3 rounded-20 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
+          <div className="w-full pt-4 border-t border-border/60 text-left space-y-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-secondary">Tùy chọn giao diện</span>
+            <div className="flex items-center justify-between p-3 rounded-20 bg-sand/20 dark:bg-white/5 border border-border/60">
               <div className="flex items-center gap-2.5 text-xs font-semibold">
-                {theme === 'dark' ? <Moon className="w-4 h-4 text-lime" /> : <Sun className="w-4 h-4 text-primary" />}
+                {theme === 'dark' ? <Moon className="w-4 h-4 text-lime" /> : <Sun className="w-4 h-4 text-brand" />}
                 <span>Chế độ: {theme === 'dark' ? 'Tối (Dark)' : 'Sáng (Light)'}</span>
               </div>
               <Button variant="outline" size="sm" onClick={toggleTheme} className="text-xs py-1 px-3">
@@ -293,7 +293,7 @@ export const ProfilePage = () => {
               title="Xóa Tài Khoản Vĩnh Viễn"
               subtitle="Toàn bộ lịch sử chi tiêu, ví và mục tiêu sẽ bị xóa sạch"
             />
-            <p className="text-xs text-ink-muted leading-relaxed mb-4">
+            <p className="text-xs text-secondary leading-relaxed mb-4">
               Hành động này không thể hoàn tác. Một khi đã xóa, toàn bộ dữ liệu tài chính của bạn trong hệ thống Pocketly sẽ bị hủy vĩnh viễn.
             </p>
             <Button

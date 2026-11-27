@@ -5,66 +5,114 @@ export default {
   theme: {
     extend: {
       colors: {
+        background: 'rgb(var(--color-background) / <alpha-value>)',
+        auth: 'rgb(var(--color-auth-text) / <alpha-value>)',
+        'auth-ink': 'rgb(var(--color-auth-ink) / <alpha-value>)',
+        'auth-warm': 'rgb(var(--color-auth-warm) / <alpha-value>)',
+        'auth-accent': 'rgb(var(--color-auth-accent) / <alpha-value>)',
+        success: 'rgb(var(--color-success) / <alpha-value>)',
+        'success-bg': 'rgb(var(--color-success-bg) / <alpha-value>)',
+        warning: 'rgb(var(--color-warning) / <alpha-value>)',
+        'warning-bg': 'rgb(var(--color-warning-bg) / <alpha-value>)',
+        'warning-hover': 'rgb(var(--color-warning-hover) / <alpha-value>)',
+        danger: 'rgb(var(--color-danger) / <alpha-value>)',
+        'danger-soft': 'rgb(var(--color-danger-soft) / <alpha-value>)',
+        info: 'rgb(var(--color-info) / <alpha-value>)',
+        'info-bg': 'rgb(var(--color-info-bg) / <alpha-value>)',
+        'chart-border': 'rgb(var(--color-chart-border) / <alpha-value>)',
+        'chart-primary': 'rgb(var(--color-chart-primary) / <alpha-value>)',
+        'chart-expense': 'rgb(var(--color-chart-expense) / <alpha-value>)',
+        'chart-secondary': 'rgb(var(--color-chart-secondary) / <alpha-value>)',
+        'focus-ink': 'rgb(var(--color-focus-ink) / <alpha-value>)',
+        'status-neutral': 'rgb(var(--color-status-neutral) / <alpha-value>)',
+        'status-neutral-bg': 'rgb(var(--color-status-neutral-bg) / <alpha-value>)',
+        brand: 'rgb(var(--color-primary) / <alpha-value>)',
         bg: {
-          light: '#F6F2EA',
-          dark: '#0E1512'
+          light: 'rgb(var(--color-background) / <alpha-value>)',
+          dark: 'rgb(var(--color-background) / <alpha-value>)'
         },
         surface: {
-          light: '#FFFFFF',
-          dark: '#17211C'
+          DEFAULT: 'rgb(var(--color-surface) / <alpha-value>)',
+          light: 'rgb(var(--color-surface) / <alpha-value>)',
+          dark: 'rgb(var(--color-surface) / <alpha-value>)'
         },
         border: {
-          light: '#E8E2D6',
-          dark: '#24332C'
+          DEFAULT: 'rgb(var(--color-border) / <alpha-value>)',
+          light: 'rgb(var(--color-border) / <alpha-value>)',
+          dark: 'rgb(var(--color-border) / <alpha-value>)'
         },
         ink: {
-          light: '#16211C',
-          dark: '#F1F5F3',
-          muted: '#5C6B64'
+          light: 'rgb(var(--color-ink-light) / <alpha-value>)',
+          dark: 'rgb(var(--color-ink-dark) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-secondary) / <alpha-value>)'
         },
         primary: {
-          DEFAULT: '#123D2F', // Forest Green
-          hover: '#0E3025',
-          light: '#E9F0EC',
-          dark: '#85D4B6'
+          DEFAULT: 'rgb(var(--color-primary) / <alpha-value>)',
+          hover: 'rgb(var(--color-primary-hover) / <alpha-value>)',
+          light: 'rgb(var(--color-primary-light) / <alpha-value>)',
+          dark: 'rgb(var(--color-primary-dark) / <alpha-value>)'
         },
         tangerine: {
-          DEFAULT: '#FF6A2B',
-          hover: '#E5581A',
-          light: '#FFF0EA'
+          DEFAULT: 'rgb(var(--color-tangerine) / <alpha-value>)',
+          hover: 'rgb(var(--color-tangerine-hover) / <alpha-value>)',
+          light: 'rgb(var(--color-tangerine-light) / <alpha-value>)'
         },
         lime: {
-          DEFAULT: '#D4F05A',
-          hover: '#C2DF45',
-          dark: '#93AB25'
+          DEFAULT: 'rgb(var(--color-accent) / <alpha-value>)',
+          hover: 'rgb(var(--color-accent-hover) / <alpha-value>)',
+          dark: 'rgb(var(--color-lime-dark) / <alpha-value>)'
+        },
+        accent: {
+          DEFAULT: 'rgb(var(--color-accent) / <alpha-value>)',
+          hover: 'rgb(var(--color-accent-hover) / <alpha-value>)'
         },
         coral: {
-          DEFAULT: '#FF8A7A', // Expense
-          light: '#FFF2F0',
-          dark: '#E06554'
+          DEFAULT: 'rgb(var(--color-coral) / <alpha-value>)',
+          light: 'rgb(var(--color-coral-light) / <alpha-value>)',
+          dark: 'rgb(var(--color-coral-dark) / <alpha-value>)'
         },
         sand: {
-          DEFAULT: '#EBDFC7',
-          light: '#F8F5EE'
+          DEFAULT: 'rgb(var(--color-sand) / <alpha-value>)',
+          light: 'rgb(var(--color-sand-light) / <alpha-value>)'
         },
         mint: {
-          DEFAULT: '#BFE8D6',
-          light: '#EAF7F1'
+          DEFAULT: 'rgb(var(--color-mint) / <alpha-value>)',
+          light: 'rgb(var(--color-mint-light) / <alpha-value>)'
         }
       },
-      fontFamily: {
-        heading: ['"Bricolage Grotesque"', 'sans-serif'],
-        body: ['"DM Sans"', 'sans-serif']
+      textColor: {
+        primary: 'rgb(var(--color-text-primary) / <alpha-value>)',
+        secondary: 'rgb(var(--color-text-secondary) / <alpha-value>)'
       },
       borderRadius: {
+        card: '16px',
+        control: '12px',
         '16': '16px',
         '20': '20px',
         '24': '24px'
       },
       boxShadow: {
-        soft: '0 4px 20px -2px rgba(18, 61, 47, 0.06)',
-        card: '0 8px 30px -4px rgba(22, 33, 28, 0.08)',
-        modal: '0 20px 40px -6px rgba(18, 61, 47, 0.16)'
+        'token-card': 'var(--shadow-soft)',
+        'token-overlay': 'var(--shadow-overlay)',
+        'auth-button': 'var(--shadow-auth-button)',
+        'auth-button-hover': 'var(--shadow-auth-button-hover)',
+        'auth-focus': '0 0 0 3px rgb(var(--color-auth-accent) / 0.4)',
+        soft: 'var(--shadow-soft)',
+        card: 'var(--shadow-card)',
+        modal: 'var(--shadow-overlay)'
+      },
+      fontSize: {
+        12: '12px',
+        14: '14px',
+        16: '16px',
+        20: '20px',
+        28: '28px',
+        36: '36px'
+      },
+      fontFamily: {
+        heading: ['"Bricolage Grotesque"', 'sans-serif'],
+        body: ['"DM Sans"', 'sans-serif'],
+        jakarta: ['"Plus Jakarta Sans"', '"DM Sans"', 'sans-serif']
       }
     }
   },

@@ -9,7 +9,7 @@ export const ProtectedRoute = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="w-full max-w-md space-y-4">
           <Skeleton className="h-12 w-3/4 mx-auto" />
           <Skeleton className="h-48 rounded-24" />
@@ -31,7 +31,7 @@ export const AdminRoute = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-light dark:bg-bg-dark flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="w-full max-w-md space-y-4">
           <Skeleton className="h-12 w-3/4 mx-auto" />
           <Skeleton className="h-48 rounded-24" />

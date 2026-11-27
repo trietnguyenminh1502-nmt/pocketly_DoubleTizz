@@ -22,12 +22,12 @@ export const EmptyState = ({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center text-center p-8 border border-dashed border-border-light dark:border-border-dark rounded-24 bg-surface-light/40 dark:bg-surface-dark/40',
+        'flex flex-col items-center justify-center text-center p-8 border border-dashed border-border rounded-24 bg-surface/40',
         className
       )}
     >
       {/* Inline SVG Friendly Illustration (Cây mầm tài chính) */}
-      <div className="w-20 h-20 mb-4 p-4 rounded-full bg-sand/50 dark:bg-surface-dark flex items-center justify-center text-primary dark:text-lime">
+      <div className="w-20 h-20 mb-4 p-4 rounded-full bg-sand/50 dark:bg-surface-dark flex items-center justify-center text-brand dark:text-lime">
         <svg
           viewBox="0 0 64 64"
           fill="none"
@@ -42,12 +42,12 @@ export const EmptyState = ({
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <circle cx="32" cy="48" r="3" fill="#FF6A2B" />
+          <circle cx="32" cy="48" r="3" fill="rgb(var(--color-tangerine))" />
         </svg>
       </div>
 
-      <h4 className="text-base font-bold text-ink-light dark:text-ink-dark mb-1">{title}</h4>
-      <p className="text-xs text-ink-muted max-w-sm mb-5">{description}</p>
+      <h4 className="text-base font-bold text-primary mb-1">{title}</h4>
+      <p className="text-xs text-secondary max-w-sm mb-5">{description}</p>
       {action && <div>{action}</div>}
     </div>
   );

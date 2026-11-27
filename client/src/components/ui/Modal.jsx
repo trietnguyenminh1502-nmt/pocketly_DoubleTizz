@@ -32,16 +32,16 @@ export const Modal = ({ isOpen, onClose, title, children, maxWidth = 'max-w-md',
       {/* Modal Box */}
       <div
         className={cn(
-          'relative w-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-24 p-6 shadow-modal z-10 animate-in fade-in zoom-in-95 duration-200',
+          'relative w-full bg-surface border border-border rounded-24 p-6 shadow-modal z-10 animate-in fade-in zoom-in-95 duration-200',
           maxWidth,
           className
         )}
       >
-        <div className="flex items-center justify-between pb-4 border-b border-border-light dark:border-border-dark mb-4">
-          <h3 className="text-lg font-bold text-ink-light dark:text-ink-dark">{title}</h3>
+        <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
+          <h3 className="text-lg font-bold text-primary">{title}</h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-full text-ink-muted hover:text-ink-light dark:hover:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            className="p-1 rounded-full text-secondary hover:text-ink-light dark:hover:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -74,10 +74,10 @@ export const ConfirmDialog = ({
               <AlertTriangle className="w-5 h-5" />
             </div>
           )}
-          <p className="text-sm text-ink-muted dark:text-ink-dark/80 mt-1">{message}</p>
+          <p className="text-sm text-secondary dark:text-primary/80 mt-1">{message}</p>
         </div>
 
-        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border-light dark:border-border-dark">
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
           <Button variant="secondary" size="sm" onClick={onClose} disabled={isLoading}>
             {cancelText}
           </Button>

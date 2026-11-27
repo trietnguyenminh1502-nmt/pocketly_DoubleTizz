@@ -32,17 +32,17 @@ export const LandingPage = () => {
     <div className="space-y-24 py-12 md:py-20">
       {/* 1. HERO SECTION (Editorial look) */}
       <section className="max-w-5xl mx-auto px-4 text-center space-y-6">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sand/60 dark:bg-surface-dark border border-border-light dark:border-border-dark text-xs font-bold text-primary dark:text-lime shadow-soft">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sand/60 dark:bg-surface-dark border border-border text-xs font-bold text-brand dark:text-lime shadow-soft">
           <Sparkles className="w-4 h-4 text-tangerine" />
           <span>Giải pháp quản lý tài chính thế hệ mới cho Gen-Z</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold font-heading text-ink-light dark:text-ink-dark tracking-tight leading-[1.08]">
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold font-heading text-primary tracking-tight leading-[1.08]">
           Học cách tiêu tiền thông minh,<br />
-          <span className="text-primary dark:text-lime">không còn lo “cháy túi”.</span>
+          <span className="text-brand dark:text-lime">không còn lo “cháy túi”.</span>
         </h1>
 
-        <p className="text-base sm:text-lg text-ink-muted max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg text-secondary max-w-2xl mx-auto leading-relaxed">
           Theo dõi từng ly cà phê, bữa cơm căn tin, chia nhỏ ngân sách và nhận tư vấn chi tiêu cực thực tế từ AI Chatbot tích hợp.
         </p>
 
@@ -62,32 +62,32 @@ export const LandingPage = () => {
         {/* Dashboard Mock Preview Card */}
         <div className="pt-10">
           <div className="relative mx-auto rounded-24 p-3 bg-gradient-to-b from-border-light/60 to-transparent dark:from-border-dark shadow-modal max-w-4xl">
-            <div className="rounded-20 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6 md:p-8 text-left space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-border-light dark:border-border-dark">
+            <div className="rounded-20 bg-surface border border-border p-6 md:p-8 text-left space-y-6">
+              <div className="flex items-center justify-between pb-4 border-b border-border">
                 <div>
-                  <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Tổng số dư khả dụng</span>
+                  <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tổng số dư khả dụng</span>
                   <div className="flex items-baseline gap-3 mt-1">
                     <Money amount={12450000} type="neutral" className="text-3xl md:text-4xl" />
-                    <span className="text-xs font-bold text-primary dark:text-lime bg-mint/50 px-2 py-0.5 rounded-full">+12% so với tháng trước</span>
+                    <span className="text-xs font-bold text-brand dark:text-lime bg-mint/50 px-2 py-0.5 rounded-full">+12% so với tháng trước</span>
                   </div>
                 </div>
-                <div className="p-3 rounded-20 bg-sand/40 dark:bg-surface-dark text-primary dark:text-lime">
+                <div className="p-3 rounded-20 bg-sand/40 dark:bg-surface-dark text-brand dark:text-lime">
                   <TrendingUp className="w-6 h-6" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
-                  <span className="text-xs text-ink-muted">Thu nhập tháng</span>
-                  <p className="text-lg font-bold text-primary dark:text-lime mt-1">+4.500.000₫</p>
+                <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
+                  <span className="text-xs text-secondary">Thu nhập tháng</span>
+                  <p className="text-lg font-bold text-brand dark:text-lime mt-1">+4.500.000₫</p>
                 </div>
-                <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
-                  <span className="text-xs text-ink-muted">Chi tiêu tháng</span>
+                <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
+                  <span className="text-xs text-secondary">Chi tiêu tháng</span>
                   <p className="text-lg font-bold text-tangerine mt-1">-2.150.000₫</p>
                 </div>
-                <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
-                  <span className="text-xs text-ink-muted">Tiết kiệm ròng</span>
-                  <p className="text-lg font-bold text-ink-light dark:text-ink-dark mt-1">2.350.000₫</p>
+                <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
+                  <span className="text-xs text-secondary">Tiết kiệm ròng</span>
+                  <p className="text-lg font-bold text-primary mt-1">2.350.000₫</p>
                 </div>
               </div>
             </div>
@@ -99,18 +99,18 @@ export const LandingPage = () => {
       <section id="features" className="max-w-6xl mx-auto px-4 space-y-12">
         <div className="text-center space-y-2">
           <span className="text-xs font-bold uppercase tracking-wider text-tangerine">Tính năng vượt trội</span>
-          <h2 className="text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h2 className="text-3xl font-extrabold font-heading text-primary">
             Mọi thứ bạn cần để kiểm soát tài chính
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card hover className="space-y-3">
-            <div className="w-12 h-12 rounded-20 bg-mint/50 text-primary flex items-center justify-center">
+            <div className="w-12 h-12 rounded-20 bg-mint/50 text-brand flex items-center justify-center">
               <Zap className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold">Ghi chép giao dịch siêu tốc</h3>
-            <p className="text-sm text-ink-muted leading-relaxed">
+            <p className="text-sm text-secondary leading-relaxed">
               Nhập chi tiêu chỉ mất 3 giây. Tự động trừ ví tiền mặt, thẻ ngân hàng hoặc ví MoMo đồng thời.
             </p>
           </Card>
@@ -120,7 +120,7 @@ export const LandingPage = () => {
               <Bot className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold">Cố vấn AI Chatbot thông minh</h3>
-            <p className="text-sm text-ink-muted leading-relaxed">
+            <p className="text-sm text-secondary leading-relaxed">
               Trò chuyện cùng AI để biết tháng này tiêu lố ở đâu, có nên mua đồ công nghệ mới hay cách cắt giảm tiền ăn vặt.
             </p>
           </Card>
@@ -130,7 +130,7 @@ export const LandingPage = () => {
               <ShieldCheck className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold">Cảnh báo ngân sách tự động</h3>
-            <p className="text-sm text-ink-muted leading-relaxed">
+            <p className="text-sm text-secondary leading-relaxed">
               Hệ thống tự động nhắc nhở khi chi tiêu chạm ngưỡng 80% hạn mức, giúp bạn luôn chủ động trước ngày cuối tháng.
             </p>
           </Card>
@@ -140,7 +140,7 @@ export const LandingPage = () => {
       {/* 3. HOW IT WORKS */}
       <section id="how-it-works" className="max-w-5xl mx-auto px-4 space-y-12">
         <div className="text-center space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-primary dark:text-lime">Quy trình đơn giản</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-brand dark:text-lime">Quy trình đơn giản</span>
           <h2 className="text-3xl font-extrabold font-heading">Chỉ 3 bước để bắt đầu</h2>
         </div>
 
@@ -150,7 +150,7 @@ export const LandingPage = () => {
               1
             </div>
             <h4 className="font-bold text-base">Đăng ký tài khoản</h4>
-            <p className="text-xs text-ink-muted">Tạo tài khoản miễn phí bằng email sinh viên chỉ trong 30 giây.</p>
+            <p className="text-xs text-secondary">Tạo tài khoản miễn phí bằng email sinh viên chỉ trong 30 giây.</p>
           </div>
 
           <div className="space-y-3">
@@ -158,7 +158,7 @@ export const LandingPage = () => {
               2
             </div>
             <h4 className="font-bold text-base">Ghi chép & Đặt ngân sách</h4>
-            <p className="text-xs text-ink-muted">Tạo các ví tiền bạn dùng và đặt hạn mức chi tiêu hàng tháng.</p>
+            <p className="text-xs text-secondary">Tạo các ví tiền bạn dùng và đặt hạn mức chi tiêu hàng tháng.</p>
           </div>
 
           <div className="space-y-3">
@@ -166,7 +166,7 @@ export const LandingPage = () => {
               3
             </div>
             <h4 className="font-bold text-base">Nhận tư vấn từ AI</h4>
-            <p className="text-xs text-ink-muted">Mở chatbot bất cứ lúc nào để hỏi về bức tranh tài chính của mình.</p>
+            <p className="text-xs text-secondary">Mở chatbot bất cứ lúc nào để hỏi về bức tranh tài chính của mình.</p>
           </div>
         </div>
       </section>
@@ -175,7 +175,7 @@ export const LandingPage = () => {
       <section id="faq" className="max-w-4xl mx-auto px-4 space-y-8">
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-extrabold font-heading">Câu hỏi thường gặp</h2>
-          <p className="text-sm text-ink-muted">Giải đáp các thắc mắc phổ biến về ứng dụng Pocketly</p>
+          <p className="text-sm text-secondary">Giải đáp các thắc mắc phổ biến về ứng dụng Pocketly</p>
         </div>
 
         <div className="space-y-4">
@@ -185,7 +185,7 @@ export const LandingPage = () => {
                 <HelpCircle className="w-4 h-4 text-tangerine shrink-0" />
                 {f.q}
               </h4>
-              <p className="text-sm text-ink-muted leading-relaxed pl-6">{f.a}</p>
+              <p className="text-sm text-secondary leading-relaxed pl-6">{f.a}</p>
             </Card>
           ))}
         </div>

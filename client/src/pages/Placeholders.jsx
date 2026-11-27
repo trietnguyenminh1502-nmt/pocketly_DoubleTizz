@@ -11,10 +11,10 @@ export const DashboardPlaceholder = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
             Xin chào, {user?.fullName}! 🌿
           </h1>
-          <p className="text-sm text-ink-muted mt-1">
+          <p className="text-sm text-secondary mt-1">
             Bảng điều khiển tài chính sinh viên của bạn
           </p>
         </div>
@@ -31,19 +31,19 @@ export const DashboardPlaceholder = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
         <Card>
-          <span className="text-xs text-ink-muted">Tổng số dư khả dụng</span>
+          <span className="text-xs text-secondary">Tổng số dư khả dụng</span>
           <div className="mt-1">
             <Money amount={4600000} type="neutral" className="text-2xl sm:text-3xl" />
           </div>
         </Card>
         <Card>
-          <span className="text-xs text-ink-muted">Thu nhập tháng này</span>
+          <span className="text-xs text-secondary">Thu nhập tháng này</span>
           <div className="mt-1">
             <Money amount={6200000} type="income" showSign className="text-2xl sm:text-3xl" />
           </div>
         </Card>
         <Card>
-          <span className="text-xs text-ink-muted">Chi tiêu tháng này</span>
+          <span className="text-xs text-secondary">Chi tiêu tháng này</span>
           <div className="mt-1">
             <Money amount={4077000} type="expense" showSign className="text-2xl sm:text-3xl" />
           </div>
@@ -55,7 +55,7 @@ export const DashboardPlaceholder = () => {
           title="Chào mừng bạn đến với Pocketly"
           subtitle="Tất cả các module backend và frontend đang sẵn sàng kết nối hoàn chỉnh!"
         />
-        <p className="text-sm text-ink-muted leading-relaxed">
+        <p className="text-sm text-secondary leading-relaxed">
           Bạn có thể truy cập các trang Giao dịch, Ví tiền, Ngân sách, Mục tiêu tiết kiệm hoặc AI Chatbot thông qua thanh menu bên trái.
         </p>
       </Card>
@@ -71,7 +71,7 @@ export const AdminPlaceholder = () => {
       </h1>
       <Card>
         <CardHeader title="Bảng điều khiển Quản trị viên" subtitle="Quản lý người dùng, danh mục hệ thống và audit log" />
-        <p className="text-sm text-ink-muted">
+        <p className="text-sm text-secondary">
           Khu vực này chỉ dành riêng cho tài khoản có vai trò <strong>ADMIN</strong>.
         </p>
       </Card>

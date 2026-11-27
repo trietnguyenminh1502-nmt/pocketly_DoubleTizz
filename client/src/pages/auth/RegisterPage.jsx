@@ -284,12 +284,12 @@ export const RegisterPage = () => {
           <div className="flex flex-col">
             <label
               htmlFor="reg-fullName"
-              className="text-[11px] font-bold tracking-wider uppercase text-[#D4F25C] mb-1.5"
+              className="text-[11px] font-bold tracking-wider uppercase text-auth-accent mb-1.5"
             >
               Họ và tên
             </label>
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-[#0A241B]/40 pointer-events-none flex" aria-hidden="true">
+              <span className="absolute left-3.5 text-auth-ink/40 pointer-events-none flex" aria-hidden="true">
                 <User size={18} />
               </span>
               <input
@@ -302,14 +302,11 @@ export const RegisterPage = () => {
                 onBlur={() => handleBlur('fullName')}
                 aria-describedby={errors.fullName ? 'err-fullName' : undefined}
                 aria-invalid={!!errors.fullName}
-                className="w-full h-[50px] bg-white text-[#0A241B] rounded-[14px] pl-11 pr-4 text-sm font-medium outline-none transition-all placeholder:text-[#0A241B]/40 focus:ring-[3px] focus:ring-[#D4F25C]/50 focus:border-[#D4F25C]"
-                style={{
-                  border: errors.fullName ? '2px solid #FF8A7A' : '2px solid transparent',
-                }}
+                className={`w-full h-[50px] bg-white text-auth-ink rounded-[14px] pl-11 pr-4 text-sm font-medium outline-none transition-all placeholder:text-auth-ink/40 focus:ring-[3px] focus:ring-auth-accent/50 focus:border-auth-accent border-2 ${errors.fullName ? 'border-coral' : 'border-transparent'}`}
               />
             </div>
             {touched.fullName && errors.fullName && (
-              <div id="err-fullName" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-[#FF8A7A] font-medium pt-1">
+              <div id="err-fullName" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-coral font-medium pt-1">
                 <AlertCircle size={14} className="shrink-0" />
                 <span>{errors.fullName}</span>
               </div>
@@ -320,12 +317,12 @@ export const RegisterPage = () => {
           <div className="flex flex-col">
             <label
               htmlFor="reg-email"
-              className="text-[11px] font-bold tracking-wider uppercase text-[#D4F25C] mb-1.5"
+              className="text-[11px] font-bold tracking-wider uppercase text-auth-accent mb-1.5"
             >
               Địa chỉ Email
             </label>
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-[#0A241B]/40 pointer-events-none flex" aria-hidden="true">
+              <span className="absolute left-3.5 text-auth-ink/40 pointer-events-none flex" aria-hidden="true">
                 <Mail size={18} />
               </span>
               <input
@@ -338,18 +335,15 @@ export const RegisterPage = () => {
                 onBlur={() => handleBlur('email')}
                 aria-describedby={errors.email ? 'err-email' : undefined}
                 aria-invalid={!!errors.email}
-                className="w-full h-[50px] bg-white text-[#0A241B] rounded-[14px] pl-11 pr-4 text-sm font-medium outline-none transition-all placeholder:text-[#0A241B]/40 focus:ring-[3px] focus:ring-[#D4F25C]/50 focus:border-[#D4F25C]"
-                style={{
-                  border: errors.email ? '2px solid #FF8A7A' : '2px solid transparent',
-                }}
+                className={`w-full h-[50px] bg-white text-auth-ink rounded-[14px] pl-11 pr-4 text-sm font-medium outline-none transition-all placeholder:text-auth-ink/40 focus:ring-[3px] focus:ring-auth-accent/50 focus:border-auth-accent border-2 ${errors.email ? 'border-coral' : 'border-transparent'}`}
               />
             </div>
             {touched.email && errors.email && (
-              <div id="err-email" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-[#FF8A7A] font-medium pt-1">
+              <div id="err-email" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-coral font-medium pt-1">
                 <AlertCircle size={14} className="shrink-0" />
                 <span>{errors.email}</span>
                 {errors.email.includes('đăng ký') && (
-                  <Link to="/login" className="text-[#FFB08A] font-bold underline ml-1 hover:text-white">
+                  <Link to="/login" className="text-auth-warm font-bold underline ml-1 hover:text-white">
                     Đăng nhập?
                   </Link>
                 )}
@@ -361,12 +355,12 @@ export const RegisterPage = () => {
           <div className="flex flex-col">
             <label
               htmlFor="reg-password"
-              className="text-[11px] font-bold tracking-wider uppercase text-[#D4F25C] mb-1.5"
+              className="text-[11px] font-bold tracking-wider uppercase text-auth-accent mb-1.5"
             >
               Mật khẩu
             </label>
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-[#0A241B]/40 pointer-events-none flex" aria-hidden="true">
+              <span className="absolute left-3.5 text-auth-ink/40 pointer-events-none flex" aria-hidden="true">
                 <Lock size={18} />
               </span>
               <input
@@ -379,22 +373,19 @@ export const RegisterPage = () => {
                 onBlur={() => handleBlur('password')}
                 aria-describedby={errors.password ? 'err-password' : undefined}
                 aria-invalid={!!errors.password}
-                className="w-full h-[50px] bg-white text-[#0A241B] rounded-[14px] pl-11 pr-11 text-sm font-medium outline-none transition-all placeholder:text-[#0A241B]/40 focus:ring-[3px] focus:ring-[#D4F25C]/50 focus:border-[#D4F25C]"
-                style={{
-                  border: errors.password ? '2px solid #FF8A7A' : '2px solid transparent',
-                }}
+                className={`w-full h-[50px] bg-white text-auth-ink rounded-[14px] pl-11 pr-11 text-sm font-medium outline-none transition-all placeholder:text-auth-ink/40 focus:ring-[3px] focus:ring-auth-accent/50 focus:border-auth-accent border-2 ${errors.password ? 'border-coral' : 'border-transparent'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                className="absolute right-3 p-1.5 text-[#0A241B]/50 hover:text-[#0A241B] transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4F25C]"
+                className="absolute right-3 p-1.5 text-auth-ink/50 hover:text-auth-ink transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-auth-accent"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {touched.password && errors.password && (
-              <div id="err-password" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-[#FF8A7A] font-medium pt-1">
+              <div id="err-password" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-coral font-medium pt-1">
                 <AlertCircle size={14} className="shrink-0" />
                 <span>{errors.password}</span>
               </div>
@@ -405,12 +396,12 @@ export const RegisterPage = () => {
           <div className="flex flex-col">
             <label
               htmlFor="reg-confirmPassword"
-              className="text-[11px] font-bold tracking-wider uppercase text-[#D4F25C] mb-1.5"
+              className="text-[11px] font-bold tracking-wider uppercase text-auth-accent mb-1.5"
             >
               Nhập lại mật khẩu
             </label>
             <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-[#0A241B]/40 pointer-events-none flex" aria-hidden="true">
+              <span className="absolute left-3.5 text-auth-ink/40 pointer-events-none flex" aria-hidden="true">
                 <Lock size={18} />
               </span>
               <input
@@ -423,22 +414,19 @@ export const RegisterPage = () => {
                 onBlur={() => handleBlur('confirmPassword')}
                 aria-describedby={errors.confirmPassword ? 'err-confirmPassword' : undefined}
                 aria-invalid={!!errors.confirmPassword}
-                className="w-full h-[50px] bg-white text-[#0A241B] rounded-[14px] pl-11 pr-11 text-sm font-medium outline-none transition-all placeholder:text-[#0A241B]/40 focus:ring-[3px] focus:ring-[#D4F25C]/50 focus:border-[#D4F25C]"
-                style={{
-                  border: errors.confirmPassword ? '2px solid #FF8A7A' : '2px solid transparent',
-                }}
+                className={`w-full h-[50px] bg-white text-auth-ink rounded-[14px] pl-11 pr-11 text-sm font-medium outline-none transition-all placeholder:text-auth-ink/40 focus:ring-[3px] focus:ring-auth-accent/50 focus:border-auth-accent border-2 ${errors.confirmPassword ? 'border-coral' : 'border-transparent'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                 aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
-                className="absolute right-3 p-1.5 text-[#0A241B]/50 hover:text-[#0A241B] transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D4F25C]"
+                className="absolute right-3 p-1.5 text-auth-ink/50 hover:text-auth-ink transition-colors rounded-lg focus:outline-none focus:ring-2 focus:ring-auth-accent"
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {touched.confirmPassword && errors.confirmPassword && (
-              <div id="err-confirmPassword" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-[#FF8A7A] font-medium pt-1">
+              <div id="err-confirmPassword" role="alert" aria-live="polite" className="flex items-center gap-1.5 text-xs text-coral font-medium pt-1">
                 <AlertCircle size={14} className="shrink-0" />
                 <span>{errors.confirmPassword}</span>
               </div>
@@ -447,12 +435,12 @@ export const RegisterPage = () => {
 
           {/* 5. Checkbox Điều khoản & Chính sách */}
           <div className="pt-1">
-            <label className="flex items-start gap-2.5 cursor-pointer text-xs sm:text-[13px] text-[#CFE2D8] leading-normal select-none">
+            <label className="flex items-start gap-2.5 cursor-pointer text-xs sm:text-[13px] text-auth leading-normal select-none">
               <input
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-0.5 w-4 h-4 rounded accent-[#D4F25C] cursor-pointer shrink-0"
+                className="mt-0.5 w-4 h-4 rounded accent-auth-accent cursor-pointer shrink-0"
                 aria-label="Đồng ý Điều khoản dịch vụ và Chính sách bảo mật"
               />
               <span>
@@ -461,7 +449,7 @@ export const RegisterPage = () => {
                   href="/terms"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#D4F25C] font-semibold underline underline-offset-2 hover:text-white"
+                  className="text-auth-accent font-semibold underline underline-offset-2 hover:text-white"
                 >
                   Điều khoản dịch vụ
                 </a>{' '}
@@ -470,7 +458,7 @@ export const RegisterPage = () => {
                   href="/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#D4F25C] font-semibold underline underline-offset-2 hover:text-white"
+                  className="text-auth-accent font-semibold underline underline-offset-2 hover:text-white"
                 >
                   Chính sách bảo mật
                 </a>.
@@ -482,16 +470,11 @@ export const RegisterPage = () => {
           <button
             type="submit"
             disabled={!isFormValid || isSubmitting}
-            className="w-full h-[52px] rounded-full flex items-center justify-center gap-2 font-bold text-base tracking-wide transition-all mt-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-            style={{
-              background: '#D4F25C',
-              color: '#0A241B',
-              boxShadow: isFormValid && !isSubmitting ? '0 0 24px rgba(212,242,92,0.35)' : 'none'
-            }}
+            className="w-full h-[52px] rounded-full flex items-center justify-center gap-2 font-bold text-base tracking-wide transition-all mt-2 cursor-pointer bg-auth-accent text-auth-ink shadow-auth-button hover:shadow-auth-button-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
             {isSubmitting ? (
               <span className="inline-flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-[#0A241B] border-t-transparent rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-auth-ink border-t-transparent rounded-full animate-spin" />
                 Đang tạo tài khoản...
               </span>
             ) : (
@@ -503,9 +486,9 @@ export const RegisterPage = () => {
           </button>
 
           {/* Link sang Đăng nhập */}
-          <p className="text-center text-xs sm:text-[13px] text-[#CFE2D8] pt-2">
+          <p className="text-center text-xs sm:text-[13px] text-auth pt-2">
             Đã có tài khoản Pocketly?{' '}
-            <Link to="/login" className="text-[#D4F25C] font-bold hover:underline">
+            <Link to="/login" className="text-auth-accent font-bold hover:underline">
               Đăng nhập ngay
             </Link>
           </p>
@@ -516,8 +499,8 @@ export const RegisterPage = () => {
       {screen === 'otp' && (
         <div className="flex flex-col gap-5 py-1">
           {/* Thông báo hướng dẫn */}
-          <div className="p-4 rounded-2xl bg-[#D4F25C]/10 border border-[#D4F25C]/20 text-xs sm:text-sm text-[#CFE2D8] leading-relaxed">
-            <p className="font-semibold text-[#D4F25C] flex items-center gap-2 mb-1">
+          <div className="p-4 rounded-2xl bg-auth-accent/10 border border-auth-accent/20 text-xs sm:text-sm text-auth leading-relaxed">
+            <p className="font-semibold text-auth-accent flex items-center gap-2 mb-1">
               <CheckCircle2 size={16} /> Kiểm tra hòm thư của bạn
             </p>
             <p className="text-xs sm:text-[13px]">
@@ -554,24 +537,12 @@ export const RegisterPage = () => {
               return (
                 <div
                   key={idx}
-                  className="w-11 h-14 sm:w-14 sm:h-16 flex items-center justify-center text-xl sm:text-2xl font-black bg-white text-[#0A241B] transition-all select-none relative"
-                  style={{
-                    borderRadius: '16px',
-                    border: otpError
-                      ? '2px solid #FF8A7A'
-                      : isActive
-                      ? '2px solid #D4F25C'
-                      : digit
-                      ? '2px solid #D4F25C'
-                      : '2px solid transparent',
-                    boxShadow: isActive ? '0 0 0 3px rgba(212,242,92,0.4)' : 'none',
-                    boxSizing: 'border-box'
-                  }}
+                  className={`w-11 h-14 sm:w-14 sm:h-16 flex items-center justify-center text-xl sm:text-2xl font-black bg-white text-auth-ink transition-all select-none relative rounded-16 border-2 box-border ${otpError ? 'border-coral' : isActive || digit ? 'border-auth-accent' : 'border-transparent'} ${isActive ? 'shadow-auth-focus' : ''}`}
                 >
                   {digit ? (
                     digit
                   ) : isActive ? (
-                    <span className="w-[2.5px] h-6 bg-[#0A241B] animate-pulse rounded-full" />
+                    <span className="w-[2.5px] h-6 bg-auth-ink animate-pulse rounded-full" />
                   ) : (
                     ''
                   )}
@@ -582,7 +553,7 @@ export const RegisterPage = () => {
 
           {/* Thông báo lỗi OTP */}
           {otpError && (
-            <div role="alert" aria-live="assertive" className="flex items-center justify-center gap-1.5 text-xs text-[#FF8A7A] font-medium text-center">
+            <div role="alert" aria-live="assertive" className="flex items-center justify-center gap-1.5 text-xs text-coral font-medium text-center">
               <AlertCircle size={15} className="shrink-0" />
               <span>{otpError}</span>
             </div>
@@ -590,8 +561,8 @@ export const RegisterPage = () => {
 
           {/* Đang xác minh */}
           {isVerifyingOtp && (
-            <div className="flex items-center justify-center gap-2 text-xs text-[#D4F25C]">
-              <span className="w-3.5 h-3.5 border-2 border-[#D4F25C] border-t-transparent rounded-full animate-spin" />
+            <div className="flex items-center justify-center gap-2 text-xs text-auth-accent">
+              <span className="w-3.5 h-3.5 border-2 border-auth-accent border-t-transparent rounded-full animate-spin" />
               Đang kiểm tra mã...
             </div>
           )}
@@ -602,7 +573,7 @@ export const RegisterPage = () => {
               type="button"
               onClick={handleResendOtp}
               disabled={resendCooldown > 0 || isResending}
-              className="inline-flex items-center gap-1.5 text-[#D4F25C] font-semibold hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 text-auth-accent font-semibold hover:underline disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
             >
               <RefreshCw size={13} className={isResending ? 'animate-spin' : ''} />
               {resendCooldown > 0 ? `Gửi lại mã sau ${resendCooldown}s` : 'Gửi lại mã'}
@@ -615,7 +586,7 @@ export const RegisterPage = () => {
                 setOtpValue('');
                 setOtpError('');
               }}
-              className="inline-flex items-center gap-1 text-[#CFE2D8] hover:text-white transition-colors"
+              className="inline-flex items-center gap-1 text-auth hover:text-white transition-colors"
             >
               <ArrowLeft size={13} />
               Đổi email khác

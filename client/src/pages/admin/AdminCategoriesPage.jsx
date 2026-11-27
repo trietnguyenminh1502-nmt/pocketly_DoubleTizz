@@ -221,10 +221,10 @@ export const AdminCategoriesPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-heading font-extrabold text-ink-light dark:text-ink-dark flex items-center gap-2.5">
+          <h1 className="text-2xl lg:text-3xl font-heading font-extrabold text-primary flex items-center gap-2.5">
             <span>🏷️</span> Quản lý Danh mục Hệ thống
           </h1>
-          <p className="text-sm text-ink-muted mt-1">
+          <p className="text-sm text-secondary mt-1">
             Các danh mục mặc định dùng chung được cung cấp sẵn cho sinh viên khi đăng ký Pocketly.
           </p>
         </div>
@@ -241,13 +241,13 @@ export const AdminCategoriesPage = () => {
       </div>
 
       {/* Tabs Filter */}
-      <div className="flex items-center gap-2 border-b border-border-light dark:border-border-dark pb-3">
+      <div className="flex items-center gap-2 border-b border-border pb-3">
         <button
           onClick={() => setActiveTab('ALL')}
           className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
             activeTab === 'ALL'
               ? 'bg-tangerine text-white shadow-soft'
-              : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
+              : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
           }`}
         >
           Tất cả ({categories.length})
@@ -257,7 +257,7 @@ export const AdminCategoriesPage = () => {
           className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
             activeTab === 'EXPENSE'
               ? 'bg-coral text-white shadow-soft'
-              : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
+              : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
           }`}
         >
           Chi tiêu ({categories.filter((c) => c.type === 'EXPENSE').length})
@@ -267,7 +267,7 @@ export const AdminCategoriesPage = () => {
           className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
             activeTab === 'INCOME'
               ? 'bg-primary dark:bg-lime text-white dark:text-forest shadow-soft'
-              : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
+              : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
           }`}
         >
           Thu nhập ({categories.filter((c) => c.type === 'INCOME').length})
@@ -297,7 +297,7 @@ export const AdminCategoriesPage = () => {
           {filteredCategories.map((cat) => (
             <Card
               key={cat.id}
-              className="p-4 flex flex-col justify-between hover:shadow-hover transition-all duration-200 border-border-light dark:border-border-dark group"
+              className="p-4 flex flex-col justify-between hover:shadow-hover transition-all duration-200 border-border group"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-3">
@@ -308,7 +308,7 @@ export const AdminCategoriesPage = () => {
                     {renderIcon(cat.icon, cat.color, 'w-6 h-6')}
                   </div>
                   <div>
-                    <h3 className="font-heading font-bold text-base text-ink-light dark:text-ink-dark line-clamp-1">
+                    <h3 className="font-heading font-bold text-base text-primary line-clamp-1">
                       {cat.name}
                     </h3>
                     <div className="flex items-center gap-1.5 mt-1">
@@ -328,13 +328,13 @@ export const AdminCategoriesPage = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-1.5 pt-3 mt-3 border-t border-border-light/60 dark:border-border-dark/60">
+              <div className="flex items-center justify-end gap-1.5 pt-3 mt-3 border-t border-border/60">
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={() => handleOpenEdit(cat)}
-                  leftIcon={<Edit2 className="w-3.5 h-3.5 text-ink-muted group-hover:text-tangerine" />}
-                  className="text-xs text-ink-muted hover:text-ink-light dark:hover:text-ink-dark"
+                  leftIcon={<Edit2 className="w-3.5 h-3.5 text-secondary group-hover:text-tangerine" />}
+                  className="text-xs text-secondary hover:text-ink-light dark:hover:text-ink-dark"
                 >
                   Sửa
                 </Button>
@@ -381,10 +381,10 @@ export const AdminCategoriesPage = () => {
 
           {/* Chọn Icon */}
           <div>
-            <label className="block text-xs font-bold text-ink-muted mb-2">
+            <label className="block text-xs font-bold text-secondary mb-2">
               Biểu tượng đại diện ({formData.icon})
             </label>
-            <div className="grid grid-cols-7 gap-2 max-h-36 overflow-y-auto p-2 bg-sand/20 dark:bg-white/5 rounded-20 border border-border-light dark:border-border-dark">
+            <div className="grid grid-cols-7 gap-2 max-h-36 overflow-y-auto p-2 bg-sand/20 dark:bg-white/5 rounded-20 border border-border">
               {ICON_OPTIONS.map((item) => {
                 const isSelected = formData.icon === item.name;
                 const IconCmp = item.icon;
@@ -397,7 +397,7 @@ export const AdminCategoriesPage = () => {
                     className={`h-10 rounded-16 flex items-center justify-center transition-all ${
                       isSelected
                         ? 'bg-tangerine text-white shadow-soft scale-105'
-                        : 'text-ink-muted hover:bg-white/80 dark:hover:bg-white/10 hover:text-ink-light dark:hover:text-ink-dark'
+                        : 'text-secondary hover:bg-white/80 dark:hover:bg-white/10 hover:text-ink-light dark:hover:text-ink-dark'
                     }`}
                   >
                     <IconCmp className="w-5 h-5" />
@@ -409,7 +409,7 @@ export const AdminCategoriesPage = () => {
 
           {/* Chọn Màu Sắc */}
           <div>
-            <label className="block text-xs font-bold text-ink-muted mb-2">
+            <label className="block text-xs font-bold text-secondary mb-2">
               Mã màu hiển thị
             </label>
             <div className="flex flex-wrap gap-2.5 items-center">
@@ -431,7 +431,7 @@ export const AdminCategoriesPage = () => {
           </div>
 
           {/* Xem trước */}
-          <div className="p-3 bg-sand/30 dark:bg-white/5 rounded-20 border border-border-light dark:border-border-dark flex items-center gap-3">
+          <div className="p-3 bg-sand/30 dark:bg-white/5 rounded-20 border border-border flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-16 flex items-center justify-center shrink-0"
               style={{ backgroundColor: `${formData.color}20` }}
@@ -439,14 +439,14 @@ export const AdminCategoriesPage = () => {
               {renderIcon(formData.icon, formData.color, 'w-5 h-5')}
             </div>
             <div>
-              <p className="text-xs text-ink-muted font-bold">Xem trước hiển thị:</p>
-              <p className="text-sm font-heading font-extrabold text-ink-light dark:text-ink-dark">
+              <p className="text-xs text-secondary font-bold">Xem trước hiển thị:</p>
+              <p className="text-sm font-heading font-extrabold text-primary">
                 {formData.name || 'Tên danh mục mẫu'}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-border">
             <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>
               Hủy bỏ
             </Button>

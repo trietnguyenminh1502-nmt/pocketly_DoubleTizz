@@ -32,21 +32,21 @@ export const ToastProvider = ({ children }) => {
               className={cn(
                 'pointer-events-auto flex items-center justify-between gap-3 p-4 rounded-20 border shadow-card animate-in slide-in-from-bottom-5 duration-200',
                 toast.type === 'success'
-                  ? 'bg-surface-light dark:bg-surface-dark border-mint text-primary dark:text-lime'
+                  ? 'bg-surface border-mint text-brand dark:text-lime'
                   : toast.type === 'error'
-                  ? 'bg-surface-light dark:bg-surface-dark border-coral text-coral'
-                  : 'bg-surface-light dark:bg-surface-dark border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark'
+                  ? 'bg-surface border-coral text-coral'
+                  : 'bg-surface border-border text-primary'
               )}
             >
               <div className="flex items-center gap-2.5">
-                {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 shrink-0 text-primary dark:text-lime" />}
+                {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 shrink-0 text-brand dark:text-lime" />}
                 {toast.type === 'error' && <AlertCircle className="w-5 h-5 shrink-0 text-coral" />}
                 {toast.type === 'info' && <Info className="w-5 h-5 shrink-0 text-tangerine" />}
-                <span className="text-sm font-medium text-ink-light dark:text-ink-dark">{toast.message}</span>
+                <span className="text-sm font-medium text-primary">{toast.message}</span>
               </div>
               <button
                 onClick={() => removeToast(toast.id)}
-                className="text-ink-muted hover:text-ink-light dark:hover:text-ink-dark"
+                className="text-secondary hover:text-ink-light dark:hover:text-ink-dark"
               >
                 <X className="w-4 h-4" />
               </button>

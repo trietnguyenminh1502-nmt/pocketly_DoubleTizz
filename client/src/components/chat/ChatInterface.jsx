@@ -142,14 +142,14 @@ export const ChatInterface = ({
 
   return (
     <div
-      className={`flex bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-24 overflow-hidden shadow-modal ${
+      className={`flex bg-surface border border-border rounded-24 overflow-hidden shadow-modal ${
         isWidget ? 'h-[520px] w-full max-w-[420px]' : 'h-[calc(100vh-140px)] w-full'
       } ${className}`}
     >
       {/* Session Sidebar (chỉ hiển thị trên full view hoặc khi cần) */}
       {!isWidget && (
-        <aside className="w-64 border-r border-border-light dark:border-border-dark bg-sand/20 dark:bg-black/20 flex flex-col shrink-0">
-          <div className="p-3 border-b border-border-light dark:border-border-dark">
+        <aside className="w-64 border-r border-border bg-sand/20 dark:bg-black/20 flex flex-col shrink-0">
+          <div className="p-3 border-b border-border">
             <Button
               variant="primary"
               size="md"
@@ -170,7 +170,7 @@ export const ChatInterface = ({
                 <Skeleton className="h-8" />
               </div>
             ) : sessions.length === 0 ? (
-              <p className="text-xs text-ink-muted text-center py-6">Chưa có phiên chat nào</p>
+              <p className="text-xs text-secondary text-center py-6">Chưa có phiên chat nào</p>
             ) : (
               sessions.map((s) => (
                 <button
@@ -179,7 +179,7 @@ export const ChatInterface = ({
                   className={`w-full text-left px-3 py-2.5 rounded-16 text-xs flex items-center gap-2 transition-colors ${
                     activeSessionId === s.id
                       ? 'bg-primary text-white dark:bg-lime dark:text-ink-light font-bold shadow-soft'
-                      : 'text-ink-muted hover:bg-black/5 dark:hover:bg-white/5'
+                      : 'text-secondary hover:bg-black/5 dark:hover:bg-white/5'
                   }`}
                 >
                   <MessageSquare className="w-3.5 h-3.5 shrink-0" />
@@ -192,18 +192,18 @@ export const ChatInterface = ({
       )}
 
       {/* Main Chat Conversation Container */}
-      <div className="flex-1 flex flex-col min-w-0 bg-surface-light dark:bg-surface-dark">
+      <div className="flex-1 flex flex-col min-w-0 bg-surface">
         {/* Chat Top Header */}
-        <div className="h-14 px-4 border-b border-border-light dark:border-border-dark flex items-center justify-between shrink-0">
+        <div className="h-14 px-4 border-b border-border flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-lime/20 text-lime-dark dark:text-lime flex items-center justify-center font-bold">
               <Bot className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-xs font-bold text-ink-light dark:text-ink-dark flex items-center gap-1">
+              <h3 className="text-xs font-bold text-primary flex items-center gap-1">
                 Pocket Assistant AI 🌿
               </h3>
-              <p className="text-[10px] text-ink-muted">Cố vấn tài chính sinh viên thông minh</p>
+              <p className="text-[10px] text-secondary">Cố vấn tài chính sinh viên thông minh</p>
             </div>
           </div>
 
@@ -211,7 +211,7 @@ export const ChatInterface = ({
             {activeSessionId && messages.length > 0 && (
               <button
                 onClick={() => clearSessionMutation.mutate(activeSessionId)}
-                className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
+                className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                 title="Xóa lịch sử cuộc trò chuyện"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -221,7 +221,7 @@ export const ChatInterface = ({
             {isWidget && onClose && (
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-ink-muted hover:text-ink-light"
+                className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-secondary hover:text-ink-light"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -239,14 +239,14 @@ export const ChatInterface = ({
             </div>
           ) : displayedMessages.length === 0 ? (
             <div className="py-8 text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-mint/50 text-primary mx-auto flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-mint/50 text-brand mx-auto flex items-center justify-center">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div className="space-y-1">
-                <h4 className="text-sm font-bold text-ink-light dark:text-ink-dark">
+                <h4 className="text-sm font-bold text-primary">
                   Chào bạn! Mình có thể giúp gì cho ví tiền của bạn hôm nay?
                 </h4>
-                <p className="text-xs text-ink-muted max-w-xs mx-auto">
+                <p className="text-xs text-secondary max-w-xs mx-auto">
                   Hãy hỏi về tổng tiền hiện có, danh mục chi tiêu nhiều nhất hoặc cách lên kế hoạch tiết kiệm!
                 </p>
               </div>
@@ -257,7 +257,7 @@ export const ChatInterface = ({
                   <button
                     key={idx}
                     onClick={() => handleSend(chip)}
-                    className="text-left text-xs px-3 py-1.5 rounded-full bg-sand/30 dark:bg-white/5 border border-border-light dark:border-border-dark text-ink-muted hover:text-primary dark:hover:text-lime hover:border-primary/40 transition-colors"
+                    className="text-left text-xs px-3 py-1.5 rounded-full bg-sand/30 dark:bg-white/5 border border-border text-secondary hover:text-brand dark:hover:text-lime hover:border-primary/40 transition-colors"
                   >
                     💡 {chip}
                   </button>
@@ -282,9 +282,8 @@ export const ChatInterface = ({
                     className={`max-w-[85%] rounded-20 px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
                       isUser
                         ? 'bg-primary text-white dark:bg-lime dark:text-ink-light rounded-br-none shadow-soft whitespace-pre-wrap'
-                        : 'bg-sand/30 dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark rounded-bl-none shadow-sm'
-                    }`}
-                    style={{ overflowWrap: 'anywhere' }}
+                        : 'bg-sand/30 dark:bg-surface-dark border border-border text-primary rounded-bl-none shadow-sm'
+                    } [overflow-wrap:anywhere]`}
                   >
                     {isUser ? (
                       m.content
@@ -300,11 +299,11 @@ export const ChatInterface = ({
           {/* Typing Indicator: Hiển thị ngay bên dưới tin nhắn vừa gửi */}
           {isTyping && (
             <div className="flex items-start gap-2.5 justify-start animate-in fade-in duration-200">
-              <div className="w-7 h-7 rounded-full bg-primary/20 text-primary dark:bg-lime/20 dark:text-lime flex items-center justify-center shrink-0 font-bold text-xs mt-0.5">
+              <div className="w-7 h-7 rounded-full bg-primary/20 text-brand dark:bg-lime/20 dark:text-lime flex items-center justify-center shrink-0 font-bold text-xs mt-0.5">
                 <Bot className="w-3.5 h-3.5" />
               </div>
-              <div className="bg-sand/30 dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-muted rounded-20 rounded-bl-none px-4 py-2.5 text-xs flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-primary dark:text-lime" />
+              <div className="bg-sand/30 dark:bg-surface-dark border border-border text-secondary rounded-20 rounded-bl-none px-4 py-2.5 text-xs flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-brand dark:text-lime" />
                 <span>Pocket Assistant đang suy nghĩ và phân tích dữ liệu...</span>
               </div>
             </div>
@@ -314,7 +313,7 @@ export const ChatInterface = ({
         </div>
 
         {/* Input Bar */}
-        <div className="p-3 border-t border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+        <div className="p-3 border-t border-border bg-surface">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -328,7 +327,7 @@ export const ChatInterface = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               disabled={isTyping}
-              className="flex-1 bg-sand/30 dark:bg-surface-dark text-ink-light dark:text-ink-dark border border-border-light dark:border-border-dark rounded-full px-4 py-2.5 text-xs outline-none focus:border-primary dark:focus:border-lime"
+              className="flex-1 bg-sand/30 dark:bg-surface-dark text-primary border border-border rounded-full px-4 py-2.5 text-xs outline-none focus:border-primary dark:focus:border-lime"
             />
             <Button
               type="submit"

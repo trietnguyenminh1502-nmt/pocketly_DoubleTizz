@@ -162,17 +162,17 @@ export const CategoriesPage = () => {
     <div className="space-y-6">
       {/* 1. Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
           Danh Mục Tài Chính 🏷️
         </h1>
-        <p className="text-xs sm:text-sm text-ink-muted mt-1">
+        <p className="text-xs sm:text-sm text-secondary mt-1">
           Quản lý danh mục thu chi mặc định của hệ thống và tạo danh mục riêng của bạn
         </p>
       </div>
 
       {/* 2. Filter Tabs & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex gap-2 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark w-fit">
+        <div className="flex gap-2 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border w-fit">
           {[
             { id: 'ALL', label: 'Tất cả' },
             { id: 'EXPENSE', label: 'Chi tiêu (Expense)' },
@@ -184,7 +184,7 @@ export const CategoriesPage = () => {
               className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
                 activeTab === tab.id
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                  : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
               }`}
             >
               {tab.label}
@@ -224,7 +224,7 @@ export const CategoriesPage = () => {
                       <IconComp className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-ink-light dark:text-ink-dark">{cat.name}</h4>
+                      <h4 className="text-sm font-bold text-primary">{cat.name}</h4>
                       <Badge variant={cat.type === 'INCOME' ? 'primary' : 'coral'} className="mt-1">
                         {cat.type === 'INCOME' ? 'Thu nhập' : 'Chi tiêu'}
                       </Badge>
@@ -240,10 +240,10 @@ export const CategoriesPage = () => {
 
                 {/* Nút hành động (chỉ cho phép sửa/xóa với danh mục tùy chỉnh của user) */}
                 {!cat.isDefault && (
-                  <div className="flex items-center justify-end gap-1 pt-3 mt-3 border-t border-border-light/60 dark:border-border-dark/60">
+                  <div className="flex items-center justify-end gap-1 pt-3 mt-3 border-t border-border/60">
                     <button
                       onClick={() => openEditModal(cat)}
-                      className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light transition-colors"
+                      className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
                       title="Sửa danh mục"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -253,7 +253,7 @@ export const CategoriesPage = () => {
                         setDeletingId(cat.id);
                         setIsDeleteDialogOpen(true);
                       }}
-                      className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
+                      className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                       title="Xóa danh mục"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -299,10 +299,10 @@ export const CategoriesPage = () => {
 
           {/* Chọn Icon */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+            <label className="text-xs font-semibold uppercase tracking-wider text-secondary">
               Biểu tượng đại diện (Icon)
             </label>
-            <div className="grid grid-cols-7 gap-2 p-3 rounded-20 bg-sand/20 dark:bg-surface-dark border border-border-light dark:border-border-dark max-h-36 overflow-y-auto">
+            <div className="grid grid-cols-7 gap-2 p-3 rounded-20 bg-sand/20 dark:bg-surface-dark border border-border max-h-36 overflow-y-auto">
               {ICON_OPTIONS.map((item) => {
                 const Icon = item.icon;
                 const isSelected = formData.icon === item.name;
@@ -314,7 +314,7 @@ export const CategoriesPage = () => {
                     className={`p-2.5 rounded-16 flex items-center justify-center transition-all ${
                       isSelected
                         ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft scale-105'
-                        : 'text-ink-muted hover:bg-black/5 dark:hover:bg-white/5'
+                        : 'text-secondary hover:bg-black/5 dark:hover:bg-white/5'
                     }`}
                     title={item.label}
                   >
@@ -327,10 +327,10 @@ export const CategoriesPage = () => {
 
           {/* Chọn Mã màu Color Picker */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+            <label className="text-xs font-semibold uppercase tracking-wider text-secondary">
               Bảng màu thương hiệu Pocketly
             </label>
-            <div className="flex flex-wrap gap-2.5 p-3 rounded-20 bg-sand/20 dark:bg-surface-dark border border-border-light dark:border-border-dark">
+            <div className="flex flex-wrap gap-2.5 p-3 rounded-20 bg-sand/20 dark:bg-surface-dark border border-border">
               {COLOR_PALETTE.map((c) => (
                 <button
                   key={c}
@@ -345,7 +345,7 @@ export const CategoriesPage = () => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <Button type="button" variant="secondary" size="sm" onClick={() => setIsModalOpen(false)}>
               Hủy
             </Button>

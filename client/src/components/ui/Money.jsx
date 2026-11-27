@@ -34,9 +34,9 @@ export const Money = ({
   }
 
   const colorClasses = {
-    income: 'text-emerald-600 dark:text-lime',
-    expense: 'text-red-500 dark:text-red-400',
-    neutral: 'text-ink-light dark:text-ink-dark'
+    income: 'text-success dark:text-lime',
+    expense: 'text-danger dark:text-danger-soft',
+    neutral: 'text-primary'
   };
 
   return (

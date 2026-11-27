@@ -128,10 +128,10 @@ export const BudgetsPage = () => {
       {/* 1. Header & Month Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
             Ngân Sách Chi Tiêu 📊
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-xs sm:text-sm text-secondary mt-1">
             Đặt hạn mức chi tiêu hàng tháng và tự động nhận cảnh báo trước khi hết tiền
           </p>
         </div>
@@ -186,10 +186,10 @@ export const BudgetsPage = () => {
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="text-base font-bold text-ink-light dark:text-ink-dark">
+                      <h3 className="text-base font-bold text-primary">
                         {b.category?.name || 'Ngân sách tổng toàn tháng'}
                       </h3>
-                      <p className="text-xs text-ink-muted mt-0.5">
+                      <p className="text-xs text-secondary mt-0.5">
                         Tháng {b.month}/{b.year} • Ngưỡng báo: {b.alertThreshold}%
                       </p>
                     </div>
@@ -202,19 +202,19 @@ export const BudgetsPage = () => {
                   {/* Số liệu Đã chi vs Giới hạn */}
                   <div className="mt-4 flex items-baseline justify-between">
                     <div>
-                      <span className="text-[11px] text-ink-muted block">Đã chi tiêu</span>
+                      <span className="text-[11px] text-secondary block">Đã chi tiêu</span>
                       <Money amount={b.spent} type={isExceeded ? 'expense' : 'neutral'} className="text-xl font-bold" />
                     </div>
                     <div className="text-right">
-                      <span className="text-[11px] text-ink-muted block">Hạn mức</span>
-                      <Money amount={b.limit} type="neutral" className="text-sm font-semibold text-ink-muted" />
+                      <span className="text-[11px] text-secondary block">Hạn mức</span>
+                      <Money amount={b.limit} type="neutral" className="text-sm font-semibold text-secondary" />
                     </div>
                   </div>
 
                   {/* Progress Bar */}
                   <div className="mt-3 space-y-1">
                     <ProgressBar progress={b.percentage} color={progressColor} />
-                    <div className="flex justify-between text-[11px] text-ink-muted pt-1">
+                    <div className="flex justify-between text-[11px] text-secondary pt-1">
                       <span>Đã dùng: <strong>{b.percentage}%</strong></span>
                       <span>
                         Còn lại: <strong>{Number(b.remaining).toLocaleString('vi-VN')}₫</strong>
@@ -224,12 +224,12 @@ export const BudgetsPage = () => {
                 </div>
 
                 {/* Footer Action Buttons */}
-                <div className="flex items-center justify-between pt-3 border-t border-border-light/60 dark:border-border-dark/60 text-xs">
-                  <div className="flex items-center gap-1.5 text-ink-muted">
+                <div className="flex items-center justify-between pt-3 border-t border-border/60 text-xs">
+                  <div className="flex items-center gap-1.5 text-secondary">
                     {isExceeded ? (
                       <AlertTriangle className="w-3.5 h-3.5 text-coral" />
                     ) : (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-primary dark:text-lime" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-brand dark:text-lime" />
                     )}
                     <span>{isExceeded ? 'Đã chi vượt hạn mức' : 'Trong tầm kiểm soát'}</span>
                   </div>
@@ -237,7 +237,7 @@ export const BudgetsPage = () => {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => openEditModal(b)}
-                      className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light transition-colors"
+                      className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
                       title="Sửa ngân sách"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -247,7 +247,7 @@ export const BudgetsPage = () => {
                         setDeletingId(b.id);
                         setIsDeleteDialogOpen(true);
                       }}
-                      className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
+                      className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                       title="Xóa ngân sách"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -315,7 +315,7 @@ export const BudgetsPage = () => {
             required
           />
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <Button type="button" variant="secondary" size="sm" onClick={() => setIsModalOpen(false)}>
               Hủy
             </Button>

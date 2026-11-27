@@ -120,7 +120,7 @@ export const TransactionFormModal = ({
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Toggle Loại giao dịch: Chi tiêu / Thu nhập */}
-        <div className="grid grid-cols-2 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark">
+        <div className="grid grid-cols-2 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border">
           <button
             type="button"
             onClick={() => {
@@ -131,7 +131,7 @@ export const TransactionFormModal = ({
             className={`py-2 rounded-full text-xs font-bold transition-all ${
               selectedType === 'EXPENSE'
                 ? 'bg-tangerine text-white shadow-soft'
-                : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
             }`}
           >
             Chi tiêu (Expense)
@@ -146,7 +146,7 @@ export const TransactionFormModal = ({
             className={`py-2 rounded-full text-xs font-bold transition-all ${
               selectedType === 'INCOME'
                 ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
             }`}
           >
             Thu nhập (Income)
@@ -192,12 +192,12 @@ export const TransactionFormModal = ({
 
         {/* Ngày giao dịch */}
         <div className="flex flex-col gap-1.5 w-full">
-          <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70">
+          <label className="text-xs font-semibold uppercase tracking-wider text-secondary dark:text-primary/70">
             Ngày giao dịch (*)
           </label>
           <input
             type="date"
-            className="w-full bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark border border-border-light dark:border-border-dark rounded-16 px-4 py-2.5 text-sm outline-none focus:border-primary dark:focus:border-lime"
+            className="w-full bg-surface text-primary border border-border rounded-16 px-4 py-2.5 text-sm outline-none focus:border-primary dark:focus:border-lime"
             {...register('date')}
             required
           />
@@ -216,7 +216,7 @@ export const TransactionFormModal = ({
         />
 
         {/* Nút hành động */}
-        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border-light dark:border-border-dark">
+        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
           <Button type="button" variant="secondary" size="sm" onClick={onClose} disabled={mutation.isPending}>
             Hủy
           </Button>

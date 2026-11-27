@@ -37,23 +37,23 @@ export const VerifyEmailPage = () => {
       title="Xác thực tài khoản"
       subtitle="Hoàn tất quy trình xác thực địa chỉ email cho tài khoản"
     >
-      <div className="text-center p-6 rounded-24 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark space-y-4">
+      <div className="text-center p-6 rounded-24 bg-surface border border-border space-y-4">
         {status === 'loading' && (
           <div className="py-8 space-y-3">
-            <Loader2 className="w-10 h-10 animate-spin text-primary dark:text-lime mx-auto" />
-            <p className="text-xs text-ink-muted">Đang kiểm tra mã xác thực email của bạn...</p>
+            <Loader2 className="w-10 h-10 animate-spin text-brand dark:text-lime mx-auto" />
+            <p className="text-xs text-secondary">Đang kiểm tra mã xác thực email của bạn...</p>
           </div>
         )}
 
         {status === 'success' && (
           <>
-            <div className="w-12 h-12 mx-auto rounded-full bg-mint flex items-center justify-center text-primary">
+            <div className="w-12 h-12 mx-auto rounded-full bg-mint flex items-center justify-center text-brand">
               <CheckCircle2 className="w-7 h-7" />
             </div>
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark">
+            <h3 className="text-base font-bold text-primary">
               Email đã được xác thực thành công! 🌿
             </h3>
-            <p className="text-xs text-ink-muted">
+            <p className="text-xs text-secondary">
               Tài khoản Pocketly của bạn đã sẵn sàng. Hãy đăng nhập để bắt đầu trải nghiệm!
             </p>
             <div className="pt-2">
@@ -69,7 +69,7 @@ export const VerifyEmailPage = () => {
             <div className="w-12 h-12 mx-auto rounded-full bg-coral/20 flex items-center justify-center text-coral">
               <AlertCircle className="w-7 h-7" />
             </div>
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark">
+            <h3 className="text-base font-bold text-primary">
               Xác thực không thành công
             </h3>
             <p className="text-xs text-coral">{message}</p>

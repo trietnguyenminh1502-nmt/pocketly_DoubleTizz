@@ -3,7 +3,7 @@ import { cn } from '@/utils/cn';
 
 export const Table = ({ children, columns, data, className = '' }) => {
   return (
-    <div className="w-full overflow-x-auto rounded-16 border border-border-light dark:border-border-dark">
+    <div className="w-full overflow-x-auto rounded-16 border border-border">
       <table className={cn('w-full text-left text-sm border-collapse', className)}>
         {columns && data ? (
           <>
@@ -54,7 +54,7 @@ export const TableHeader = ({ children, className = '' }) => {
   return (
     <thead
       className={cn(
-        'bg-sand/40 dark:bg-surface-dark border-b border-border-light dark:border-border-dark text-xs uppercase font-bold text-ink-muted dark:text-ink-dark/70 tracking-wider',
+        'bg-sand/40 dark:bg-surface-dark border-b border-border text-xs uppercase font-bold text-secondary dark:text-primary/70 tracking-wider',
         className
       )}
     >
@@ -65,7 +65,7 @@ export const TableHeader = ({ children, className = '' }) => {
 
 export const TableBody = ({ children, className = '' }) => {
   return (
-    <tbody className={cn('divide-y divide-border-light/60 dark:divide-border-dark/60 bg-surface-light dark:bg-surface-dark', className)}>
+    <tbody className={cn('divide-y divide-border-light/60 dark:divide-border-dark/60 bg-surface', className)}>
       {children}
     </tbody>
   );
@@ -95,7 +95,7 @@ export const TableHead = ({ children, className = '', ...props }) => {
 
 export const TableCell = ({ children, className = '', ...props }) => {
   return (
-    <td className={cn('px-4 py-3.5 text-ink-light dark:text-ink-dark', className)} {...props}>
+    <td className={cn('px-4 py-3.5 text-primary', className)} {...props}>
       {children}
     </td>
   );

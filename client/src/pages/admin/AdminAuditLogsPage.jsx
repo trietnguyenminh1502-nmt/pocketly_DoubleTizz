@@ -86,10 +86,10 @@ export const AdminAuditLogsPage = () => {
               className="bg-tangerine text-white"
             />
             <div>
-              <p className="font-bold text-xs text-ink-light dark:text-ink-dark line-clamp-1">
+              <p className="font-bold text-xs text-primary line-clamp-1">
                 {admin?.fullName || 'Admin hệ thống'}
               </p>
-              <p className="text-[11px] text-ink-muted line-clamp-1">{admin?.email || 'N/A'}</p>
+              <p className="text-[11px] text-secondary line-clamp-1">{admin?.email || 'N/A'}</p>
             </div>
           </div>
         );
@@ -112,7 +112,7 @@ export const AdminAuditLogsPage = () => {
     {
       header: 'Mã đối tượng tác động (Target ID)',
       render: (log) => (
-        <div className="flex items-center gap-1.5 font-mono text-xs text-ink-muted">
+        <div className="flex items-center gap-1.5 font-mono text-xs text-secondary">
           <span className="bg-sand/30 dark:bg-white/5 px-2 py-1 rounded-8 line-clamp-1 max-w-[200px]">
             {log.targetId || 'N/A'}
           </span>
@@ -135,7 +135,7 @@ export const AdminAuditLogsPage = () => {
     {
       header: 'Thời điểm',
       render: (log) => (
-        <span className="text-xs text-ink-muted whitespace-nowrap">
+        <span className="text-xs text-secondary whitespace-nowrap">
           {log.createdAt ? format(new Date(log.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: vi }) : 'N/A'}
         </span>
       )
@@ -146,10 +146,10 @@ export const AdminAuditLogsPage = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-heading font-extrabold text-ink-light dark:text-ink-dark flex items-center gap-2.5">
+        <h1 className="text-2xl lg:text-3xl font-heading font-extrabold text-primary flex items-center gap-2.5">
           <span>🛡️</span> Nhật ký Thao tác Quản trị (Audit Logs)
         </h1>
-        <p className="text-sm text-ink-muted mt-1">
+        <p className="text-sm text-secondary mt-1">
           Hệ thống ghi nhận minh bạch và không thể chỉnh sửa mọi hành động của quản trị viên để bảo mật.
         </p>
       </div>
@@ -162,12 +162,12 @@ export const AdminAuditLogsPage = () => {
               placeholder="Tìm theo tên Admin, email, Target ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              leftIcon={<Search className="w-4 h-4 text-ink-muted" />}
+              leftIcon={<Search className="w-4 h-4 text-secondary" />}
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs font-bold text-ink-muted whitespace-nowrap">Loại hành động:</span>
+            <span className="text-xs font-bold text-secondary whitespace-nowrap">Loại hành động:</span>
             <Select
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
@@ -215,7 +215,7 @@ export const AdminAuditLogsPage = () => {
 
             {/* Pagination */}
             {meta.totalPages > 1 && (
-              <div className="p-4 border-t border-border-light dark:border-border-dark flex justify-center">
+              <div className="p-4 border-t border-border flex justify-center">
                 <Pagination
                   currentPage={page}
                   totalPages={meta.totalPages}

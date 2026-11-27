@@ -186,10 +186,10 @@ export const TransactionsPage = () => {
       {/* 1. Page Header & Primary Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
             Sổ Giao Dịch 🧾
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-xs sm:text-sm text-secondary mt-1">
             Quản lý chi tiết các khoản thu, chi và lịch sử biến động số dư
           </p>
         </div>
@@ -228,14 +228,14 @@ export const TransactionsPage = () => {
 
       {/* 2. Filter & Search Card */}
       <Card className="space-y-4">
-        <div className="flex items-center justify-between border-b border-border-light/60 dark:border-border-dark/60 pb-3">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-ink-muted">
+        <div className="flex items-center justify-between border-b border-border/60 pb-3">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-secondary">
             <Filter className="w-4 h-4 text-tangerine" />
             <span>Bộ Lọc Tìm Kiếm Nâng Cao</span>
           </div>
           <button
             onClick={resetFilters}
-            className="text-xs text-ink-muted hover:text-primary dark:hover:text-lime flex items-center gap-1 font-semibold"
+            className="text-xs text-secondary hover:text-brand dark:hover:text-lime flex items-center gap-1 font-semibold"
           >
             <RotateCcw className="w-3.5 h-3.5" /> Đặt lại
           </button>
@@ -290,27 +290,27 @@ export const TransactionsPage = () => {
         {/* Lọc theo Khoảng ngày & Sắp xếp */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-ink-muted whitespace-nowrap">Từ:</span>
+            <span className="text-xs text-secondary whitespace-nowrap">Từ:</span>
             <input
               type="date"
-              className="w-full bg-sand/30 dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-16 px-3 py-1.5 text-xs outline-none"
+              className="w-full bg-sand/30 dark:bg-surface-dark border border-border rounded-16 px-3 py-1.5 text-xs outline-none"
               value={filters.startDate}
               onChange={(e) => setFilters({ ...filters, startDate: e.target.value, page: 1 })}
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-ink-muted whitespace-nowrap">Đến:</span>
+            <span className="text-xs text-secondary whitespace-nowrap">Đến:</span>
             <input
               type="date"
-              className="w-full bg-sand/30 dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-16 px-3 py-1.5 text-xs outline-none"
+              className="w-full bg-sand/30 dark:bg-surface-dark border border-border rounded-16 px-3 py-1.5 text-xs outline-none"
               value={filters.endDate}
               onChange={(e) => setFilters({ ...filters, endDate: e.target.value, page: 1 })}
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-ink-muted whitespace-nowrap">Sắp xếp:</span>
+            <span className="text-xs text-secondary whitespace-nowrap">Sắp xếp:</span>
             <Select
               value={`${filters.sortBy}-${filters.order}`}
               onChange={(e) => {
@@ -330,8 +330,8 @@ export const TransactionsPage = () => {
 
       {/* 3. Bulk Action Bar */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center justify-between p-3.5 rounded-20 bg-sand dark:bg-surface-dark border border-border-light dark:border-border-dark animate-in fade-in">
-          <span className="text-xs font-bold text-ink-light dark:text-ink-dark">
+        <div className="flex items-center justify-between p-3.5 rounded-20 bg-sand dark:bg-surface-dark border border-border animate-in fade-in">
+          <span className="text-xs font-bold text-primary">
             Đã chọn <strong>{selectedIds.length}</strong> giao dịch
           </span>
           <Button
@@ -407,22 +407,22 @@ export const TransactionsPage = () => {
                         className="rounded accent-primary cursor-pointer"
                       />
                     </TableCell>
-                    <TableCell className="tabular-nums text-xs font-semibold text-ink-muted">
+                    <TableCell className="tabular-nums text-xs font-semibold text-secondary">
                       {new Date(tx.date).toLocaleDateString('vi-VN')}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <span
                           className="w-2.5 h-2.5 rounded-full shrink-0"
-                          style={{ backgroundColor: tx.category?.color || '#FF6A2B' }}
+                          style={{ backgroundColor: tx.category?.color || 'rgb(var(--color-tangerine))' }}
                         />
                         <span className="font-bold text-xs">{tx.category?.name}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[200px] truncate text-xs text-ink-light dark:text-ink-dark">
-                      {tx.note || <span className="text-ink-muted/50 italic">Không có ghi chú</span>}
+                    <TableCell className="max-w-[200px] truncate text-xs text-primary">
+                      {tx.note || <span className="text-secondary/50 italic">Không có ghi chú</span>}
                     </TableCell>
-                    <TableCell className="text-xs text-ink-muted">{tx.wallet?.name}</TableCell>
+                    <TableCell className="text-xs text-secondary">{tx.wallet?.name}</TableCell>
                     <TableCell>
                       <Money
                         amount={Number(tx.amount)}
@@ -438,7 +438,7 @@ export const TransactionsPage = () => {
                             setEditingTransaction(tx);
                             setIsFormModalOpen(true);
                           }}
-                          className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light transition-colors"
+                          className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
                           title="Sửa giao dịch"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -448,7 +448,7 @@ export const TransactionsPage = () => {
                             setDeletingId(tx.id);
                             setIsDeleteDialogOpen(true);
                           }}
-                          className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
+                          className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                           title="Xóa giao dịch"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -461,7 +461,7 @@ export const TransactionsPage = () => {
             </Table>
 
             {/* Phân trang */}
-            <div className="p-4 border-t border-border-light dark:border-border-dark">
+            <div className="p-4 border-t border-border">
               <Pagination
                 currentPage={filters.page}
                 totalPages={meta.totalPages}

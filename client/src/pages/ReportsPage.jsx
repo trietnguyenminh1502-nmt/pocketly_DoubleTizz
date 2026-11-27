@@ -123,10 +123,10 @@ export const ReportsPage = () => {
       {/* 1. Header & Bộ lọc thời gian linh hoạt */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
             Báo Cáo & Phân Tích 📈
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-xs sm:text-sm text-secondary mt-1">
             Báo cáo chi tiết theo năm, theo quý hoặc khoảng tháng tuỳ chọn và xuất file Excel
           </p>
         </div>
@@ -143,13 +143,13 @@ export const ReportsPage = () => {
       </div>
 
       {/* Filter Bar: Chọn Năm, Từ tháng, Đến tháng & Chọn nhanh theo Quý */}
-      <Card className="p-4 bg-surface-light dark:bg-surface-dark border-border-light dark:border-border-dark">
+      <Card className="p-4 bg-surface border-border">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             {/* Lọc Năm */}
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary dark:text-lime" />
-              <span className="text-xs font-bold text-ink-muted">Năm:</span>
+              <Calendar className="w-4 h-4 text-brand dark:text-lime" />
+              <span className="text-xs font-bold text-secondary">Năm:</span>
               <Select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))}
@@ -166,7 +166,7 @@ export const ReportsPage = () => {
 
             {/* Lọc Khoảng Tháng (Từ tháng ... đến tháng ...) */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-ink-muted">Từ:</span>
+              <span className="text-xs font-bold text-secondary">Từ:</span>
               <Select
                 value={fromMonth}
                 onChange={(e) => {
@@ -184,7 +184,7 @@ export const ReportsPage = () => {
                 ))}
               </Select>
 
-              <span className="text-xs font-bold text-ink-muted">đến:</span>
+              <span className="text-xs font-bold text-secondary">đến:</span>
               <Select
                 value={toMonth}
                 onChange={(e) => {
@@ -205,14 +205,14 @@ export const ReportsPage = () => {
           </div>
 
           {/* Chọn nhanh theo Quý (3 tháng) và Cả năm */}
-          <div className="flex items-center gap-1 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark overflow-x-auto">
+          <div className="flex items-center gap-1 p-1 rounded-full bg-border-light/40 dark:bg-surface-dark border border-border overflow-x-auto">
             <button
               onClick={() => setQuarter(1, 3)}
               className={cn(
                 'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
                 fromMonth === 1 && toMonth === 3
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                  : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
               )}
             >
               Quý 1 (T1-3)
@@ -223,7 +223,7 @@ export const ReportsPage = () => {
                 'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
                 fromMonth === 4 && toMonth === 6
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                  : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
               )}
             >
               Quý 2 (T4-6)
@@ -234,7 +234,7 @@ export const ReportsPage = () => {
                 'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
                 fromMonth === 7 && toMonth === 9
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                  : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
               )}
             >
               Quý 3 (T7-9)
@@ -245,7 +245,7 @@ export const ReportsPage = () => {
                 'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
                 fromMonth === 10 && toMonth === 12
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                  : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
               )}
             >
               Quý 4 (T10-12)
@@ -256,7 +256,7 @@ export const ReportsPage = () => {
                 'px-2.5 py-1 rounded-full text-xs font-bold transition-all whitespace-nowrap',
                 fromMonth === 1 && toMonth === 12
                   ? 'bg-primary text-white dark:bg-lime dark:text-ink-light shadow-soft'
-                  : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                  : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
               )}
             >
               Cả năm
@@ -268,27 +268,27 @@ export const ReportsPage = () => {
       {/* 2. Month-over-Month Comparison Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Tổng thu nhập tháng</span>
+          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tổng thu nhập tháng</span>
           <div className="mt-2">
             <Money amount={summary?.currentMonth?.income || 0} type="income" showSign className="text-2xl font-extrabold" />
           </div>
-          <p className="text-[11px] text-ink-muted mt-2">
+          <p className="text-[11px] text-secondary mt-2">
             Tháng trước: {Number(summary?.momComparison?.lastMonthIncome || 0).toLocaleString('vi-VN')}₫
           </p>
         </Card>
 
         <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Tổng chi tiêu tháng</span>
+          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tổng chi tiêu tháng</span>
           <div className="mt-2">
             <Money amount={summary?.currentMonth?.expense || 0} type="expense" showSign className="text-2xl font-extrabold" />
           </div>
-          <p className="text-[11px] text-ink-muted mt-2">
+          <p className="text-[11px] text-secondary mt-2">
             Tháng trước: {Number(summary?.momComparison?.lastMonthExpense || 0).toLocaleString('vi-VN')}₫
           </p>
         </Card>
 
         <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Tiền tiết kiệm ròng</span>
+          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tiền tiết kiệm ròng</span>
           <div className="mt-2">
             <Money
               amount={summary?.currentMonth?.netSavings || 0}
@@ -297,17 +297,17 @@ export const ReportsPage = () => {
               className="text-2xl font-extrabold"
             />
           </div>
-          <p className="text-[11px] text-ink-muted mt-2">
+          <p className="text-[11px] text-secondary mt-2">
             Dư sau khi trừ chi phí sinh hoạt
           </p>
         </Card>
 
         <Card className="flex flex-col justify-between p-5">
-          <span className="text-xs text-ink-muted uppercase font-bold tracking-wider">Tỷ lệ tiết kiệm (%)</span>
-          <div className="mt-2 text-2xl font-extrabold font-heading text-primary dark:text-lime">
+          <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tỷ lệ tiết kiệm (%)</span>
+          <div className="mt-2 text-2xl font-extrabold font-heading text-brand dark:text-lime">
             {summary?.currentMonth?.savingsRate}%
           </div>
-          <p className="text-[11px] text-ink-muted mt-2">
+          <p className="text-[11px] text-secondary mt-2">
             Mục tiêu khuyến nghị sinh viên: ≥ 20%
           </p>
         </Card>
@@ -331,21 +331,21 @@ export const ReportsPage = () => {
             <div className="h-72 w-full my-auto pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={trendsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8E2D6" opacity={0.5} />
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#5C6B64' }} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--color-chart-border))" opacity={0.5} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
                   <YAxis
-                    tick={{ fontSize: 10, fill: '#5C6B64' }}
+                    tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }}
                     tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
                     tickLine={false}
                     axisLine={false}
                   />
                   <Tooltip
                     formatter={(val) => `${Number(val).toLocaleString('vi-VN')}₫`}
-                    contentStyle={{ borderRadius: '16px', border: '1px solid #E8E2D6' }}
+                    contentStyle={{ borderRadius: '16px', border: '1px solid rgb(var(--color-chart-border))' }}
                   />
                   <Legend verticalAlign="top" align="right" wrapperStyle={{ fontSize: 11, paddingBottom: 10 }} />
-                  <Bar dataKey="income" name="Thu nhập" fill="#123D2F" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="expense" name="Chi tiêu" fill="#FF8A7A" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="income" name="Thu nhập" fill="rgb(var(--color-chart-primary))" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="expense" name="Chi tiêu" fill="rgb(var(--color-chart-expense))" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -383,7 +383,7 @@ export const ReportsPage = () => {
                       {Number(c.amount).toLocaleString('vi-VN')}₫ ({c.percentage}%)
                     </strong>
                   </div>
-                  <div className="w-full bg-border-light/60 dark:bg-border-dark rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-border/60 rounded-full h-2 overflow-hidden">
                     <div
                       className="h-full rounded-full"
                       style={{ width: `${c.percentage}%`, backgroundColor: c.color }}

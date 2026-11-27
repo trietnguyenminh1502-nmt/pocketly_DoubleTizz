@@ -57,8 +57,8 @@ const DISTINCT_COLORS = [
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-3 rounded-16 shadow-modal text-xs">
-        {label && <p className="font-bold text-ink-light dark:text-ink-dark mb-1">{label}</p>}
+      <div className="bg-surface border border-border p-3 rounded-16 shadow-modal text-xs">
+        {label && <p className="font-bold text-primary mb-1">{label}</p>}
         {payload.map((entry, index) => (
           <p key={`item-${index}`} className="flex items-center gap-2" style={{ color: entry.color || entry.fill }}>
             <span className="font-semibold">{entry.name}:</span>
@@ -136,10 +136,10 @@ export const DashboardPage = () => {
       {/* 1. Header & Quick Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
             Tổng quan tài chính 🌿
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-xs sm:text-sm text-secondary mt-1">
             Theo dõi dòng tiền, ngân sách và mục tiêu tiết kiệm thông minh
           </p>
         </div>
@@ -174,37 +174,37 @@ export const DashboardPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Tổng số dư ví */}
           <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Tổng số dư khả dụng</span>
-              <div className="p-2 rounded-full bg-sand/40 text-primary dark:text-lime">
+              <div className="p-2 rounded-full bg-sand/40 text-brand dark:text-lime">
                 <Wallet className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2">
               <Money amount={summary?.totalBalance || 0} type="neutral" className="text-2xl font-extrabold font-heading" />
             </div>
-            <p className="text-[11px] text-ink-muted mt-2">Tổng từ tất cả ví cá nhân</p>
+            <p className="text-[11px] text-secondary mt-2">Tổng từ tất cả ví cá nhân</p>
           </Card>
 
           {/* Card 2: Thu nhập tháng này */}
           <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Thu nhập tháng</span>
-              <div className="p-2 rounded-full bg-mint/50 text-primary">
+              <div className="p-2 rounded-full bg-mint/50 text-brand">
                 <ArrowDownLeft className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2">
               <Money amount={summary?.currentMonth?.income || 0} type="income" showSign className="text-2xl font-extrabold font-heading" />
             </div>
-            <p className="text-[11px] text-ink-muted mt-2">
-              Tăng trưởng: <strong className="text-primary dark:text-lime">{summary?.momComparison?.incomeGrowthPercentage}%</strong> so với tháng trước
+            <p className="text-[11px] text-secondary mt-2">
+              Tăng trưởng: <strong className="text-brand dark:text-lime">{summary?.momComparison?.incomeGrowthPercentage}%</strong> so với tháng trước
             </p>
           </Card>
 
           {/* Card 3: Chi tiêu tháng này */}
           <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Chi tiêu tháng</span>
               <div className="p-2 rounded-full bg-tangerine/15 text-tangerine">
                 <ArrowUpRight className="w-4 h-4" />
@@ -213,14 +213,14 @@ export const DashboardPage = () => {
             <div className="mt-2">
               <Money amount={summary?.currentMonth?.expense || 0} type="expense" showSign className="text-2xl font-extrabold font-heading" />
             </div>
-            <p className="text-[11px] text-ink-muted mt-2">
+            <p className="text-[11px] text-secondary mt-2">
               Biến động: <strong className="text-tangerine">{summary?.momComparison?.expenseGrowthPercentage}%</strong> so với tháng trước
             </p>
           </Card>
 
           {/* Card 4: Tiết kiệm ròng & Tỷ lệ */}
           <Card className="flex flex-col justify-between">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Tiết kiệm ròng</span>
               <div className="p-2 rounded-full bg-lime/20 text-lime-dark">
                 <TrendingUp className="w-4 h-4" />
@@ -229,8 +229,8 @@ export const DashboardPage = () => {
             <div className="mt-2">
               <Money amount={summary?.currentMonth?.netSavings || 0} type={summary?.currentMonth?.netSavings >= 0 ? 'income' : 'expense'} showSign className="text-2xl font-extrabold font-heading" />
             </div>
-            <p className="text-[11px] text-ink-muted mt-2">
-              Tỷ lệ tiết kiệm: <strong className="text-primary dark:text-lime">{summary?.currentMonth?.savingsRate}%</strong>
+            <p className="text-[11px] text-secondary mt-2">
+              Tỷ lệ tiết kiệm: <strong className="text-brand dark:text-lime">{summary?.currentMonth?.savingsRate}%</strong>
             </p>
           </Card>
         </div>
@@ -274,7 +274,7 @@ export const DashboardPage = () => {
               </div>
 
               {/* Legend List */}
-              <div className="pt-4 border-t border-border-light/60 dark:border-border-dark/60">
+              <div className="pt-4 border-t border-border/60">
                 <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm">
                   {categoryData.slice(0, 4).map((cat, idx) => (
                     <div key={cat.categoryId || idx} className="flex items-center gap-2">
@@ -282,8 +282,8 @@ export const DashboardPage = () => {
                         className="w-2.5 h-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: cat.color }}
                       />
-                      <span className="truncate text-ink-muted text-xs sm:text-sm">{cat.name}:</span>
-                      <strong className="text-ink-light dark:text-ink-dark text-xs sm:text-sm font-bold shrink-0">
+                      <span className="truncate text-secondary text-xs sm:text-sm">{cat.name}:</span>
+                      <strong className="text-primary text-xs sm:text-sm font-bold shrink-0">
                         {cat.percentage}%
                       </strong>
                     </div>
@@ -308,10 +308,10 @@ export const DashboardPage = () => {
             <div className="h-64 w-full my-auto pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={trendsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8E2D6" opacity={0.5} />
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#5C6B64' }} tickLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--color-chart-border))" opacity={0.5} />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
                   <YAxis
-                    tick={{ fontSize: 10, fill: '#5C6B64' }}
+                    tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }}
                     tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
                     tickLine={false}
                     axisLine={false}
@@ -322,8 +322,8 @@ export const DashboardPage = () => {
                     align="right"
                     wrapperStyle={{ fontSize: 11, paddingBottom: 10 }}
                   />
-                  <Bar dataKey="income" name="Thu nhập" fill="#123D2F" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="expense" name="Chi tiêu" fill="#FF8A7A" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="income" name="Thu nhập" fill="rgb(var(--color-chart-primary))" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="expense" name="Chi tiêu" fill="rgb(var(--color-chart-expense))" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -341,7 +341,7 @@ export const DashboardPage = () => {
               title="Tiến Độ Ngân Sách Tháng"
               subtitle="Cảnh báo khi chi tiêu vượt hạn mức an toàn"
               action={
-                <Link to="/budgets" className="text-xs font-bold text-primary dark:text-lime hover:underline flex items-center">
+                <Link to="/budgets" className="text-xs font-bold text-brand dark:text-lime hover:underline flex items-center">
                   Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               }
@@ -357,9 +357,9 @@ export const DashboardPage = () => {
             ) : (
               <div className="space-y-4">
                 {budgets.slice(0, 3).map((b) => (
-                  <div key={b.id} className="space-y-1.5 p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
+                  <div key={b.id} className="space-y-1.5 p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-ink-light dark:text-ink-dark">
+                      <span className="font-bold text-primary">
                         {b.category?.name || 'Ngân sách tổng toàn tháng'}
                       </span>
                       <div className="flex items-center gap-1.5">
@@ -389,7 +389,7 @@ export const DashboardPage = () => {
               title="Mục Tiêu Tiết Kiệm"
               subtitle="Tích lũy cho các dự định lớn của sinh viên"
               action={
-                <Link to="/goals" className="text-xs font-bold text-primary dark:text-lime hover:underline flex items-center">
+                <Link to="/goals" className="text-xs font-bold text-brand dark:text-lime hover:underline flex items-center">
                   Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               }
@@ -405,9 +405,9 @@ export const DashboardPage = () => {
             ) : (
               <div className="space-y-4">
                 {savingGoals.slice(0, 2).map((g) => (
-                  <div key={g.id} className="space-y-1.5 p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
+                  <div key={g.id} className="space-y-1.5 p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-ink-light dark:text-ink-dark truncate max-w-[200px]">
+                      <span className="font-bold text-primary truncate max-w-[200px]">
                         {g.title}
                       </span>
                       <div className="flex items-center gap-1.5">
@@ -419,7 +419,7 @@ export const DashboardPage = () => {
                     </div>
                     <ProgressBar progress={g.progress} color="lime" />
                     {g.projectedCompletionDate && (
-                      <p className="text-[10px] text-ink-muted flex items-center gap-1 pt-1">
+                      <p className="text-[10px] text-secondary flex items-center gap-1 pt-1">
                         <Clock className="w-3 h-3 text-tangerine" />
                         Dự kiến hoàn thành: <strong>{g.projectedCompletionDate}</strong>
                       </p>
@@ -438,7 +438,7 @@ export const DashboardPage = () => {
               title="Giao Dịch Gần Đây"
               subtitle="5 khoản chi tiêu/thu nhập mới nhất"
               action={
-                <Link to="/transactions" className="text-xs font-bold text-primary dark:text-lime hover:underline flex items-center">
+                <Link to="/transactions" className="text-xs font-bold text-brand dark:text-lime hover:underline flex items-center">
                   Tất cả giao dịch <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               }
@@ -461,17 +461,17 @@ export const DashboardPage = () => {
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-sm shadow-soft"
                         style={{
-                          backgroundColor: `${tx.category?.color || '#FF6A2B'}20`,
-                          color: tx.category?.color || '#FF6A2B'
+                          backgroundColor: tx.category?.color ? `${tx.category.color}20` : 'rgb(var(--color-tangerine) / 0.125)',
+                          color: tx.category?.color || 'rgb(var(--color-tangerine))'
                         }}
                       >
                         {tx.type === 'INCOME' ? '+' : '-'}
                       </div>
                       <div className="overflow-hidden">
-                        <p className="text-sm font-bold text-ink-light dark:text-ink-dark truncate">
+                        <p className="text-sm font-bold text-primary truncate">
                           {tx.note || tx.category?.name || 'Giao dịch'}
                         </p>
-                        <p className="text-[11px] text-ink-muted">
+                        <p className="text-[11px] text-secondary">
                           {new Date(tx.date).toLocaleDateString('vi-VN')} • {tx.wallet?.name}
                         </p>
                       </div>
@@ -484,7 +484,7 @@ export const DashboardPage = () => {
                         showSign
                         className="text-sm font-bold"
                       />
-                      <span className="block text-[10px] text-ink-muted uppercase">{tx.category?.name}</span>
+                      <span className="block text-[10px] text-secondary uppercase">{tx.category?.name}</span>
                     </div>
                   </div>
                 ))}

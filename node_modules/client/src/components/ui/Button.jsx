@@ -21,8 +21,8 @@ export const Button = ({
   const variants = {
     primary: 'bg-primary hover:bg-primary-hover text-white shadow-soft dark:bg-lime dark:text-ink-light dark:hover:bg-lime-hover',
     secondary: 'bg-sand hover:bg-sand-light text-ink-light border border-border-light dark:bg-surface-dark dark:text-ink-dark dark:border-border-dark',
-    outline: 'border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5',
-    ghost: 'text-ink-light dark:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5',
+    outline: 'border border-border text-primary hover:bg-black/5 dark:hover:bg-white/5',
+    ghost: 'text-primary hover:bg-black/5 dark:hover:bg-white/5',
     danger: 'bg-coral text-white hover:bg-coral-dark shadow-soft',
     lime: 'bg-lime text-ink-light hover:bg-lime-hover shadow-soft'
   };

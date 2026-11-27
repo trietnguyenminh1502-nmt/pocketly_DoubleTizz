@@ -65,10 +65,10 @@ export const NotificationsPage = () => {
       {/* 1. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
             Trung Tâm Thông Báo 🔔
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-xs sm:text-sm text-secondary mt-1">
             Cập nhật cảnh báo ngân sách, thông báo phát sóng hệ thống và tin tức từ Pocketly
           </p>
         </div>
@@ -115,7 +115,7 @@ export const NotificationsPage = () => {
                       className={`p-2 rounded-20 shrink-0 mt-0.5 ${
                         n.type === 'BUDGET_ALERT'
                           ? 'bg-coral/15 text-coral'
-                          : 'bg-primary/10 text-primary dark:bg-lime/20 dark:text-lime'
+                          : 'bg-primary/10 text-brand dark:bg-lime/20 dark:text-lime'
                       }`}
                     >
                       {n.type === 'BUDGET_ALERT' ? (
@@ -127,7 +127,7 @@ export const NotificationsPage = () => {
 
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-ink-light dark:text-ink-dark">
+                        <h4 className="text-sm font-bold text-primary">
                           {n.title}
                         </h4>
                         {!n.isRead && (
@@ -138,8 +138,8 @@ export const NotificationsPage = () => {
                         )}
                       </div>
 
-                      <p className="text-xs text-ink-muted leading-relaxed">{n.message}</p>
-                      <span className="text-[10px] text-ink-muted/70 block pt-1">
+                      <p className="text-xs text-secondary leading-relaxed">{n.message}</p>
+                      <span className="text-[10px] text-secondary/70 block pt-1">
                         {new Date(n.createdAt).toLocaleString('vi-VN')}
                       </span>
                     </div>
@@ -149,7 +149,7 @@ export const NotificationsPage = () => {
                     {!n.isRead && (
                       <button
                         onClick={() => markOneMutation.mutate(n.id)}
-                        className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-ink-muted hover:text-primary dark:hover:text-lime transition-colors"
+                        className="p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-secondary hover:text-brand dark:hover:text-lime transition-colors"
                         title="Đánh dấu đã đọc"
                       >
                         <Check className="w-4 h-4" />
@@ -157,7 +157,7 @@ export const NotificationsPage = () => {
                     )}
                     <button
                       onClick={() => deleteMutation.mutate(n.id)}
-                      className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
+                      className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                       title="Xóa thông báo"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -167,7 +167,7 @@ export const NotificationsPage = () => {
               ))}
             </div>
 
-            <div className="p-4 border-t border-border-light dark:border-border-dark">
+            <div className="p-4 border-t border-border">
               <Pagination
                 currentPage={page}
                 totalPages={meta.totalPages}

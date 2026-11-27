@@ -46,20 +46,20 @@ export const AppLayout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-ink-light dark:text-ink-dark flex transition-colors">
+    <div className="min-h-screen bg-background text-primary flex transition-colors">
       {/* Desktop Collapsible Sidebar */}
       <aside
         className={cn(
-          'hidden md:flex flex-col border-r border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark transition-all duration-300 z-30 shrink-0 sticky top-0 h-screen',
+          'hidden md:flex flex-col border-r border-border bg-surface transition-all duration-300 z-30 shrink-0 sticky top-0 h-screen',
           collapsed ? 'w-20' : 'w-64'
         )}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-border-light dark:border-border-dark">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-border">
           {!collapsed && (
             <Link to="/dashboard" className="flex items-center gap-2.5">
               <span className="text-2xl">🌿</span>
-              <span className="font-heading font-extrabold text-xl text-primary dark:text-lime">Pocketly</span>
+              <span className="font-heading font-extrabold text-xl text-brand dark:text-lime">Pocketly</span>
             </Link>
           )}
           {collapsed && (
@@ -69,7 +69,7 @@ export const AppLayout = () => {
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-full text-ink-muted hover:text-ink-light dark:hover:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5 ml-auto"
+            className="p-1.5 rounded-full text-secondary hover:text-ink-light dark:hover:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5 ml-auto"
             title={collapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
           >
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -88,7 +88,7 @@ export const AppLayout = () => {
                   'flex items-center gap-3 px-3.5 py-3 rounded-20 text-sm font-semibold transition-all duration-150',
                   isActive
                     ? 'bg-primary text-white shadow-soft dark:bg-lime dark:text-ink-light'
-                    : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
+                    : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark hover:bg-sand/30 dark:hover:bg-white/5'
                 )}
                 title={collapsed ? item.name : undefined}
               >
@@ -100,7 +100,7 @@ export const AppLayout = () => {
         </nav>
 
         {/* User Card at Bottom of Sidebar */}
-        <div className="p-3 border-t border-border-light dark:border-border-dark">
+        <div className="p-3 border-t border-border">
           <Link
             to="/profile"
             className="flex items-center gap-3 p-2 rounded-20 bg-sand/30 dark:bg-surface-dark hover:bg-sand/60 dark:hover:bg-white/10 transition-colors group cursor-pointer"
@@ -109,10 +109,10 @@ export const AppLayout = () => {
             <Avatar src={user?.avatarUrl} fallback={user?.fullName?.charAt(0) || 'U'} size="sm" />
             {!collapsed && (
               <div className="overflow-hidden flex-1">
-                <p className="text-xs font-bold truncate text-ink-light dark:text-ink-dark group-hover:text-primary dark:group-hover:text-lime transition-colors">
+                <p className="text-xs font-bold truncate text-primary group-hover:text-brand dark:group-hover:text-lime transition-colors">
                   {user?.fullName}
                 </p>
-                <p className="text-[10px] text-ink-muted truncate">{user?.email}</p>
+                <p className="text-[10px] text-secondary truncate">{user?.email}</p>
               </div>
             )}
           </Link>
@@ -122,14 +122,14 @@ export const AppLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Sticky Top Bar */}
-        <header className="sticky top-0 z-20 h-16 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-light dark:border-border-dark px-4 sm:px-6 flex items-center justify-between gap-4">
+        <header className="sticky top-0 z-20 h-16 bg-surface/80 backdrop-blur-md border-b border-border px-4 sm:px-6 flex items-center justify-between gap-4">
           {/* Quick Search */}
           <div className="relative flex-1 max-w-md hidden sm:block">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-secondary" />
             <input
               type="text"
               placeholder="Tìm kiếm giao dịch, ghi chú, hóa đơn..."
-              className="w-full bg-sand/40 dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-full pl-10 pr-4 py-2 text-xs outline-none focus:border-primary dark:focus:border-lime"
+              className="w-full bg-sand/40 dark:bg-surface-dark border border-border rounded-full pl-10 pr-4 py-2 text-xs outline-none focus:border-primary dark:focus:border-lime"
             />
           </div>
 
@@ -161,7 +161,7 @@ export const AppLayout = () => {
         <FloatingChatWidget />
 
         {/* Mobile Bottom Navigation Bar */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border-t border-border-light dark:border-border-dark flex items-center justify-around py-2 px-1">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface/95 backdrop-blur-md border-t border-border flex items-center justify-around py-2 px-1">
           {navigation.map((item) => {
             const isActive = location.pathname.startsWith(item.href);
             return (
@@ -171,8 +171,8 @@ export const AppLayout = () => {
                 className={cn(
                   'flex flex-col items-center gap-1 py-1 px-2.5 rounded-16 text-[10px] font-bold transition-colors',
                   isActive
-                    ? 'text-primary dark:text-lime'
-                    : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                    ? 'text-brand dark:text-lime'
+                    : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
                 )}
               >
                 <item.icon className="w-5 h-5" />

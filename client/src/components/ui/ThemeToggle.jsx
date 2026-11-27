@@ -9,14 +9,14 @@ export const ThemeToggle = () => {
     <button
       onClick={toggleTheme}
       type="button"
-      className="p-2.5 rounded-full border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark hover:scale-105 transition-all shadow-soft"
+      className="p-2.5 rounded-full border border-border bg-surface text-primary hover:scale-105 transition-all shadow-soft"
       aria-label="Toggle theme"
       title={theme === 'dark' ? 'Chuyển sang chế độ Sáng' : 'Chuyển sang chế độ Tối'}
     >
       {theme === 'dark' ? (
         <Sun className="w-5 h-5 text-lime" />
       ) : (
-        <Moon className="w-5 h-5 text-primary" />
+        <Moon className="w-5 h-5 text-brand" />
       )}
     </button>
   );

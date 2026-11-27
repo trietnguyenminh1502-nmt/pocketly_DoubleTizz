@@ -6,12 +6,12 @@ import { supportApi } from '@/api/support';
 
 export const NotFoundPage = () => {
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-ink-light dark:text-ink-dark flex flex-col items-center justify-center p-6 text-center">
-      <span className="text-8xl font-black font-heading text-primary dark:text-lime tracking-tighter">
+    <div className="min-h-screen bg-background text-primary flex flex-col items-center justify-center p-6 text-center">
+      <span className="text-8xl font-black font-heading text-brand dark:text-lime tracking-tighter">
         404
       </span>
       <h1 className="text-2xl font-bold font-heading mt-2">Trang không tồn tại</h1>
-      <p className="text-sm text-ink-muted max-w-sm mt-2 mb-6">
+      <p className="text-sm text-secondary max-w-sm mt-2 mb-6">
         Đường dẫn bạn đang tìm kiếm có thể đã bị di chuyển, xóa hoặc không còn tồn tại trên hệ thống Pocketly.
       </p>
       <Link to="/">
@@ -23,12 +23,12 @@ export const NotFoundPage = () => {
 
 export const ForbiddenPage = () => {
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-ink-light dark:text-ink-dark flex flex-col items-center justify-center p-6 text-center">
+    <div className="min-h-screen bg-background text-primary flex flex-col items-center justify-center p-6 text-center">
       <span className="text-8xl font-black font-heading text-coral tracking-tighter">
         403
       </span>
       <h1 className="text-2xl font-bold font-heading mt-2">Truy cập bị từ chối</h1>
-      <p className="text-sm text-ink-muted max-w-sm mt-2 mb-6">
+      <p className="text-sm text-secondary max-w-sm mt-2 mb-6">
         Bạn không có quyền hạn quản trị viên (ADMIN) để truy cập vào khu vực này.
       </p>
       <Link to="/dashboard">
@@ -43,20 +43,20 @@ export const LegalPage = ({ type = 'terms' }) => {
 
   return (
     <div className="max-w-3xl mx-auto py-12 px-4 space-y-6">
-      <h1 className="text-3xl font-extrabold font-heading text-primary dark:text-lime">
+      <h1 className="text-3xl font-extrabold font-heading text-brand dark:text-lime">
         {isTerms ? 'Điều khoản sử dụng Pocketly' : 'Chính sách bảo mật thông tin'}
       </h1>
-      <p className="text-xs text-ink-muted">Cập nhật lần cuối: Tháng 11/2026</p>
+      <p className="text-xs text-secondary">Cập nhật lần cuối: Tháng 11/2026</p>
 
       {isTerms ? (
         /* Nội dung Điều khoản sử dụng */
-        <div className="space-y-5 text-sm leading-relaxed text-ink-muted">
+        <div className="space-y-5 text-sm leading-relaxed text-secondary">
           <p>
             Chào mừng bạn đến với <strong>Pocketly</strong> – Ứng dụng quản lý tài chính cá nhân thông minh dành cho sinh viên. Khi đăng ký tài khoản và sử dụng bất kỳ dịch vụ nào của Pocketly, bạn đồng ý tuân thủ các điều khoản và điều kiện được nêu rõ dưới đây.
           </p>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               1. Điều kiện đăng ký và tài khoản người dùng
             </h3>
             <p>
@@ -65,7 +65,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               2. Quyền và trách nhiệm khi sử dụng dịch vụ
             </h3>
             <p>
@@ -74,7 +74,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               3. Tính năng Cố vấn Tài chính AI (Pocket Assistant)
             </h3>
             <p>
@@ -83,7 +83,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               4. Bản quyền và quyền sở hữu trí tuệ
             </h3>
             <p>
@@ -92,7 +92,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               5. Tạm ngừng và chấm dứt tài khoản
             </h3>
             <p>
@@ -102,13 +102,13 @@ export const LegalPage = ({ type = 'terms' }) => {
         </div>
       ) : (
         /* Nội dung Chính sách bảo mật thông tin */
-        <div className="space-y-5 text-sm leading-relaxed text-ink-muted">
+        <div className="space-y-5 text-sm leading-relaxed text-secondary">
           <p>
             Tại <strong>Pocketly</strong>, chúng tôi hiểu rằng dữ liệu tài chính là thông tin cực kỳ nhạy cảm và quan trọng. Chính sách này mô tả cách chúng tôi thu thập, sử dụng và cam kết bảo vệ dữ liệu cá nhân của bạn khi sử dụng ứng dụng.
           </p>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               1. Dữ liệu chúng tôi thu thập
             </h3>
             <p>
@@ -117,7 +117,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               2. Mục đích sử dụng dữ liệu
             </h3>
             <p>
@@ -126,7 +126,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               3. Cam kết KHÔNG chia sẻ hoặc bán dữ liệu
             </h3>
             <p>
@@ -135,7 +135,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               4. Bảo mật dữ liệu với Trí tuệ nhân tạo (AI Chatbot)
             </h3>
             <p>
@@ -144,7 +144,7 @@ export const LegalPage = ({ type = 'terms' }) => {
           </section>
 
           <section className="space-y-1.5">
-            <h3 className="text-base font-bold text-ink-light dark:text-ink-dark pt-2">
+            <h3 className="text-base font-bold text-primary pt-2">
               5. Quyền kiểm soát và xóa dữ liệu của bạn
             </h3>
             <p>
@@ -217,13 +217,13 @@ export const ContactSupportPage = () => {
     <div className="max-w-5xl mx-auto py-12 px-4 space-y-12">
       {/* 1. Header */}
       <div className="text-center space-y-3 max-w-2xl mx-auto">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 dark:bg-lime/10 text-primary dark:text-lime text-xs font-bold uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 dark:bg-lime/10 text-brand dark:text-lime text-xs font-bold uppercase tracking-wider">
           <MessageSquare className="w-3.5 h-3.5" /> Trung Tâm Trợ Giúp
         </span>
-        <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-ink-light dark:text-ink-dark tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold font-heading text-primary tracking-tight">
           Liên Hệ & Hỗ Trợ Kỹ Thuật
         </h1>
-        <p className="text-sm text-ink-muted">
+        <p className="text-sm text-secondary">
           Bạn gặp khó khăn trong quá trình sử dụng, cần giải đáp thắc mắc hoặc có ý tưởng đóng góp cho Pocketly? Đội ngũ chúng mình luôn sẵn sàng lắng nghe bạn!
         </p>
       </div>
@@ -233,19 +233,19 @@ export const ContactSupportPage = () => {
         {/* Cột trái: Kênh liên hệ trực tiếp */}
         <div className="md:col-span-5 space-y-4">
           <Card className="p-6 space-y-6">
-            <h2 className="text-lg font-bold font-heading text-ink-light dark:text-ink-dark border-b border-border-light dark:border-border-dark pb-3">
+            <h2 className="text-lg font-bold font-heading text-primary border-b border-border pb-3">
               Thông Tin Liên Hệ
             </h2>
 
             <div className="space-y-4 text-sm">
               <div className="flex items-start gap-3.5">
-                <div className="p-2.5 rounded-16 bg-primary/10 dark:bg-lime/10 text-primary dark:text-lime shrink-0">
+                <div className="p-2.5 rounded-16 bg-primary/10 dark:bg-lime/10 text-brand dark:text-lime shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-ink-light dark:text-ink-dark">Email hỗ trợ</h3>
-                  <p className="text-xs text-ink-muted mt-0.5">Phản hồi nhanh trong vòng 24 giờ</p>
-                  <a href="mailto:tvocabs1502@gmail.com" className="text-xs font-bold text-primary dark:text-lime hover:underline mt-1 inline-block">
+                  <h3 className="font-semibold text-primary">Email hỗ trợ</h3>
+                  <p className="text-xs text-secondary mt-0.5">Phản hồi nhanh trong vòng 24 giờ</p>
+                  <a href="mailto:tvocabs1502@gmail.com" className="text-xs font-bold text-brand dark:text-lime hover:underline mt-1 inline-block">
                     tvocabs1502@gmail.com
                   </a>
                 </div>
@@ -256,29 +256,29 @@ export const ContactSupportPage = () => {
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-ink-light dark:text-ink-dark">Đường dây nóng</h3>
-                  <p className="text-xs text-ink-muted mt-0.5">Thứ 2 - Thứ 7 (8:00 - 18:00)</p>
-                  <a href="tel:0385814985" className="text-xs font-bold text-ink-light dark:text-ink-dark hover:underline mt-1 inline-block">
+                  <h3 className="font-semibold text-primary">Đường dây nóng</h3>
+                  <p className="text-xs text-secondary mt-0.5">Thứ 2 - Thứ 7 (8:00 - 18:00)</p>
+                  <a href="tel:0385814985" className="text-xs font-bold text-primary hover:underline mt-1 inline-block">
                     (+84) 038 5814 985
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-3.5">
-                <div className="p-2.5 rounded-16 bg-sand dark:bg-surface-dark text-ink-muted shrink-0">
+                <div className="p-2.5 rounded-16 bg-sand dark:bg-surface-dark text-secondary shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-ink-light dark:text-ink-dark">Địa chỉ nghiên cứu & phát triển</h3>
-                  <p className="text-xs text-ink-muted mt-0.5 leading-relaxed">
+                  <h3 className="font-semibold text-primary">Địa chỉ nghiên cứu & phát triển</h3>
+                  <p className="text-xs text-secondary mt-0.5 leading-relaxed">
                     Trường Đại học Công nghệ Kỹ thuật TP.HCM, Số 1 Võ Văn Ngân, Thành phố Thủ Đức
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="p-4 rounded-16 bg-sand/60 dark:bg-surface-dark text-xs text-ink-muted space-y-1">
-              <span className="font-bold text-ink-light dark:text-ink-dark block">⚡ Hỗ trợ trực tuyến:</span>
+            <div className="p-4 rounded-16 bg-sand/60 dark:bg-surface-dark text-xs text-secondary space-y-1">
+              <span className="font-bold text-primary block">⚡ Hỗ trợ trực tuyến:</span>
               Bạn cũng có thể mở thanh <strong>"Hỏi Pocket Assistant"</strong> ở góc dưới bên phải màn hình để được trợ lý AI giải đáp tức thì về các thao tác sử dụng ví, ngân sách hay tra cứu giao dịch.
             </div>
           </Card>
@@ -287,15 +287,15 @@ export const ContactSupportPage = () => {
         {/* Cột phải: Form gửi tin nhắn hỗ trợ */}
         <div className="md:col-span-7">
           <Card className="p-6 sm:p-8 space-y-6">
-            <h2 className="text-lg font-bold font-heading text-ink-light dark:text-ink-dark border-b border-border-light dark:border-border-dark pb-3">
+            <h2 className="text-lg font-bold font-heading text-primary border-b border-border pb-3">
               Gửi Yêu Cầu Hỗ Trợ
             </h2>
 
             {submitted ? (
               <div className="text-center py-8 space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-primary dark:text-lime mx-auto" />
-                <h3 className="text-lg font-bold text-ink-light dark:text-ink-dark">Cảm ơn bạn đã liên hệ!</h3>
-                <p className="text-xs text-ink-muted max-w-md mx-auto">
+                <CheckCircle2 className="w-12 h-12 text-brand dark:text-lime mx-auto" />
+                <h3 className="text-lg font-bold text-primary">Cảm ơn bạn đã liên hệ!</h3>
+                <p className="text-xs text-secondary max-w-md mx-auto">
                   Chúng mình đã tiếp nhận tin nhắn và sẽ phản hồi đến địa chỉ email của bạn sớm nhất. Chúc bạn có một ngày học tập và quản lý chi tiêu hiệu quả!
                 </p>
                 <Button variant="secondary" size="sm" onClick={() => setSubmitted(false)}>
@@ -361,22 +361,22 @@ export const ContactSupportPage = () => {
       </div>
 
       {/* 3. FAQ Section */}
-      <div className="space-y-6 pt-6 border-t border-border-light dark:border-border-dark">
+      <div className="space-y-6 pt-6 border-t border-border">
         <div className="text-center space-y-1">
-          <h2 className="text-xl font-bold font-heading text-ink-light dark:text-ink-dark flex items-center justify-center gap-2">
-            <HelpCircle className="w-5 h-5 text-primary dark:text-lime" /> Câu Hỏi Thường Gặp (FAQ)
+          <h2 className="text-xl font-bold font-heading text-primary flex items-center justify-center gap-2">
+            <HelpCircle className="w-5 h-5 text-brand dark:text-lime" /> Câu Hỏi Thường Gặp (FAQ)
           </h2>
-          <p className="text-xs text-ink-muted">Giải đáp nhanh các thắc mắc phổ biến nhất của sinh viên</p>
+          <p className="text-xs text-secondary">Giải đáp nhanh các thắc mắc phổ biến nhất của sinh viên</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {faqs.map((faq, idx) => (
             <Card key={idx} className="p-5 space-y-2">
-              <h3 className="text-sm font-bold text-ink-light dark:text-ink-dark flex items-start gap-2">
-                <span className="text-primary dark:text-lime font-mono">Q:</span>
+              <h3 className="text-sm font-bold text-primary flex items-start gap-2">
+                <span className="text-brand dark:text-lime font-mono">Q:</span>
                 {faq.q}
               </h3>
-              <p className="text-xs text-ink-muted leading-relaxed pl-5">
+              <p className="text-xs text-secondary leading-relaxed pl-5">
                 {faq.a}
               </p>
             </Card>

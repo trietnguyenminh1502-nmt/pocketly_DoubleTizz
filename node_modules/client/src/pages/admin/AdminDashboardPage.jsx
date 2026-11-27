@@ -68,20 +68,20 @@ export const AdminDashboardPage = () => {
   });
 
   const chartData = [
-    { name: 'Người dùng hoạt động', count: stats?.users?.active || 0, fill: '#123D2F' },
-    { name: 'Người dùng bị khóa', count: stats?.users?.locked || 0, fill: '#FF8A7A' },
-    { name: 'Đăng ký tuần qua', count: stats?.users?.newThisWeek || 0, fill: '#FF6A2B' },
-    { name: 'Có giao dịch tháng qua', count: stats?.users?.transactingPast30Days || 0, fill: '#D4F05A' }
+    { name: 'Người dùng hoạt động', count: stats?.users?.active || 0, fill: 'rgb(var(--color-chart-primary))' },
+    { name: 'Người dùng bị khóa', count: stats?.users?.locked || 0, fill: 'rgb(var(--color-coral))' },
+    { name: 'Đăng ký tuần qua', count: stats?.users?.newThisWeek || 0, fill: 'rgb(var(--color-tangerine))' },
+    { name: 'Có giao dịch tháng qua', count: stats?.users?.transactingPast30Days || 0, fill: 'rgb(var(--color-accent))' }
   ];
 
   return (
     <div className="space-y-8">
       {/* 1. Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
           Trung Tâm Quản Trị Hệ Thống 🛡️
         </h1>
-        <p className="text-xs sm:text-sm text-ink-muted mt-1">
+        <p className="text-xs sm:text-sm text-secondary mt-1">
           Giám sát tình hình hoạt động, tăng trưởng người dùng và thông báo toàn hệ thống
         </p>
       </div>
@@ -97,37 +97,37 @@ export const AdminDashboardPage = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Tổng người dùng</span>
-              <div className="p-2 rounded-full bg-sand/40 text-primary dark:text-lime">
+              <div className="p-2 rounded-full bg-sand/40 text-brand dark:text-lime">
                 <Users className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-2 text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+            <div className="mt-2 text-3xl font-extrabold font-heading text-primary">
               {stats?.users?.total || 0}
             </div>
-            <p className="text-[11px] text-primary dark:text-lime mt-1 font-semibold">
+            <p className="text-[11px] text-brand dark:text-lime mt-1 font-semibold">
               +{stats?.users?.newThisWeek || 0} sinh viên đăng ký tuần qua
             </p>
           </Card>
 
           <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Người dùng Active</span>
-              <div className="p-2 rounded-full bg-mint/50 text-primary">
+              <div className="p-2 rounded-full bg-mint/50 text-brand">
                 <UserCheck className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-2 text-3xl font-extrabold font-heading text-primary dark:text-lime">
+            <div className="mt-2 text-3xl font-extrabold font-heading text-brand dark:text-lime">
               {stats?.users?.active || 0}
             </div>
-            <p className="text-[11px] text-ink-muted mt-1">
+            <p className="text-[11px] text-secondary mt-1">
               Đang hoạt động bình thường trên hệ thống
             </p>
           </Card>
 
           <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Tổng giao dịch</span>
               <div className="p-2 rounded-full bg-tangerine/15 text-tangerine">
                 <ReceiptText className="w-4 h-4" />
@@ -136,22 +136,22 @@ export const AdminDashboardPage = () => {
             <div className="mt-2 text-3xl font-extrabold font-heading text-tangerine">
               {stats?.transactions?.total || 0}
             </div>
-            <p className="text-[11px] text-ink-muted mt-1">
+            <p className="text-[11px] text-secondary mt-1">
               {stats?.users?.transactingPast30Days || 0} user có phát sinh chi tiêu gần đây
             </p>
           </Card>
 
           <Card className="flex flex-col justify-between p-5">
-            <div className="flex items-center justify-between text-ink-muted">
+            <div className="flex items-center justify-between text-secondary">
               <span className="text-xs font-bold uppercase tracking-wider">Lượt hỏi AI Chatbot</span>
               <div className="p-2 rounded-full bg-lime/20 text-lime-dark">
                 <Bot className="w-4 h-4" />
               </div>
             </div>
-            <div className="mt-2 text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+            <div className="mt-2 text-3xl font-extrabold font-heading text-primary">
               {stats?.chatbot?.totalMessages || 0}
             </div>
-            <p className="text-[11px] text-ink-muted mt-1">
+            <p className="text-[11px] text-secondary mt-1">
               Qua {stats?.chatbot?.totalSessions || 0} phiên tư vấn tài chính
             </p>
           </Card>
@@ -172,10 +172,10 @@ export const AdminDashboardPage = () => {
             <div className="h-64 w-full my-auto pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E8E2D6" opacity={0.5} />
-                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#5C6B64' }} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#5C6B64' }} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #E8E2D6' }} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgb(var(--color-chart-border))" opacity={0.5} />
+                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid rgb(var(--color-chart-border))' }} />
                   <Bar dataKey="count" name="Số lượng" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>

@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 
 // Component Vòng Tròn Tiến Độ SVG (Progress Ring)
-const ProgressRing = ({ progress = 0, size = 80, strokeWidth = 8, color = '#123D2F' }) => {
+const ProgressRing = ({ progress = 0, size = 80, strokeWidth = 8, color = 'rgb(var(--color-chart-primary))' }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const clampedProgress = Math.min(100, Math.max(0, progress));
@@ -41,10 +41,9 @@ const ProgressRing = ({ progress = 0, size = 80, strokeWidth = 8, color = '#123D
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="#E8E2D6"
+          stroke="rgb(var(--color-chart-border))"
           strokeWidth={strokeWidth}
           fill="transparent"
-          className="dark:stroke-[#24332C]"
         />
         <circle
           cx={size / 2}
@@ -191,10 +190,10 @@ export const SavingGoalsPage = () => {
       {/* 1. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+          <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
             Mục Tiêu Tiết Kiệm 🎯
           </h1>
-          <p className="text-xs sm:text-sm text-ink-muted mt-1">
+          <p className="text-xs sm:text-sm text-secondary mt-1">
             Đặt kế hoạch mua sắm, dự phòng hoặc tích lũy tài chính cho các dự định quan trọng
           </p>
         </div>
@@ -231,11 +230,11 @@ export const SavingGoalsPage = () => {
               <Card key={g.id} className="p-6 flex flex-col justify-between space-y-4" hover>
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-1">
-                    <h3 className="text-base font-bold text-ink-light dark:text-ink-dark line-clamp-2">
+                    <h3 className="text-base font-bold text-primary line-clamp-2">
                       {g.title}
                     </h3>
                     {g.deadline && (
-                      <p className="text-xs text-ink-muted flex items-center gap-1">
+                      <p className="text-xs text-secondary flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-tangerine" />
                         Hạn chót: {new Date(g.deadline).toLocaleDateString('vi-VN')}
                       </p>
@@ -245,39 +244,39 @@ export const SavingGoalsPage = () => {
                   {/* Vòng tròn Progress Ring SVG */}
                   <ProgressRing
                     progress={g.progress}
-                    color={isFinished ? '#D4F05A' : '#123D2F'}
+                    color={isFinished ? 'rgb(var(--color-accent))' : 'rgb(var(--color-chart-primary))'}
                     size={76}
                   />
                 </div>
 
                 {/* Tiền đã tích lũy vs Mục tiêu */}
-                <div className="space-y-2 p-3.5 rounded-20 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
+                <div className="space-y-2 p-3.5 rounded-20 bg-sand/20 dark:bg-white/5 border border-border/60">
                   <div className="flex justify-between text-xs">
-                    <span className="text-ink-muted">Đã tích lũy:</span>
+                    <span className="text-secondary">Đã tích lũy:</span>
                     <Money amount={g.currentAmount} type="income" className="font-bold" />
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-ink-muted">Mục tiêu:</span>
+                    <span className="text-secondary">Mục tiêu:</span>
                     <Money amount={g.targetAmount} type="neutral" className="font-semibold" />
                   </div>
-                  <div className="flex justify-between text-xs pt-1 border-t border-border-light/40 dark:border-border-dark/40">
-                    <span className="text-ink-muted">Còn thiếu:</span>
+                  <div className="flex justify-between text-xs pt-1 border-t border-border/40">
+                    <span className="text-secondary">Còn thiếu:</span>
                     <Money amount={g.remainingAmount} type="expense" className="font-bold" />
                   </div>
                 </div>
 
                 {/* Ngày hoàn thành dự kiến */}
                 {g.projectedCompletionDate && (
-                  <div className="text-[11px] text-ink-muted flex items-center gap-1.5 bg-mint/30 dark:bg-white/5 px-3 py-1.5 rounded-full w-fit">
-                    <Clock className="w-3.5 h-3.5 text-primary dark:text-lime" />
+                  <div className="text-[11px] text-secondary flex items-center gap-1.5 bg-mint/30 dark:bg-white/5 px-3 py-1.5 rounded-full w-fit">
+                    <Clock className="w-3.5 h-3.5 text-brand dark:text-lime" />
                     <span>
-                      Dự kiến hoàn thành: <strong className="text-ink-light dark:text-ink-dark">{g.projectedCompletionDate}</strong>
+                      Dự kiến hoàn thành: <strong className="text-primary">{g.projectedCompletionDate}</strong>
                     </span>
                   </div>
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-3 border-t border-border-light/60 dark:border-border-dark/60">
+                <div className="flex items-center justify-between pt-3 border-t border-border/60">
                   <Button
                     variant="lime"
                     size="sm"
@@ -290,7 +289,7 @@ export const SavingGoalsPage = () => {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => openEditModal(g)}
-                      className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light transition-colors"
+                      className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light transition-colors"
                       title="Sửa mục tiêu"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -301,7 +300,7 @@ export const SavingGoalsPage = () => {
                         setRefundWalletId(wallets[0]?.id || '');
                         setIsDeleteDialogOpen(true);
                       }}
-                      className="p-1.5 rounded-full hover:bg-coral/15 text-ink-muted hover:text-coral transition-colors"
+                      className="p-1.5 rounded-full hover:bg-coral/15 text-secondary hover:text-coral transition-colors"
                       title="Xóa mục tiêu"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -362,18 +361,18 @@ export const SavingGoalsPage = () => {
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+            <label className="text-xs font-semibold uppercase tracking-wider text-secondary">
               Hạn chót dự kiến hoàn thành
             </label>
             <input
               type="date"
-              className="w-full bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark border border-border-light dark:border-border-dark rounded-16 px-4 py-2.5 text-sm outline-none focus:border-primary dark:focus:border-lime"
+              className="w-full bg-surface text-primary border border-border rounded-16 px-4 py-2.5 text-sm outline-none focus:border-primary dark:focus:border-lime"
               value={formData.deadline}
               onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
             />
           </div>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <Button type="button" variant="secondary" size="sm" onClick={() => setIsModalOpen(false)}>
               Hủy
             </Button>
@@ -428,7 +427,7 @@ export const SavingGoalsPage = () => {
             ))}
           </Select>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <Button type="button" variant="secondary" size="sm" onClick={() => setIsContributeOpen(false)}>
               Hủy
             </Button>
@@ -450,13 +449,13 @@ export const SavingGoalsPage = () => {
         maxWidth="max-w-md"
       >
         <div className="space-y-4">
-          <div className="p-3.5 rounded-20 bg-coral/10 border border-coral/20 text-xs sm:text-sm text-ink-light dark:text-ink-dark space-y-1.5">
+          <div className="p-3.5 rounded-20 bg-coral/10 border border-coral/20 text-xs sm:text-sm text-primary space-y-1.5">
             <p className="font-bold text-coral">
               Bạn đang chuẩn bị xóa mục tiêu: &ldquo;{deletingGoal?.title}&rdquo;
             </p>
-            <p className="text-xs text-ink-muted">
+            <p className="text-xs text-secondary">
               Mục tiêu này đang có số tiền đã tích lũy là{' '}
-              <strong className="text-ink-light dark:text-ink-dark font-extrabold text-sm">
+              <strong className="text-primary font-extrabold text-sm">
                 {Number(deletingGoal?.currentAmount || 0).toLocaleString('vi-VN')}₫
               </strong>
               . Bạn có muốn hoàn trả số tiền này về lại một trong các ví của bạn không?
@@ -477,7 +476,7 @@ export const SavingGoalsPage = () => {
             <option value="">Không hoàn trả (Hủy bỏ số tiền tích lũy)</option>
           </Select>
 
-          <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+          <div className="flex justify-end gap-2 pt-3 border-t border-border">
             <Button
               type="button"
               variant="secondary"

@@ -5,7 +5,7 @@ export const Tabs = ({ tabs = [], activeTab, onChange, className = '' }) => {
   return (
     <div
       className={cn(
-        'inline-flex p-1 bg-border-light/40 dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-full',
+        'inline-flex p-1 bg-border-light/40 dark:bg-surface-dark border border-border rounded-full',
         className
       )}
     >
@@ -20,7 +20,7 @@ export const Tabs = ({ tabs = [], activeTab, onChange, className = '' }) => {
               'px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 flex items-center gap-1.5',
               isActive
                 ? 'bg-primary text-white shadow-soft dark:bg-lime dark:text-ink-light'
-                : 'text-ink-muted hover:text-ink-light dark:hover:text-ink-dark'
+                : 'text-secondary hover:text-ink-light dark:hover:text-ink-dark'
             )}
           >
             {tab.icon && <tab.icon className="w-3.5 h-3.5" />}

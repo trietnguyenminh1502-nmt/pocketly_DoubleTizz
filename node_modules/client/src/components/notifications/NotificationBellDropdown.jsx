@@ -58,7 +58,7 @@ export const NotificationBellDropdown = () => {
       {/* Nút Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2.5 rounded-full border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark hover:scale-105 transition-all shadow-soft relative"
+        className="p-2.5 rounded-full border border-border bg-surface text-primary hover:scale-105 transition-all shadow-soft relative"
         aria-label="Thông báo"
         title="Xem thông báo"
       >
@@ -72,15 +72,15 @@ export const NotificationBellDropdown = () => {
 
       {/* Dropdown Box */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-24 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-3 shadow-modal z-50 animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center justify-between pb-2 px-2 border-b border-border-light/60 dark:border-border-dark/60">
-            <span className="text-xs font-bold text-ink-light dark:text-ink-dark">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-24 border border-border bg-surface p-3 shadow-modal z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="flex items-center justify-between pb-2 px-2 border-b border-border/60">
+            <span className="text-xs font-bold text-primary">
               Thông báo ({unreadCount} chưa đọc)
             </span>
             {unreadCount > 0 && (
               <button
                 onClick={() => markAllMutation.mutate()}
-                className="text-[11px] text-primary dark:text-lime hover:underline font-semibold flex items-center gap-1"
+                className="text-[11px] text-brand dark:text-lime hover:underline font-semibold flex items-center gap-1"
               >
                 <CheckCheck className="w-3.5 h-3.5" /> Đọc tất cả
               </button>
@@ -89,9 +89,9 @@ export const NotificationBellDropdown = () => {
 
           <div className="max-h-80 overflow-y-auto divide-y divide-border-light/40 dark:divide-border-dark/40 py-1">
             {isLoading ? (
-              <div className="py-4 text-center text-xs text-ink-muted">Đang tải...</div>
+              <div className="py-4 text-center text-xs text-secondary">Đang tải...</div>
             ) : notifications.length === 0 ? (
-              <div className="py-6 text-center text-xs text-ink-muted">Không có thông báo nào</div>
+              <div className="py-6 text-center text-xs text-secondary">Không có thông báo nào</div>
             ) : (
               notifications.map((n) => (
                 <div
@@ -105,14 +105,14 @@ export const NotificationBellDropdown = () => {
                     {n.type === 'BUDGET_ALERT' ? (
                       <AlertTriangle className="w-3.5 h-3.5 text-coral" />
                     ) : (
-                      <Info className="w-3.5 h-3.5 text-primary dark:text-lime" />
+                      <Info className="w-3.5 h-3.5 text-brand dark:text-lime" />
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-ink-light dark:text-ink-dark leading-snug">{n.title}</p>
-                    <p className="text-[11px] text-ink-muted line-clamp-2 mt-0.5 font-normal">{n.message}</p>
-                    <span className="text-[10px] text-ink-muted/70 block mt-1">
+                    <p className="text-xs text-primary leading-snug">{n.title}</p>
+                    <p className="text-[11px] text-secondary line-clamp-2 mt-0.5 font-normal">{n.message}</p>
+                    <span className="text-[10px] text-secondary/70 block mt-1">
                       {new Date(n.createdAt).toLocaleDateString('vi-VN')}
                     </span>
                   </div>
@@ -125,11 +125,11 @@ export const NotificationBellDropdown = () => {
             )}
           </div>
 
-          <div className="pt-2 px-2 border-t border-border-light/60 dark:border-border-dark/60 text-center">
+          <div className="pt-2 px-2 border-t border-border/60 text-center">
             <Link
               to="/notifications"
               onClick={() => setIsOpen(false)}
-              className="text-xs font-bold text-primary dark:text-lime hover:underline block py-1"
+              className="text-xs font-bold text-brand dark:text-lime hover:underline block py-1"
             >
               Xem tất cả thông báo →
             </Link>

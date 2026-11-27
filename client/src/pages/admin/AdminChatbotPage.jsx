@@ -100,10 +100,10 @@ export const AdminChatbotPage = () => {
               className="bg-sand text-ink-light font-bold"
             />
             <div>
-              <p className="font-bold text-xs text-ink-light dark:text-ink-dark line-clamp-1">
+              <p className="font-bold text-xs text-primary line-clamp-1">
                 {u?.fullName || 'Người dùng ẩn danh'}
               </p>
-              <p className="text-[11px] text-ink-muted line-clamp-1">{u?.email || 'N/A'}</p>
+              <p className="text-[11px] text-secondary line-clamp-1">{u?.email || 'N/A'}</p>
             </div>
           </div>
         );
@@ -115,19 +115,19 @@ export const AdminChatbotPage = () => {
         const lastMsg = s.messages && s.messages.length > 0 ? s.messages[s.messages.length - 1] : null;
         return (
           <div className="max-w-md py-1">
-            <div className="flex items-center gap-1.5 font-bold text-xs text-ink-light dark:text-ink-dark line-clamp-1">
-              <MessageSquare className="w-3.5 h-3.5 text-primary dark:text-lime shrink-0" />
+            <div className="flex items-center gap-1.5 font-bold text-xs text-primary line-clamp-1">
+              <MessageSquare className="w-3.5 h-3.5 text-brand dark:text-lime shrink-0" />
               <span>{s.title || 'Trò chuyện tài chính thông minh'}</span>
             </div>
             {lastMsg ? (
-              <p className="text-[11px] text-ink-muted line-clamp-1 mt-1 font-sans">
-                <span className="font-semibold text-ink-light dark:text-ink-dark">
+              <p className="text-[11px] text-secondary line-clamp-1 mt-1 font-sans">
+                <span className="font-semibold text-primary">
                   {isAiRole(lastMsg.role) ? 'Pocket AI: ' : 'Sinh viên: '}
                 </span>
                 {lastMsg.content}
               </p>
             ) : (
-              <span className="text-[10px] text-ink-muted italic mt-1 block">Chưa có tin nhắn nào</span>
+              <span className="text-[10px] text-secondary italic mt-1 block">Chưa có tin nhắn nào</span>
             )}
           </div>
         );
@@ -152,11 +152,11 @@ export const AdminChatbotPage = () => {
     {
       header: 'Cập nhật lần cuối',
       render: (s) => (
-        <div className="text-xs text-ink-muted whitespace-nowrap">
-          <p className="font-semibold text-ink-light dark:text-ink-dark">
+        <div className="text-xs text-secondary whitespace-nowrap">
+          <p className="font-semibold text-primary">
             {s.updatedAt ? format(new Date(s.updatedAt), 'dd/MM/yyyy HH:mm', { locale: vi }) : 'N/A'}
           </p>
-          <span className="text-[10px] text-ink-muted">
+          <span className="text-[10px] text-secondary">
             Tạo lúc: {s.createdAt ? format(new Date(s.createdAt), 'dd/MM/yyyy', { locale: vi }) : ''}
           </span>
         </div>
@@ -172,14 +172,14 @@ export const AdminChatbotPage = () => {
             variant="ghost"
             onClick={() => setSelectedSession(s)}
             leftIcon={<Eye className="w-3.5 h-3.5" />}
-            className="text-xs text-primary dark:text-lime hover:underline whitespace-nowrap font-bold"
+            className="text-xs text-brand dark:text-lime hover:underline whitespace-nowrap font-bold"
           >
             Xem hội thoại
           </Button>
           <button
             onClick={() => setSessionToDelete(s)}
             title="Xóa cuộc trò chuyện này"
-            className="p-1.5 text-ink-muted hover:text-red-500 hover:bg-red-500/10 rounded-8 transition-colors"
+            className="p-1.5 text-secondary hover:text-danger hover:bg-danger/10 rounded-8 transition-colors"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -192,10 +192,10 @@ export const AdminChatbotPage = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-heading font-extrabold text-ink-light dark:text-ink-dark flex items-center gap-2.5">
+        <h1 className="text-2xl lg:text-3xl font-heading font-extrabold text-primary flex items-center gap-2.5">
           <span>🤖</span> Nhật ký & Thống kê AI Chatbot
         </h1>
-        <p className="text-sm text-ink-muted mt-1">
+        <p className="text-sm text-secondary mt-1">
           Theo dõi các cuộc hội thoại tài chính sinh viên được lưu trữ theo từng phiên tương tác với Pocket AI.
         </p>
       </div>
@@ -207,20 +207,20 @@ export const AdminChatbotPage = () => {
             <MessageSquare className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-muted uppercase">Tổng tin nhắn AI</p>
-            <h3 className="text-2xl font-heading font-extrabold text-ink-light dark:text-ink-dark mt-0.5">
+            <p className="text-xs font-bold text-secondary uppercase">Tổng tin nhắn AI</p>
+            <h3 className="text-2xl font-heading font-extrabold text-primary mt-0.5">
               {stats.totalMessages.toLocaleString('vi-VN')}
             </h3>
           </div>
         </Card>
 
         <Card className="p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-20 bg-lime/25 flex items-center justify-center text-primary dark:text-lime shrink-0">
+          <div className="w-12 h-12 rounded-20 bg-lime/25 flex items-center justify-center text-brand dark:text-lime shrink-0">
             <Sparkles className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-muted uppercase">Số cuộc trò chuyện</p>
-            <h3 className="text-2xl font-heading font-extrabold text-ink-light dark:text-ink-dark mt-0.5">
+            <p className="text-xs font-bold text-secondary uppercase">Số cuộc trò chuyện</p>
+            <h3 className="text-2xl font-heading font-extrabold text-primary mt-0.5">
               {stats.totalSessions.toLocaleString('vi-VN')}
             </h3>
           </div>
@@ -231,23 +231,23 @@ export const AdminChatbotPage = () => {
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-muted uppercase">TB Tin nhắn / Phiên</p>
-            <h3 className="text-2xl font-heading font-extrabold text-ink-light dark:text-ink-dark mt-0.5">
+            <p className="text-xs font-bold text-secondary uppercase">TB Tin nhắn / Phiên</p>
+            <h3 className="text-2xl font-heading font-extrabold text-primary mt-0.5">
               {stats.averageMessagesPerSession}
             </h3>
           </div>
         </Card>
 
         <Card className="p-5 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-20 bg-primary/10 dark:bg-white/10 flex items-center justify-center text-primary dark:text-lime shrink-0">
+          <div className="w-12 h-12 rounded-20 bg-primary/10 dark:bg-white/10 flex items-center justify-center text-brand dark:text-lime shrink-0">
             <Cpu className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-muted uppercase">Mô hình AI</p>
-            <h3 className="text-base font-heading font-extrabold text-ink-light dark:text-ink-dark mt-0.5">
+            <p className="text-xs font-bold text-secondary uppercase">Mô hình AI</p>
+            <h3 className="text-base font-heading font-extrabold text-primary mt-0.5">
               Gemini 2.5 Flash
             </h3>
-            <span className="text-[10px] text-ink-muted font-bold">Google DeepMind</span>
+            <span className="text-[10px] text-secondary font-bold">Google DeepMind</span>
           </div>
         </Card>
       </div>
@@ -263,12 +263,12 @@ export const AdminChatbotPage = () => {
                 setSearchQuery(e.target.value);
                 setPage(1);
               }}
-              leftIcon={<Search className="w-4 h-4 text-ink-muted" />}
+              leftIcon={<Search className="w-4 h-4 text-secondary" />}
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <span className="text-xs font-bold text-ink-muted whitespace-nowrap">Bộ lọc:</span>
+            <span className="text-xs font-bold text-secondary whitespace-nowrap">Bộ lọc:</span>
             <Select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
@@ -310,7 +310,7 @@ export const AdminChatbotPage = () => {
 
             {/* Phân trang */}
             {meta.totalPages > 1 && (
-              <div className="p-4 border-t border-border-light dark:border-border-dark flex justify-center">
+              <div className="p-4 border-t border-border flex justify-center">
                 <Pagination
                   currentPage={page}
                   totalPages={meta.totalPages}
@@ -332,7 +332,7 @@ export const AdminChatbotPage = () => {
         {selectedSession && (
           <div className="space-y-4">
             {/* Header info bar */}
-            <div className="p-4 bg-sand/30 dark:bg-white/5 rounded-20 border border-border-light dark:border-border-dark flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="p-4 bg-sand/30 dark:bg-white/5 rounded-20 border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <Avatar
                   fallback={selectedSession.user?.fullName?.[0] || 'U'}
@@ -341,10 +341,10 @@ export const AdminChatbotPage = () => {
                   className="bg-sand text-ink-light font-bold"
                 />
                 <div>
-                  <h4 className="font-bold text-sm text-ink-light dark:text-ink-dark">
+                  <h4 className="font-bold text-sm text-primary">
                     {selectedSession.user?.fullName || 'Người dùng ẩn danh'}
                   </h4>
-                  <p className="text-xs text-ink-muted">{selectedSession.user?.email}</p>
+                  <p className="text-xs text-secondary">{selectedSession.user?.email}</p>
                 </div>
               </div>
 
@@ -352,7 +352,7 @@ export const AdminChatbotPage = () => {
                 <Badge variant="lime" size="sm" className="font-bold">
                   {selectedSession.messages?.length || 0} tin nhắn
                 </Badge>
-                <span className="text-xs text-ink-muted">
+                <span className="text-xs text-secondary">
                   Bắt đầu:{' '}
                   {selectedSession.createdAt
                     ? format(new Date(selectedSession.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })
@@ -363,17 +363,17 @@ export const AdminChatbotPage = () => {
 
             {/* Tiêu đề phiên */}
             <div className="px-1 flex items-center gap-2">
-              <span className="text-xs font-bold text-ink-muted uppercase">Chủ đề:</span>
-              <span className="text-sm font-semibold text-primary dark:text-lime">
+              <span className="text-xs font-bold text-secondary uppercase">Chủ đề:</span>
+              <span className="text-sm font-semibold text-brand dark:text-lime">
                 {selectedSession.title || 'Trò chuyện tài chính thông minh'}
               </span>
             </div>
 
             {/* Khung chat trực quan hiển thị toàn bộ luồng hội thoại */}
-            <div className="max-h-[62vh] overflow-y-auto space-y-4 p-4 bg-sand/15 dark:bg-black/25 rounded-20 border border-border-light dark:border-border-dark">
+            <div className="max-h-[62vh] overflow-y-auto space-y-4 p-4 bg-sand/15 dark:bg-black/25 rounded-20 border border-border">
               {!selectedSession.messages || selectedSession.messages.length === 0 ? (
-                <div className="py-12 text-center text-ink-muted">
-                  <Bot className="w-10 h-10 mx-auto text-ink-muted/50 mb-2" />
+                <div className="py-12 text-center text-secondary">
+                  <Bot className="w-10 h-10 mx-auto text-secondary/50 mb-2" />
                   <p className="text-sm font-medium">Phiên này chưa phát sinh tin nhắn trao đổi nào.</p>
                 </div>
               ) : (
@@ -402,10 +402,10 @@ export const AdminChatbotPage = () => {
 
                       {/* Bubble */}
                       <div className={`max-w-[85%] sm:max-w-[78%] space-y-1 ${isUser ? 'text-right' : 'text-left'}`}>
-                        <div className="flex items-center gap-2 px-1 text-[11px] text-ink-muted">
+                        <div className="flex items-center gap-2 px-1 text-[11px] text-secondary">
                           {isUser ? (
                             <>
-                              <span className="font-semibold text-ink-light dark:text-ink-dark">
+                              <span className="font-semibold text-primary">
                                 {selectedSession.user?.fullName || 'Sinh viên'}
                               </span>
                               <span>•</span>
@@ -417,7 +417,7 @@ export const AdminChatbotPage = () => {
                             </>
                           ) : (
                             <>
-                              <span className="font-bold text-primary dark:text-lime flex items-center gap-1">
+                              <span className="font-bold text-brand dark:text-lime flex items-center gap-1">
                                 Pocket AI
                               </span>
                               <Badge variant="lime" size="xs" className="text-[9px] py-0 px-1 font-semibold">
@@ -437,9 +437,8 @@ export const AdminChatbotPage = () => {
                           className={`max-w-[85%] sm:max-w-[85%] rounded-20 px-4 py-3 text-xs sm:text-sm leading-relaxed ${
                             isUser
                               ? 'bg-primary text-white dark:bg-lime dark:text-ink-light rounded-tr-none shadow-sm text-left whitespace-pre-wrap'
-                              : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark rounded-tl-none shadow-sm'
-                          }`}
-                          style={{ overflowWrap: 'anywhere' }}
+                              : 'bg-surface border border-border text-primary rounded-tl-none shadow-sm'
+                          } [overflow-wrap:anywhere]`}
                         >
                           {isUser ? (
                             <p className="whitespace-pre-wrap">{m.content}</p>
@@ -455,8 +454,8 @@ export const AdminChatbotPage = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-between pt-3 border-t border-border-light dark:border-border-dark">
-              <span className="text-xs text-ink-muted">
+            <div className="flex items-center justify-between pt-3 border-t border-border">
+              <span className="text-xs text-secondary">
                 Toàn bộ luồng hội thoại gồm <b>{selectedSession.messages?.length || 0}</b> tin nhắn.
               </span>
               <Button variant="ghost" onClick={() => setSelectedSession(null)}>
@@ -476,16 +475,16 @@ export const AdminChatbotPage = () => {
       >
         {sessionToDelete && (
           <div className="space-y-4">
-            <p className="text-sm text-ink-light dark:text-ink-dark">
+            <p className="text-sm text-primary">
               Bạn có chắc chắn muốn xóa cuộc trò chuyện{' '}
               <b>"{sessionToDelete.title || 'Trò chuyện tài chính'}"</b> của sinh viên{' '}
               <b>{sessionToDelete.user?.fullName}</b> không?
             </p>
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-danger">
               Hành động này sẽ xóa vĩnh viễn toàn bộ {sessionToDelete._count?.messages || 0} tin nhắn bên trong và
               không thể khôi phục.
             </p>
-            <div className="flex justify-end gap-2 pt-3 border-t border-border-light dark:border-border-dark">
+            <div className="flex justify-end gap-2 pt-3 border-t border-border">
               <Button variant="ghost" onClick={() => setSessionToDelete(null)}>
                 Hủy
               </Button>

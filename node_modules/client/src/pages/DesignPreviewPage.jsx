@@ -60,18 +60,18 @@ export const DesignPreviewPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-ink-light dark:text-ink-dark transition-colors p-6 md:p-12">
+    <div className="min-h-screen bg-background text-primary transition-colors p-6 md:p-12">
       <div className="max-w-5xl mx-auto space-y-10">
         {/* Header Showcase */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border-light dark:border-border-dark">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-border">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-2xl">🌿</span>
-              <h1 className="text-3xl font-extrabold font-heading text-primary dark:text-lime">
+              <h1 className="text-3xl font-extrabold font-heading text-brand dark:text-lime">
                 Pocketly Design System
               </h1>
             </div>
-            <p className="text-sm text-ink-muted">
+            <p className="text-sm text-secondary">
               Hệ thống UI Component hoàn chỉnh theo phong cách Gen-Z Fintech Editorial (Light & Dark Mode)
             </p>
           </div>
@@ -94,15 +94,15 @@ export const DesignPreviewPage = () => {
           <h2 className="text-lg font-bold font-heading">1. Định dạng Tiền tệ (Money Component)</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Card>
-              <span className="text-xs text-ink-muted block mb-1">Tổng Số Dư Khả Dụng</span>
+              <span className="text-xs text-secondary block mb-1">Tổng Số Dư Khả Dụng</span>
               <Money amount={12450000} type="neutral" className="text-2xl" />
             </Card>
             <Card>
-              <span className="text-xs text-ink-muted block mb-1">Thu Nhập Tháng (Income)</span>
+              <span className="text-xs text-secondary block mb-1">Thu Nhập Tháng (Income)</span>
               <Money amount={4500000} type="income" showSign className="text-2xl" />
             </Card>
             <Card>
-              <span className="text-xs text-ink-muted block mb-1">Chi Tiêu Tháng (Expense)</span>
+              <span className="text-xs text-secondary block mb-1">Chi Tiêu Tháng (Expense)</span>
               <Money amount={2150000} type="expense" showSign className="text-2xl" />
             </Card>
           </div>
@@ -122,7 +122,7 @@ export const DesignPreviewPage = () => {
               <Button variant="primary" isLoading>Loading</Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border-light dark:border-border-dark">
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
               <Badge variant="primary">Primary Mint</Badge>
               <Badge variant="tangerine">Tangerine</Badge>
               <Badge variant="lime">Lime Accent</Badge>
@@ -151,7 +151,7 @@ export const DesignPreviewPage = () => {
               />
               <Input label="Input Báo Lỗi" value="abc" error="Định dạng số không hợp lệ" readOnly />
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted">Dropdown Menu</label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-secondary">Dropdown Menu</label>
                 <div>
                   <Dropdown
                     trigger={
@@ -224,7 +224,7 @@ export const DesignPreviewPage = () => {
                 </TableRow>
               </TableBody>
             </Table>
-            <div className="p-4 border-t border-border-light dark:border-border-dark">
+            <div className="p-4 border-t border-border">
               <Pagination currentPage={page} totalPages={5} onPageChange={setPage} />
             </div>
           </Card>
@@ -237,7 +237,7 @@ export const DesignPreviewPage = () => {
             <Card className="flex flex-col justify-between">
               <div>
                 <CardHeader title="Modal & Confirm Dialog" subtitle="Kiểm tra mở hộp thoại xác nhận" />
-                <p className="text-sm text-ink-muted mb-4">
+                <p className="text-sm text-secondary mb-4">
                   Bấm các nút dưới đây để kiểm tra hiệu ứng Pop-up và backdrop mờ:
                 </p>
               </div>

@@ -19,22 +19,22 @@ export const Pagination = ({ currentPage = 1, totalPages = 1, onPageChange, clas
 
   return (
     <div className={cn('flex items-center justify-between gap-2 text-sm', className)}>
-      <span className="text-xs text-ink-muted">
-        Trang <strong className="text-ink-light dark:text-ink-dark">{currentPage}</strong> / {totalPages}
+      <span className="text-xs text-secondary">
+        Trang <strong className="text-primary">{currentPage}</strong> / {totalPages}
       </span>
 
       <div className="flex items-center gap-1.5">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="p-1.5 rounded-full border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-40"
+          className="p-1.5 rounded-full border border-border text-primary hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-40"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          className="p-1.5 rounded-full border border-border-light dark:border-border-dark text-ink-light dark:text-ink-dark hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-40"
+          className="p-1.5 rounded-full border border-border text-primary hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-40"
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -54,7 +54,7 @@ export const ProgressBar = ({ progress = 0, color = 'primary', className = '' })
   };
 
   return (
-    <div className={cn('w-full bg-border-light/60 dark:bg-border-dark rounded-full h-2.5 overflow-hidden', className)}>
+    <div className={cn('w-full bg-border/60 rounded-full h-2.5 overflow-hidden', className)}>
       <div
         className={cn('h-full transition-all duration-300 rounded-full', colors[color] || colors.primary)}
         style={{ width: `${clamped}%` }}
@@ -82,7 +82,7 @@ export const Avatar = ({ src, alt = '', fallback = 'U', size = 'md', className =
   return (
     <div
       className={cn(
-        'rounded-full bg-sand dark:bg-surface-dark border border-border-light dark:border-border-dark flex items-center justify-center font-bold text-ink-light dark:text-ink-dark overflow-hidden shrink-0 shadow-soft',
+        'rounded-full bg-sand dark:bg-surface-dark border border-border flex items-center justify-center font-bold text-primary overflow-hidden shrink-0 shadow-soft',
         sizes[size],
         className
       )}
@@ -105,7 +105,7 @@ export const DatePicker = ({ label, value, onChange, error, className = '' }) =>
   return (
     <div className={cn('flex flex-col gap-1.5 w-full', className)}>
       {label && (
-        <label className="text-xs font-semibold uppercase tracking-wider text-ink-muted dark:text-ink-dark/70">
+        <label className="text-xs font-semibold uppercase tracking-wider text-secondary dark:text-primary/70">
           {label}
         </label>
       )}
@@ -113,7 +113,7 @@ export const DatePicker = ({ label, value, onChange, error, className = '' }) =>
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-surface-light dark:bg-surface-dark text-ink-light dark:text-ink-dark border border-border-light dark:border-border-dark rounded-16 px-4 py-2.5 text-sm outline-none focus:border-primary dark:focus:border-lime"
+        className="w-full bg-surface text-primary border border-border rounded-16 px-4 py-2.5 text-sm outline-none focus:border-primary dark:focus:border-lime"
       />
       {error && <span className="text-xs text-coral font-medium">{error}</span>}
     </div>

@@ -25,7 +25,7 @@ export const ResetPasswordPage = () => {
       >
         <div className="text-center space-y-4 p-6 rounded-24 bg-coral/10 border border-coral/30">
           <XCircle className="w-10 h-10 text-coral mx-auto" />
-          <p className="text-sm text-ink-muted">
+          <p className="text-sm text-secondary">
             Liên kết này không hợp lệ hoặc đã hết hạn (1 giờ). Vui lòng gửi lại yêu cầu.
           </p>
           <Link to="/forgot-password">
@@ -101,7 +101,7 @@ export const ResetPasswordPage = () => {
         </Button>
 
         <div className="text-center pt-2">
-          <Link to="/login" className="text-xs text-ink-muted hover:underline">
+          <Link to="/login" className="text-xs text-secondary hover:underline">
             Quay lại trang Đăng nhập
           </Link>
         </div>

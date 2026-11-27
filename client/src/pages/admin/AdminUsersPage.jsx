@@ -123,10 +123,10 @@ export const AdminUsersPage = () => {
     <div className="space-y-6">
       {/* 1. Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-ink-light dark:text-ink-dark">
+        <h1 className="text-2xl sm:text-3xl font-extrabold font-heading text-primary">
           Quản Lý Người Dùng 👥
         </h1>
-        <p className="text-xs sm:text-sm text-ink-muted mt-1">
+        <p className="text-xs sm:text-sm text-secondary mt-1">
           Xem thông tin, phân quyền, khóa tài khoản hoặc kiểm tra chi tiết sinh viên
         </p>
       </div>
@@ -195,8 +195,8 @@ export const AdminUsersPage = () => {
                           size="sm"
                         />
                         <div>
-                          <p className="text-xs font-bold text-ink-light dark:text-ink-dark">{u.fullName}</p>
-                          <p className="text-[11px] text-ink-muted">{u.email}</p>
+                          <p className="text-xs font-bold text-primary">{u.fullName}</p>
+                          <p className="text-[11px] text-secondary">{u.email}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -213,7 +213,7 @@ export const AdminUsersPage = () => {
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-xs text-ink-muted">
+                    <TableCell className="text-xs text-secondary">
                       {new Date(u.createdAt).toLocaleDateString('vi-VN')}
                     </TableCell>
 
@@ -228,7 +228,7 @@ export const AdminUsersPage = () => {
                             setSelectedUser(u);
                             setDetailDrawerOpen(true);
                           }}
-                          className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-ink-muted hover:text-ink-light"
+                          className="p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 text-secondary hover:text-ink-light"
                           title="Xem chi tiết"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -237,7 +237,7 @@ export const AdminUsersPage = () => {
                         <button
                           onClick={() => setConfirmAction({ type: 'STATUS', user: u })}
                           className={`p-1.5 rounded-full hover:bg-sand/60 dark:hover:bg-white/10 ${
-                            u.status === 'ACTIVE' ? 'text-coral' : 'text-primary dark:text-lime'
+                            u.status === 'ACTIVE' ? 'text-coral' : 'text-brand dark:text-lime'
                           }`}
                           title={u.status === 'ACTIVE' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
                         >
@@ -266,7 +266,7 @@ export const AdminUsersPage = () => {
               </TableBody>
             </Table>
 
-            <div className="p-4 border-t border-border-light dark:border-border-dark">
+            <div className="p-4 border-t border-border">
               <Pagination
                 currentPage={filters.page}
                 totalPages={meta.totalPages}
@@ -285,14 +285,14 @@ export const AdminUsersPage = () => {
             onClick={() => setDetailDrawerOpen(false)}
           />
 
-          <div className="relative w-full max-w-md bg-surface-light dark:bg-surface-dark border-l border-border-light dark:border-border-dark h-full shadow-modal p-6 overflow-y-auto space-y-6 z-10 animate-in slide-in-from-right duration-200">
-            <div className="flex items-center justify-between pb-4 border-b border-border-light dark:border-border-dark">
-              <h3 className="text-base font-bold text-ink-light dark:text-ink-dark">
+          <div className="relative w-full max-w-md bg-surface border-l border-border h-full shadow-modal p-6 overflow-y-auto space-y-6 z-10 animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
+              <h3 className="text-base font-bold text-primary">
                 Chi Tiết Người Dùng
               </h3>
               <button
                 onClick={() => setDetailDrawerOpen(false)}
-                className="p-1 rounded-full text-ink-muted hover:text-ink-light"
+                className="p-1 rounded-full text-secondary hover:text-ink-light"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -307,15 +307,15 @@ export const AdminUsersPage = () => {
             ) : userDetail ? (
               <div className="space-y-6">
                 {/* Profile header */}
-                <div className="flex items-center gap-3.5 p-4 rounded-20 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
+                <div className="flex items-center gap-3.5 p-4 rounded-20 bg-sand/20 dark:bg-white/5 border border-border/60">
                   <Avatar
                     src={userDetail.avatarUrl ? `http://localhost:5000${userDetail.avatarUrl}` : null}
                     fallback={userDetail.fullName?.charAt(0) || 'U'}
                     size="md"
                   />
                   <div>
-                    <h4 className="text-sm font-bold text-ink-light dark:text-ink-dark">{userDetail.fullName}</h4>
-                    <p className="text-xs text-ink-muted">{userDetail.email}</p>
+                    <h4 className="text-sm font-bold text-primary">{userDetail.fullName}</h4>
+                    <p className="text-xs text-secondary">{userDetail.email}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <Badge variant={userDetail.role === 'ADMIN' ? 'tangerine' : 'primary'}>
                         {userDetail.role}
@@ -329,14 +329,14 @@ export const AdminUsersPage = () => {
 
                 {/* Thống kê hoạt động */}
                 <div className="grid grid-cols-2 gap-3 text-center">
-                  <div className="p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
-                    <span className="text-xs text-ink-muted block">Tổng giao dịch</span>
-                    <strong className="text-lg text-primary dark:text-lime">
+                  <div className="p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
+                    <span className="text-xs text-secondary block">Tổng giao dịch</span>
+                    <strong className="text-lg text-brand dark:text-lime">
                       {userDetail._count?.transactions || 0}
                     </strong>
                   </div>
-                  <div className="p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border-light/60 dark:border-border-dark/60">
-                    <span className="text-xs text-ink-muted block">Phiên Chatbot AI</span>
+                  <div className="p-3 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
+                    <span className="text-xs text-secondary block">Phiên Chatbot AI</span>
                     <strong className="text-lg text-tangerine">
                       {userDetail._count?.chatSessions || 0}
                     </strong>
@@ -345,7 +345,7 @@ export const AdminUsersPage = () => {
 
                 {/* Danh sách ví */}
                 <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                  <span className="text-xs font-bold uppercase tracking-wider text-secondary">
                     Ví cá nhân ({userDetail.wallets?.length || 0})
                   </span>
                   <div className="space-y-1.5">
@@ -355,7 +355,7 @@ export const AdminUsersPage = () => {
                         className="p-2.5 rounded-16 bg-sand/20 dark:bg-white/5 flex items-center justify-between text-xs"
                       >
                         <span className="font-semibold">{w.name}</span>
-                        <strong className="text-primary dark:text-lime">
+                        <strong className="text-brand dark:text-lime">
                           {Number(w.balance).toLocaleString('vi-VN')}₫
                         </strong>
                       </div>
@@ -365,7 +365,7 @@ export const AdminUsersPage = () => {
 
                 {/* Mục tiêu tiết kiệm */}
                 <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-ink-muted">
+                  <span className="text-xs font-bold uppercase tracking-wider text-secondary">
                     Mục tiêu tiết kiệm ({userDetail.savingGoals?.length || 0})
                   </span>
                   <div className="space-y-1.5">

@@ -5,7 +5,7 @@ export const Card = ({ children, className = '', hover = false, ...props }) => {
   return (
     <div
       className={cn(
-        'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-24 p-6 shadow-soft transition-all duration-200',
+        'bg-surface border border-border rounded-24 p-6 shadow-soft transition-all duration-200',
         hover ? 'hover:-translate-y-1 hover:shadow-card' : '',
         className
       )}
@@ -18,10 +18,10 @@ export const Card = ({ children, className = '', hover = false, ...props }) => {
 
 export const CardHeader = ({ title, subtitle, action, className = '' }) => {
   return (
-    <div className={cn('flex items-center justify-between pb-4 border-b border-border-light/60 dark:border-border-dark/60 mb-5', className)}>
+    <div className={cn('flex items-center justify-between pb-4 border-b border-border/60 mb-5', className)}>
       <div>
-        <h3 className="text-lg font-bold text-ink-light dark:text-ink-dark">{title}</h3>
-        {subtitle && <p className="text-xs text-ink-muted mt-0.5">{subtitle}</p>}
+        <h3 className="text-lg font-bold text-primary">{title}</h3>
+        {subtitle && <p className="text-xs text-secondary mt-0.5">{subtitle}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>
@@ -30,12 +30,12 @@ export const CardHeader = ({ title, subtitle, action, className = '' }) => {
 
 export const Badge = ({ children, variant = 'neutral', className = '' }) => {
   const variants = {
-    primary: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-lime',
+    primary: 'bg-primary/10 text-brand dark:bg-primary/20 dark:text-lime',
     tangerine: 'bg-tangerine/10 text-tangerine',
     lime: 'bg-lime/20 text-lime-dark dark:text-lime',
     coral: 'bg-coral/15 text-coral dark:text-coral',
     sand: 'bg-sand text-ink-light',
-    neutral: 'bg-border-light/60 dark:bg-border-dark text-ink-muted dark:text-ink-dark/80'
+    neutral: 'bg-border/60 text-secondary dark:text-primary/80'
   };
 
   return (
