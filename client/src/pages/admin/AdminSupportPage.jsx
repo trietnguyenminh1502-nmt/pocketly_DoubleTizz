@@ -17,6 +17,7 @@ import {
   Tag
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import { formatDateTime } from '../../../../shared/formatters.js';
 
 const TOPIC_LABELS = {
   general: 'Hỏi đáp chung',
@@ -307,7 +308,7 @@ export const AdminSupportPage = () => {
                       </td>
 
                       <td className="py-3.5 px-4 text-xs text-secondary whitespace-nowrap">
-                        {new Date(t.createdAt).toLocaleString('vi-VN')}
+                        {formatDateTime(t.createdAt)}
                       </td>
 
                       <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
@@ -398,7 +399,7 @@ export const AdminSupportPage = () => {
               </div>
 
               <div className="text-xs text-secondary">
-                Thời gian gửi: {new Date(selectedTicket.createdAt).toLocaleString('vi-VN')}
+                Thời gian gửi: {formatDateTime(selectedTicket.createdAt)}
               </div>
             </div>
 

@@ -12,6 +12,7 @@ import {
   EmptyState,
   useToast
 } from '@/components/ui';
+import { formatCompactVND, formatPercent, formatVND } from '../../../shared/formatters.js';
 import {
   FileSpreadsheet,
   TrendingUp,
@@ -273,7 +274,7 @@ export const ReportsPage = () => {
             <Money amount={summary?.currentMonth?.income || 0} type="income" showSign className="text-2xl font-extrabold" />
           </div>
           <p className="text-[11px] text-secondary mt-2">
-            Tháng trước: {Number(summary?.momComparison?.lastMonthIncome || 0).toLocaleString('vi-VN')}₫
+            Tháng trước: <Money amount={summary?.momComparison?.lastMonthIncome || 0} type="neutral" className="text-secondary font-normal" />
           </p>
         </Card>
 
@@ -283,7 +284,7 @@ export const ReportsPage = () => {
             <Money amount={summary?.currentMonth?.expense || 0} type="expense" showSign className="text-2xl font-extrabold" />
           </div>
           <p className="text-[11px] text-secondary mt-2">
-            Tháng trước: {Number(summary?.momComparison?.lastMonthExpense || 0).toLocaleString('vi-VN')}₫
+            Tháng trước: <Money amount={summary?.momComparison?.lastMonthExpense || 0} type="neutral" className="text-secondary font-normal" />
           </p>
         </Card>
 
@@ -305,7 +306,7 @@ export const ReportsPage = () => {
         <Card className="flex flex-col justify-between p-5">
           <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tỷ lệ tiết kiệm (%)</span>
           <div className="mt-2 text-2xl font-extrabold font-heading text-brand dark:text-lime">
-            {summary?.currentMonth?.savingsRate}%
+            {formatPercent(summary?.currentMonth?.savingsRate ?? 0)}
           </div>
           <p className="text-[11px] text-secondary mt-2">
             Mục tiêu khuyến nghị sinh viên: ≥ 20%
@@ -335,12 +336,12 @@ export const ReportsPage = () => {
                   <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
                   <YAxis
                     tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }}
-                    tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
+                    tickFormatter={formatCompactVND}
                     tickLine={false}
                     axisLine={false}
                   />
                   <Tooltip
-                    formatter={(val) => `${Number(val).toLocaleString('vi-VN')}₫`}
+                    formatter={(val) => formatVND(val)}
                     contentStyle={{ borderRadius: '16px', border: '1px solid rgb(var(--color-chart-border))' }}
                   />
                   <Legend verticalAlign="top" align="right" wrapperStyle={{ fontSize: 11, paddingBottom: 10 }} />
@@ -380,7 +381,7 @@ export const ReportsPage = () => {
                       {index + 1}. {c.name}
                     </span>
                     <strong className="text-tangerine">
-                      {Number(c.amount).toLocaleString('vi-VN')}₫ ({c.percentage}%)
+                      <Money amount={c.amount} type="expense" className="text-tangerine font-extrabold" /> ({formatPercent(c.percentage ?? 0)})
                     </strong>
                   </div>
                   <div className="w-full bg-border/60 rounded-full h-2 overflow-hidden">

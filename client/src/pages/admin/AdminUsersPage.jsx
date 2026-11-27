@@ -16,11 +16,13 @@ import {
   Pagination,
   Badge,
   Avatar,
+  Money,
   ConfirmDialog,
   Skeleton,
   EmptyState,
   useToast
 } from '@/components/ui';
+import { formatDate } from '../../../../shared/formatters.js';
 import {
   Search,
   Lock,
@@ -214,7 +216,7 @@ export const AdminUsersPage = () => {
                     </TableCell>
 
                     <TableCell className="text-xs text-secondary">
-                      {new Date(u.createdAt).toLocaleDateString('vi-VN')}
+                      {formatDate(u.createdAt)}
                     </TableCell>
 
                     <TableCell className="text-center font-bold text-xs">
@@ -356,7 +358,7 @@ export const AdminUsersPage = () => {
                       >
                         <span className="font-semibold">{w.name}</span>
                         <strong className="text-brand dark:text-lime">
-                          {Number(w.balance).toLocaleString('vi-VN')}₫
+                          <Money amount={w.balance} type="neutral" className="text-brand dark:text-lime" />
                         </strong>
                       </div>
                     ))}
@@ -376,7 +378,7 @@ export const AdminUsersPage = () => {
                       >
                         <span className="font-semibold truncate max-w-[180px]">{g.title}</span>
                         <span>
-                          {Number(g.currentAmount).toLocaleString('vi-VN')}₫ / {Number(g.targetAmount).toLocaleString('vi-VN')}₫
+                          <Money amount={g.currentAmount} type="neutral" /> / <Money amount={g.targetAmount} type="neutral" />
                         </span>
                       </div>
                     ))}

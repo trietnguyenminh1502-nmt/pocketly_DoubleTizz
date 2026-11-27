@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs';
 import { prisma } from '../config/prisma.js';
 import { BudgetService } from './budget.service.js';
+import { formatDate } from '../../../shared/formatters.js';
 
 export class TransactionService {
   /**
@@ -380,7 +381,7 @@ export class TransactionService {
     transactions.forEach((tx) => {
       const row = worksheet.addRow({
         id: tx.id,
-        date: new Date(tx.date).toLocaleDateString('vi-VN'),
+        date: formatDate(tx.date),
         type: tx.type === 'INCOME' ? 'Thu nhập' : 'Chi tiêu',
         category: tx.category?.name || 'Chưa phân loại',
         wallet: tx.wallet?.name || '',
@@ -410,7 +411,7 @@ export class TransactionService {
     const headers = ['Mã GD', 'Ngày', 'Loại', 'Danh Mục', 'Ví', 'Số Tiền', 'Ghi Chú'];
     const rows = transactions.map((tx) => [
       `"${tx.id}"`,
-      `"${new Date(tx.date).toLocaleDateString('vi-VN')}"`,
+      `"${formatDate(tx.date)}"`,
       `"${tx.type === 'INCOME' ? 'Thu nhập' : 'Chi tiêu'}"`,
       `"${tx.category?.name || ''}"`,
       `"${tx.wallet?.name || ''}"`,

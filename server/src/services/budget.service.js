@@ -1,5 +1,6 @@
 import { prisma } from '../config/prisma.js';
 import { NotificationService } from './notification.service.js';
+import { formatPercent, formatVND } from '../../../shared/formatters.js';
 
 export class BudgetService {
   /**
@@ -234,7 +235,7 @@ export class BudgetService {
         await NotificationService.createBudgetAlertIfNotExists({
           userId,
           title: `⚠️ Vượt ngân sách ${budgetName}!`,
-          message: `Bạn đã chi ${spent.toLocaleString('vi-VN')}₫ / ${limit.toLocaleString('vi-VN')}₫ (${Math.round(percentage)}%) ngân sách ${budgetName} tháng ${month}/${year}.`,
+          message: `Bạn đã chi ${formatVND(spent)} / ${formatVND(limit)} (${formatPercent(Math.round(percentage))}) ngân sách ${budgetName} tháng ${month}/${year}.`,
           type: 'BUDGET_ALERT',
           month,
           year
@@ -244,7 +245,7 @@ export class BudgetService {
         await NotificationService.createBudgetAlertIfNotExists({
           userId,
           title: `🔔 Cảnh báo ngân sách ${budgetName}`,
-          message: `Chi tiêu ${budgetName} đã đạt ${Math.round(percentage)}% hạn mức (${spent.toLocaleString('vi-VN')}₫ / ${limit.toLocaleString('vi-VN')}₫). Hãy cân nhắc chi tiêu nhé!`,
+          message: `Chi tiêu ${budgetName} đã đạt ${formatPercent(Math.round(percentage))} hạn mức (${formatVND(spent)} / ${formatVND(limit)}). Hãy cân nhắc chi tiêu nhé!`,
           type: 'BUDGET_ALERT',
           month,
           year

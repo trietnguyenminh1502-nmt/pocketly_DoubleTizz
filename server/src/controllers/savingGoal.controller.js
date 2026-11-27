@@ -1,5 +1,6 @@
 import { SavingGoalService } from '../services/savingGoal.service.js';
 import { successResponse } from '../utils/response.js';
+import { formatVND } from '../../../shared/formatters.js';
 import {
   createSavingGoalSchema,
   updateSavingGoalSchema,
@@ -86,7 +87,7 @@ export class SavingGoalController {
 
       return successResponse(res, {
         message: result.refundedAmount > 0
-          ? `Đã xóa mục tiêu và hoàn trả ${result.refundedAmount.toLocaleString('vi-VN')}₫ về ví thành công!`
+          ? `Đã xóa mục tiêu và hoàn trả ${formatVND(result.refundedAmount)} về ví thành công!`
           : 'Xóa mục tiêu tiết kiệm thành công',
         data: result
       });

@@ -15,6 +15,7 @@ import {
   EmptyState,
   useToast
 } from '@/components/ui';
+import { formatDate, formatPercent, formatVND } from '../../../shared/formatters.js';
 import {
   Target,
   Plus,
@@ -59,7 +60,7 @@ const ProgressRing = ({ progress = 0, size = 80, strokeWidth = 8, color = 'rgb(v
         />
       </svg>
       <div className="absolute text-center">
-        <span className="text-xs font-extrabold tabular-nums">{clampedProgress}%</span>
+        <span className="text-xs font-extrabold tabular-nums">{formatPercent(clampedProgress)}</span>
       </div>
     </div>
   );
@@ -236,7 +237,7 @@ export const SavingGoalsPage = () => {
                     {g.deadline && (
                       <p className="text-xs text-secondary flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-tangerine" />
-                        Hạn chót: {new Date(g.deadline).toLocaleDateString('vi-VN')}
+                        Hạn chót: {formatDate(g.deadline)}
                       </p>
                     )}
                   </div>
@@ -422,7 +423,7 @@ export const SavingGoalsPage = () => {
             <option value="">Không trừ ví (Nạp từ nguồn ngoài)</option>
             {wallets.map((w) => (
               <option key={w.id} value={w.id}>
-                {w.name} (Khả dụng: {Number(w.balance).toLocaleString('vi-VN')}₫)
+                {w.name} (Khả dụng: {formatVND(w.balance)})
               </option>
             ))}
           </Select>
@@ -456,7 +457,7 @@ export const SavingGoalsPage = () => {
             <p className="text-xs text-secondary">
               Mục tiêu này đang có số tiền đã tích lũy là{' '}
               <strong className="text-primary font-extrabold text-sm">
-                {Number(deletingGoal?.currentAmount || 0).toLocaleString('vi-VN')}₫
+                <Money amount={deletingGoal?.currentAmount || 0} type="neutral" className="text-primary font-extrabold text-sm" />
               </strong>
               . Bạn có muốn hoàn trả số tiền này về lại một trong các ví của bạn không?
             </p>
@@ -470,7 +471,7 @@ export const SavingGoalsPage = () => {
           >
             {wallets.map((w) => (
               <option key={w.id} value={w.id}>
-                Hoàn về: {w.name} (Số dư hiện tại: {Number(w.balance).toLocaleString('vi-VN')}₫)
+                Hoàn về: {w.name} (Số dư hiện tại: {formatVND(w.balance)})
               </option>
             ))}
             <option value="">Không hoàn trả (Hủy bỏ số tiền tích lũy)</option>

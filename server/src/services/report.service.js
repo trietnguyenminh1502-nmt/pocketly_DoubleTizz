@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs';
 import { prisma } from '../config/prisma.js';
+import { formatPercent } from '../../../shared/formatters.js';
 
 export class ReportService {
   /**
@@ -291,7 +292,7 @@ export class ReportService {
     sheet1.addRow({ metric: 'Tổng thu nhập', value: totalIncome });
     sheet1.addRow({ metric: 'Tổng chi tiêu', value: totalExpense });
     sheet1.addRow({ metric: 'Tiền tiết kiệm ròng', value: netSavings });
-    sheet1.addRow({ metric: 'Tỷ lệ tiết kiệm', value: `${savingsRate}%` });
+    sheet1.addRow({ metric: 'Tỷ lệ tiết kiệm', value: formatPercent(savingsRate) });
 
     [3, 4, 5].forEach((rowNum) => {
       sheet1.getCell(`B${rowNum}`).numFmt = '#,##0 "₫"';
@@ -316,7 +317,7 @@ export class ReportService {
       const r = sheet2.addRow({
         name: cat.name,
         amount: cat.amount,
-        percentage: `${cat.percentage}%`,
+        percentage: formatPercent(cat.percentage),
         count: cat.count
       });
       r.getCell('amount').numFmt = '#,##0 "₫"';

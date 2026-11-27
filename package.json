@@ -2,6 +2,7 @@
   "name": "pocketly-monorepo",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Pocketly - Student Expense Tracker with AI Chatbot",
   "workspaces": [
     "client",

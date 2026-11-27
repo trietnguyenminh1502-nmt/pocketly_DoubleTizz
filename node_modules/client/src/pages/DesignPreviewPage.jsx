@@ -27,6 +27,7 @@ import {
   ThemeToggle,
   useToast
 } from '@/components/ui';
+import { formatPercent } from '../../../shared/formatters.js';
 import {
   Wallet,
   Sparkles,
@@ -185,8 +186,10 @@ export const DesignPreviewPage = () => {
 
             <div className="space-y-2">
               <div className="flex justify-between text-xs">
-                <span>Tiến độ tiết kiệm mua Laptop (65%)</span>
-                <strong>11.700.000₫ / 18.000.000₫</strong>
+                <span>Tiến độ tiết kiệm mua Laptop ({formatPercent(65)})</span>
+                <strong>
+                  <Money amount={11700000} type="neutral" /> / <Money amount={18000000} type="neutral" />
+                </strong>
               </div>
               <ProgressBar progress={65} color="primary" />
             </div>

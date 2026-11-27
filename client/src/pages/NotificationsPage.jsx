@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationApi } from '@/api/chatNotificationUser';
+import { formatDateTime } from '../../../shared/formatters.js';
 import {
   Card,
   CardHeader,
@@ -140,7 +141,7 @@ export const NotificationsPage = () => {
 
                       <p className="text-xs text-secondary leading-relaxed">{n.message}</p>
                       <span className="text-[10px] text-secondary/70 block pt-1">
-                        {new Date(n.createdAt).toLocaleString('vi-VN')}
+                        {formatDateTime(n.createdAt)}
                       </span>
                     </div>
                   </div>

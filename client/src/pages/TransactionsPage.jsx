@@ -22,6 +22,7 @@ import {
   useToast
 } from '@/components/ui';
 import { TransactionFormModal } from '@/components/finance/TransactionFormModal';
+import { formatDate } from '../../../shared/formatters.js';
 import {
   Search,
   Plus,
@@ -408,7 +409,7 @@ export const TransactionsPage = () => {
                       />
                     </TableCell>
                     <TableCell className="tabular-nums text-xs font-semibold text-secondary">
-                      {new Date(tx.date).toLocaleDateString('vi-VN')}
+                      {formatDate(tx.date)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

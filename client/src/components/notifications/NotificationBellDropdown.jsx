@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationApi } from '@/api/chatNotificationUser';
+import { formatDate } from '../../../../shared/formatters.js';
 import { Bell, Check, CheckCheck, Trash2, Info, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -113,7 +114,7 @@ export const NotificationBellDropdown = () => {
                     <p className="text-xs text-primary leading-snug">{n.title}</p>
                     <p className="text-[11px] text-secondary line-clamp-2 mt-0.5 font-normal">{n.message}</p>
                     <span className="text-[10px] text-secondary/70 block mt-1">
-                      {new Date(n.createdAt).toLocaleDateString('vi-VN')}
+                      {formatDate(n.createdAt)}
                     </span>
                   </div>
 

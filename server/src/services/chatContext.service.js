@@ -1,4 +1,7 @@
 import { prisma } from '../config/prisma.js';
+import { formatDate, formatPercent, formatVND } from '../../../shared/formatters.js';
+
+const fmt = formatVND;
 
 // Hàm chuẩn hóa chuỗi tiếng Việt không dấu để matching từ khóa chính xác
 const normalizeText = (text) => {
@@ -31,7 +34,6 @@ export class ChatContextBuilder {
 
     const currency = '₫';
     const fullName = user?.fullName || 'Người dùng';
-    const fmt = (n) => Number(n || 0).toLocaleString('vi-VN') + ' ₫';
 
     // 2. Tổng số dư và chi tiết các ví
     const wallets = await prisma.wallet.findMany({
@@ -89,7 +91,7 @@ export class ChatContextBuilder {
 
     const sortedCats = sortedCatsList
       .slice(0, 5)
-      .map((c) => `- ${c.name}: ${fmt(c.amount)} (${c.pct}%)`)
+      .map((c) => `- ${c.name}: ${fmt(c.amount)} (${formatPercent(c.pct)})`)
       .join('\n');
 
     // 5. Tình hình ngân sách tháng này (Budget Status)
@@ -113,7 +115,7 @@ export class ChatContextBuilder {
         remaining,
         pct,
         statusText,
-        line: `- Ngân sách ${targetName}: Hạn mức ${fmt(limit)}, đã tiêu ${fmt(spent)} (${pct}%) -> [${statusText}]`
+        line: `- Ngân sách ${targetName}: Hạn mức ${fmt(limit)}, đã tiêu ${fmt(spent)} (${formatPercent(pct)}) -> [${statusText}]`
       };
     });
 
@@ -131,7 +133,7 @@ export class ChatContextBuilder {
     });
 
     const txLines = recentTransactions.map((tx) => {
-      const d = new Date(tx.date).toLocaleDateString('vi-VN');
+      const d = formatDate(tx.date);
       const sign = tx.type === 'INCOME' ? '+' : '-';
       const cat = tx.category?.name || 'Khác';
       const note = tx.note ? ` ("${tx.note}")` : '';
@@ -148,14 +150,14 @@ export class ChatContextBuilder {
       const cur = Number(g.currentAmount);
       const tgt = Number(g.targetAmount);
       const pct = tgt > 0 ? Math.round((cur / tgt) * 100) : 0;
-      const deadline = g.deadline ? ` (Hạn chót: ${new Date(g.deadline).toLocaleDateString('vi-VN')})` : '';
+      const deadline = g.deadline ? ` (Hạn chót: ${formatDate(g.deadline)})` : '';
       return {
         title: g.title,
         current: cur,
         target: tgt,
         pct,
         deadline,
-        line: `- "${g.title}": ${fmt(cur)} / ${fmt(tgt)} (${pct}%)${deadline}`
+        line: `- "${g.title}": ${fmt(cur)} / ${fmt(tgt)} (${formatPercent(pct)})${deadline}`
       };
     });
 
@@ -203,7 +205,6 @@ export class ChatContextBuilder {
    */
   static async buildFinancialContext(userId) {
     const data = await this.getFinancialSummary(userId);
-    const fmt = (n) => Number(n || 0).toLocaleString('vi-VN') + ' ₫';
 
     // 1. Số liệu thực tế từ database
     const income = data.currentIncome;
@@ -296,7 +297,6 @@ ${computedSection}
    */
   static async generateRuleBasedFallback(userId, question) {
     const query = normalizeText(question);
-    const fmt = (n) => Number(n || 0).toLocaleString('vi-VN') + ' ₫';
 
     // 0. Nhận diện intent: Liệt kê tất cả danh mục tài chính trong hệ thống (all categories)
     const isAllCategories =
@@ -398,10 +398,10 @@ ${computedSection}
       const top1 = sortedCatsList[0];
       const categoryLines = sortedCatsList
         .slice(0, 5)
-        .map((c, idx) => `${idx + 1}. **${c.name}**: ${fmt(c.amount)} — chiếm ${c.pct}% tổng chi tiêu.`)
+        .map((c, idx) => `${idx + 1}. **${c.name}**: ${fmt(c.amount)} — chiếm ${formatPercent(c.pct)} tổng chi tiêu.`)
         .join('\n');
 
-      return `**Top danh mục chi tiêu nhiều nhất Tháng ${currentMonth}/${currentYear}**\n${categoryLines}\n\nKhoản chi lớn nhất là **${top1.name}**: ${fmt(top1.amount)} — chiếm ${top1.pct}% tổng chi tiêu.`;
+      return `**Top danh mục chi tiêu nhiều nhất Tháng ${currentMonth}/${currentYear}**\n${categoryLines}\n\nKhoản chi lớn nhất là **${top1.name}**: ${fmt(top1.amount)} — chiếm ${formatPercent(top1.pct)} tổng chi tiêu.`;
     }
 
     if (isBudget) {
@@ -410,7 +410,7 @@ ${computedSection}
       }
 
       const budgetLines = budgets
-        .map((b) => `- ${b.targetName}: ${fmt(b.limit)} — đã tiêu ${fmt(b.spent)} (${b.pct}%), còn lại ${fmt(b.remaining)} [${b.statusText}].`)
+        .map((b) => `- ${b.targetName}: ${fmt(b.limit)} — đã tiêu ${fmt(b.spent)} (${formatPercent(b.pct)}), còn lại ${fmt(b.remaining)} [${b.statusText}].`)
         .join('\n');
 
       return `**Tình hình ngân sách Tháng ${currentMonth}/${currentYear}**\n${budgetLines}`;
@@ -422,7 +422,7 @@ ${computedSection}
       }
 
       const goalLines = savingGoals
-        .map((g) => `- ${g.title}: ${fmt(g.current)} / ${fmt(g.target)} — đạt ${g.pct}%${g.deadline ? ' — ' + g.deadline : ''}.`)
+        .map((g) => `- ${g.title}: ${fmt(g.current)} / ${fmt(g.target)} — đạt ${formatPercent(g.pct)}${g.deadline ? ' — ' + g.deadline : ''}.`)
         .join('\n');
 
       return `**Tiến độ các mục tiêu tiết kiệm hiện tại**\n${goalLines}`;

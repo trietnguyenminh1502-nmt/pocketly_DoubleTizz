@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { walletApi } from '@/api/finance';
+import { formatPercent, formatVND } from '../../../shared/formatters.js';
 import {
   Button,
   Input,
   Select,
   Modal,
+  Money,
   ConfirmDialog,
   useToast
 } from '@/components/ui';
@@ -57,14 +59,6 @@ const getWalletColor = (name = '', index = 0) => {
   return fallbackList[index % fallbackList.length];
 };
 
-// Định dạng tiền tệ kiểu tiếng Việt đồng bộ font-heading + tabular-nums
-const formatMoney = (amount) => {
-  const val = Number(amount || 0);
-  const isNegative = val < 0;
-  const formatted = new Intl.NumberFormat('vi-VN').format(Math.abs(val));
-  return `${isNegative ? '−' : ''}${formatted} ₫`;
-};
-
 export const WalletsPage = () => {
   const queryClient = useQueryClient();
   const { addToast } = useToast();
@@ -108,13 +102,11 @@ export const WalletsPage = () => {
     const balance = Number(w.balance || 0);
     const color = getWalletColor(w.name, index);
     const pct = totalBalance > 0 ? (Math.max(0, balance) / totalBalance) * 100 : 0;
-    const pctFormatted = pct.toFixed(1).replace('.', ',');
     return {
       ...w,
       balance,
       color,
-      pct,
-      pctFormatted
+      pct
     };
   });
 
@@ -275,9 +267,11 @@ export const WalletsPage = () => {
               <span className="text-xs sm:text-sm font-medium text-secondary block">
                 Tổng tài sản trên tất cả các ví
               </span>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-primary tabular-nums leading-tight mt-1.5">
-                {formatMoney(totalBalance)}
-              </div>
+              <Money
+                amount={totalBalance}
+                type="neutral"
+                className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading leading-tight mt-1.5"
+              />
             </div>
 
             {/* Cột phải: Thanh phân bổ & Chú thích */}
@@ -298,7 +292,7 @@ export const WalletsPage = () => {
                           key={w.id}
                           className="h-full transition-all duration-300"
                           style={{ width: `${w.pct}%`, backgroundColor: w.color }}
-                          title={`${w.name}: ${w.pctFormatted}%`}
+                          title={`${w.name}: ${formatPercent(w.pct)}`}
                         />
                       );
                     })}
@@ -316,7 +310,7 @@ export const WalletsPage = () => {
                           {w.name}
                         </span>
                         <span className="tabular-nums font-semibold text-primary">
-                          {w.pctFormatted}%
+                          {formatPercent(w.pct)}
                         </span>
                       </div>
                     ))}
@@ -368,9 +362,11 @@ export const WalletsPage = () => {
 
                   {/* Phần dưới: Số dư, số giao dịch liên kết và nút Sửa/Xóa */}
                   <div className="mt-5">
-                    <div className="text-xl sm:text-2xl font-extrabold font-heading tracking-tight tabular-nums text-white leading-tight">
-                      {formatMoney(w.balance)}
-                    </div>
+                    <Money
+                      amount={w.balance}
+                      type="neutral"
+                      className="text-xl sm:text-2xl font-extrabold font-heading tracking-tight text-white leading-tight"
+                    />
 
                     <p className="text-xs text-white/85 mt-1">
                       {w._count?.transactions || 0} giao dịch liên kết
@@ -518,7 +514,7 @@ export const WalletsPage = () => {
           >
             {wallets.map((w) => (
               <option key={w.id} value={w.id}>
-                {w.name} (Khả dụng: {Number(w.balance).toLocaleString('vi-VN')} ₫)
+                {w.name} (Khả dụng: {formatVND(w.balance)})
               </option>
             ))}
           </Select>
@@ -533,7 +529,7 @@ export const WalletsPage = () => {
               .filter((w) => w.id !== transferData.fromWalletId)
               .map((w) => (
                 <option key={w.id} value={w.id}>
-                  {w.name} (Số dư: {Number(w.balance).toLocaleString('vi-VN')} ₫)
+                  {w.name} (Số dư: {formatVND(w.balance)})
                 </option>
               ))}
           </Select>

@@ -16,6 +16,7 @@ import {
   EmptyState,
   useToast
 } from '@/components/ui';
+import { formatPercent } from '../../../shared/formatters.js';
 import {
   PiggyBank,
   Plus,
@@ -190,7 +191,7 @@ export const BudgetsPage = () => {
                         {b.category?.name || 'Ngân sách tổng toàn tháng'}
                       </h3>
                       <p className="text-xs text-secondary mt-0.5">
-                        Tháng {b.month}/{b.year} • Ngưỡng báo: {b.alertThreshold}%
+                        Tháng {b.month}/{b.year} • Ngưỡng báo: {formatPercent(b.alertThreshold ?? 0)}
                       </p>
                     </div>
 
@@ -215,9 +216,9 @@ export const BudgetsPage = () => {
                   <div className="mt-3 space-y-1">
                     <ProgressBar progress={b.percentage} color={progressColor} />
                     <div className="flex justify-between text-[11px] text-secondary pt-1">
-                      <span>Đã dùng: <strong>{b.percentage}%</strong></span>
+                      <span>Đã dùng: <strong>{formatPercent(b.percentage ?? 0)}</strong></span>
                       <span>
-                        Còn lại: <strong>{Number(b.remaining).toLocaleString('vi-VN')}₫</strong>
+                        Còn lại: <Money amount={b.remaining} type="neutral" className="font-bold" />
                       </span>
                     </div>
                   </div>

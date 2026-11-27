@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { reportApi, budgetApi, savingGoalApi, transactionApi, categoryApi, walletApi } from '@/api/finance';
 import { Card, CardHeader, Money, Button, ProgressBar, Badge, Skeleton, EmptyState } from '@/components/ui';
 import { TransactionFormModal } from '@/components/finance/TransactionFormModal';
+import { formatCompactVND, formatDate, formatPercent, formatVND } from '../../../shared/formatters.js';
 import {
   ResponsiveContainer,
   PieChart,
@@ -63,7 +64,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           <p key={`item-${index}`} className="flex items-center gap-2" style={{ color: entry.color || entry.fill }}>
             <span className="font-semibold">{entry.name}:</span>
             <span className="font-bold tabular-nums">
-              {Number(entry.value).toLocaleString('vi-VN')}₫
+              {formatVND(entry.value)}
             </span>
           </p>
         ))}
@@ -198,7 +199,7 @@ export const DashboardPage = () => {
               <Money amount={summary?.currentMonth?.income || 0} type="income" showSign className="text-2xl font-extrabold font-heading" />
             </div>
             <p className="text-[11px] text-secondary mt-2">
-              Tăng trưởng: <strong className="text-brand dark:text-lime">{summary?.momComparison?.incomeGrowthPercentage}%</strong> so với tháng trước
+              Tăng trưởng: <strong className="text-brand dark:text-lime">{formatPercent(summary?.momComparison?.incomeGrowthPercentage ?? 0)}</strong> so với tháng trước
             </p>
           </Card>
 
@@ -214,7 +215,7 @@ export const DashboardPage = () => {
               <Money amount={summary?.currentMonth?.expense || 0} type="expense" showSign className="text-2xl font-extrabold font-heading" />
             </div>
             <p className="text-[11px] text-secondary mt-2">
-              Biến động: <strong className="text-tangerine">{summary?.momComparison?.expenseGrowthPercentage}%</strong> so với tháng trước
+              Biến động: <strong className="text-tangerine">{formatPercent(summary?.momComparison?.expenseGrowthPercentage ?? 0)}</strong> so với tháng trước
             </p>
           </Card>
 
@@ -230,7 +231,7 @@ export const DashboardPage = () => {
               <Money amount={summary?.currentMonth?.netSavings || 0} type={summary?.currentMonth?.netSavings >= 0 ? 'income' : 'expense'} showSign className="text-2xl font-extrabold font-heading" />
             </div>
             <p className="text-[11px] text-secondary mt-2">
-              Tỷ lệ tiết kiệm: <strong className="text-brand dark:text-lime">{summary?.currentMonth?.savingsRate}%</strong>
+              Tỷ lệ tiết kiệm: <strong className="text-brand dark:text-lime">{formatPercent(summary?.currentMonth?.savingsRate ?? 0)}</strong>
             </p>
           </Card>
         </div>
@@ -284,7 +285,7 @@ export const DashboardPage = () => {
                       />
                       <span className="truncate text-secondary text-xs sm:text-sm">{cat.name}:</span>
                       <strong className="text-primary text-xs sm:text-sm font-bold shrink-0">
-                        {cat.percentage}%
+                        {formatPercent(cat.percentage ?? 0)}
                       </strong>
                     </div>
                   ))}
@@ -312,7 +313,7 @@ export const DashboardPage = () => {
                   <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'rgb(var(--color-chart-secondary))' }} tickLine={false} />
                   <YAxis
                     tick={{ fontSize: 10, fill: 'rgb(var(--color-chart-secondary))' }}
-                    tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
+                    tickFormatter={formatCompactVND}
                     tickLine={false}
                     axisLine={false}
                   />
@@ -364,12 +365,12 @@ export const DashboardPage = () => {
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className="tabular-nums font-semibold">
-                          {Number(b.spent).toLocaleString('vi-VN')}₫ / {Number(b.limit).toLocaleString('vi-VN')}₫
+                          <Money amount={b.spent} type="neutral" className="font-semibold" /> / <Money amount={b.limit} type="neutral" className="font-semibold" />
                         </span>
                         <Badge
                           variant={b.status === 'EXCEEDED' ? 'coral' : b.status === 'WARNING' ? 'tangerine' : 'primary'}
                         >
-                          {b.percentage}%
+                          {formatPercent(b.percentage ?? 0)}
                         </Badge>
                       </div>
                     </div>
@@ -412,9 +413,9 @@ export const DashboardPage = () => {
                       </span>
                       <div className="flex items-center gap-1.5">
                         <span className="tabular-nums font-semibold">
-                          {Number(g.currentAmount).toLocaleString('vi-VN')}₫ / {Number(g.targetAmount).toLocaleString('vi-VN')}₫
+                          <Money amount={g.currentAmount} type="neutral" className="font-semibold" /> / <Money amount={g.targetAmount} type="neutral" className="font-semibold" />
                         </span>
-                        <Badge variant="lime">{g.progress}%</Badge>
+                        <Badge variant="lime">{formatPercent(g.progress ?? 0)}</Badge>
                       </div>
                     </div>
                     <ProgressBar progress={g.progress} color="lime" />
@@ -472,7 +473,7 @@ export const DashboardPage = () => {
                           {tx.note || tx.category?.name || 'Giao dịch'}
                         </p>
                         <p className="text-[11px] text-secondary">
-                          {new Date(tx.date).toLocaleDateString('vi-VN')} • {tx.wallet?.name}
+                          {formatDate(tx.date)} • {tx.wallet?.name}
                         </p>
                       </div>
                     </div>

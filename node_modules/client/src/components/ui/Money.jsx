@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/utils/cn';
+import { formatCurrency, formatVND } from '../../../../shared/formatters.js';
 
 /**
  * Component hiển thị tiền tệ định dạng chuẩn Intl.NumberFormat
@@ -14,11 +15,10 @@ export const Money = ({
 }) => {
   const numericAmount = Number(amount) || 0;
 
-  const formatted = new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: currency,
-    maximumFractionDigits: currency === 'VND' ? 0 : 2
-  }).format(Math.abs(numericAmount));
+  const absoluteAmount = Math.abs(numericAmount);
+  const formatted = currency === 'VND'
+    ? formatVND(absoluteAmount)
+    : formatCurrency(absoluteAmount, currency);
 
   let sign = '';
   if (showSign) {
@@ -40,7 +40,7 @@ export const Money = ({
   };
 
   return (
-    <span className={cn('tabular-nums font-bold inline-flex items-baseline', colorClasses[type], className)}>
+    <span className={cn('tabular-nums font-bold inline-flex items-baseline', colorClasses[type] || colorClasses.neutral, className)}>
       {sign}
       {formatted}
     </span>

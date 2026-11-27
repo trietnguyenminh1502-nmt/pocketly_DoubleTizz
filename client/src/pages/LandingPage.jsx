@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, Money } from '@/components/ui';
+import { formatPercent } from '../../../shared/formatters.js';
 import {
   Sparkles,
   ArrowRight,
@@ -68,7 +69,7 @@ export const LandingPage = () => {
                   <span className="text-xs text-secondary uppercase font-bold tracking-wider">Tổng số dư khả dụng</span>
                   <div className="flex items-baseline gap-3 mt-1">
                     <Money amount={12450000} type="neutral" className="text-3xl md:text-4xl" />
-                    <span className="text-xs font-bold text-brand dark:text-lime bg-mint/50 px-2 py-0.5 rounded-full">+12% so với tháng trước</span>
+                    <span className="text-xs font-bold text-brand dark:text-lime bg-mint/50 px-2 py-0.5 rounded-full">+{formatPercent(12)} so với tháng trước</span>
                   </div>
                 </div>
                 <div className="p-3 rounded-20 bg-sand/40 dark:bg-surface-dark text-brand dark:text-lime">
@@ -79,15 +80,15 @@ export const LandingPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
                   <span className="text-xs text-secondary">Thu nhập tháng</span>
-                  <p className="text-lg font-bold text-brand dark:text-lime mt-1">+4.500.000₫</p>
+                  <Money amount={4500000} type="income" showSign className="text-lg mt-1" />
                 </div>
                 <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
                   <span className="text-xs text-secondary">Chi tiêu tháng</span>
-                  <p className="text-lg font-bold text-tangerine mt-1">-2.150.000₫</p>
+                  <Money amount={2150000} type="expense" showSign className="text-lg mt-1" />
                 </div>
                 <div className="p-4 rounded-16 bg-sand/20 dark:bg-white/5 border border-border/60">
                   <span className="text-xs text-secondary">Tiết kiệm ròng</span>
-                  <p className="text-lg font-bold text-primary mt-1">2.350.000₫</p>
+                  <Money amount={2350000} type="neutral" className="text-lg mt-1" />
                 </div>
               </div>
             </div>

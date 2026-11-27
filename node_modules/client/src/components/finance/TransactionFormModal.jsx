@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { transactionApi } from '@/api/finance';
 import { Modal, Button, Input, Select, Textarea, useToast } from '@/components/ui';
+import { formatVND } from '../../../../shared/formatters.js';
 import { Plus, Edit2 } from 'lucide-react';
 
 const transactionSchema = z.object({
@@ -185,7 +186,7 @@ export const TransactionFormModal = ({
         >
           {wallets.map((w) => (
             <option key={w.id} value={w.id}>
-              {w.name} (Số dư: {Number(w.balance).toLocaleString('vi-VN')}₫)
+              {w.name} (Số dư: {formatVND(w.balance)})
             </option>
           ))}
         </Select>
